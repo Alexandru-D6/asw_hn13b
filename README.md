@@ -1,8 +1,7 @@
 # ASW - HN13B
 
-## Students:
-
 ## Team Members
+
 | Name | GitHub username | Taiga username |
 | ---- | --------------- | -------------- |
 | Asenjo Carvajal, Víctor | [victor-asenjo](https://github.com/victor-asenjo) | victor-asenjo |
