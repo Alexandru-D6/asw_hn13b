@@ -9,6 +9,10 @@ class SubmissionsController < ApplicationController
       @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
     end
   end
+  
+  def newest
+    @submissions = Submission.all
+  end
 
   # GET /submissions/1 or /submissions/1.json
   def show
