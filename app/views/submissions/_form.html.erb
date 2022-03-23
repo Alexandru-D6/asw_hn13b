@@ -10,23 +10,41 @@
       </ul>
     </div>
   <% end %>
+  
+  <table border="0" cellpadding="2">
+    <tbody>
+      <tr>
+        <td>title</td>
+        <td><%= form.text_field :title, size: "70x1" %></td>
+      </tr>
+      <tr>
+        <td>url</td>
+        <td><%= form.text_field :url, size: "70x1" %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>or</td>
+      </tr>
+      <tr>
+        <td>text</td>
+          <td><%= form.text_field :text, size: "70x5" %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><%= form.submit 'submit' %></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <body>
+      <tr>
+        <td>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread.</td>
+      </tr>
+      <tr>
+        <td>You can also submit via <%= link_to 'bookmarklet', '/enlace' %></td>
+      </tr>
+    </body>
+  </table>
 
-  <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div class="field">
-    <%= form.label :url %>
-    <%= form.text_field :url %>
-  </div>
-
-  <div class="field">
-    <%= form.label :text %>
-    <%= form.text_field :text %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
-  </div>
 <% end %>
