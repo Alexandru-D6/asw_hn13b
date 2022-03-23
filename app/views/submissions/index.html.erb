@@ -4,31 +4,39 @@
       <meta name="referrer" content="origin">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" type="text/css" href="news.css?QZejSKY7mNWXnObVdaSN">
-      <link rel="shortcut icon" href="https://news.ycombinator.com/favicon.ico">
+      <link rel="shortcut icon" href="favicon.ico">
       <link rel="alternate" type="application/rss+xml" title="RSS" href="rss">
       <title>Hacker News</title>
    </head>
    <body>
       <center>
          <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+          
+            <tr id="pagespace" title="" style="height:10px"></tr>
             <tr>
-               <td bgcolor="#ff6600">
-                  
-               </td>
-            </tr>
-            <table>
-               <thead>
-                  <tr>
-                     <th>Title</th>
-                     <th>Url</th>
-                     <th>Text</th>
-                     <th>Upvotes</th>
-                     <th colspan="3"></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  <% @submissions.each do |submission| %>
-                  <tr>
+               <td>
+                  <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
+                     <% count = 1 %>
+                     <% @submissions.each do |submission| %>
+                     <tr class='athing' id='30782735'>
+                        <td align="right" valign="top" class="title"><span class="rank"><%= count %>. <% count = count + 1 %></span></td>
+                        <td valign="top" class="votelinks">
+                           <center>
+                              <a id='up_30782735' class='clicky' href='vote?id=30782735&amp;how=up&amp;auth=c0534089f544bb2ce27ffe542a30ddb20b6cb148&amp;goto=news'>
+                                 <div class='votearrow' title='upvote'></div>
+                              </a>
+                           </center>
+                        </td>
+                        <td class="title"><a href=submission.url class="titlelink"><%= submission.title %></a><span class="sitebit comhead"> (<a href="from?site=spotify.com"><span class="sitestr">spotify.com</span></a>)</span></td>
+                     </tr>
+                     <tr>
+                        <td colspan="2"></td>
+                        <td class="subtext">
+                           <span class="score"><%= submission.UpVotes %> points</span> by <a href="user?id=laminarflow" class="hnuser">laminarflow</a> <span class="age" title="2022-03-23T20:11:49"><a href="item?id=30782735">1 hour ago</a></span> <span id="unv_30782735"></span> | <a href="hide?id=30782735&amp;auth=c0534089f544bb2ce27ffe542a30ddb20b6cb148&amp;goto=news" class="clicky">hide</a> | <a href="item?id=30782735">75&nbsp;comments</a>              
+                        </td>
+                     </tr>
+                     <tr class="spacer" style="height:5px"></tr>
+                     
                      <td><%= submission.title %></td>
                      <td><%= submission.url %></td>
                      <td><%= submission.text %></td>
@@ -37,12 +45,24 @@
                      <td><%= link_to 'Show', submission %></td>
                      <td><%= link_to 'Edit', edit_submission_path(submission) %></td>
                      <td><%= link_to 'Destroy', submission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-                  </tr>
-                  <% end %>
-               </tbody>
-            </table>
-            <%= link_to 'New Submission', new_submission_path %>
-            </td></tr>
+                     </tr>
+                     <% end %>
+                     
+                     <tr>
+                        <td colspan="2"></td>
+                        <td class="subtext">
+                           <span class="score" id="score_30777383">123 points</span> by <a href="user?id=belter" class="hnuser">belter</a> <span class="age" title="2022-03-23T11:35:33"><a href="item?id=30777383">9 hours ago</a></span> <span id="unv_30777383"></span> | <a href="hide?id=30777383&amp;auth=2a0698de43806d9b684b2c0084b10bfb2d2a976c&amp;goto=news" class="clicky">hide</a> | <a href="item?id=30777383">84&nbsp;comments</a>              
+                        </td>
+                     </tr>
+                     <tr class="spacer" style="height:5px"></tr>
+                     <tr class="morespace" style="height:10px"></tr>
+                     <tr>
+                        <td colspan="2"></td>
+                        <td class='title'><a href='news?p=2' class='morelink' rel='next'>More</a></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
             <tr>
                <td>
                   <img src="s.gif" height="10" width="0">
