@@ -1,34 +1,79 @@
 <p id="notice"><%= notice %></p>
-
-<h1>Hacker News</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Url</th>
-      <th>Text</th>
-      <th>Upvotes</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @submissions.each do |submission| %>
-      <tr>
-        <td><%= submission.title %></td>
-        <td><%= submission.url %></td>
-        <td><%= submission.text %></td>
-        <td><%= submission.UpVotes %></td>
-        <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
-        <td><%= link_to 'Show', submission %></td>
-        <td><%= link_to 'Edit', edit_submission_path(submission) %></td>
-        <td><%= link_to 'Destroy', submission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Submission', new_submission_path %>
+<html lang="en" op="news">
+   <head>
+      <meta name="referrer" content="origin">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" type="text/css" href="news.css?QZejSKY7mNWXnObVdaSN">
+      <link rel="shortcut icon" href="https://news.ycombinator.com/favicon.ico">
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="rss">
+      <title>Hacker News</title>
+   </head>
+   <body>
+      <center>
+         <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+               <td bgcolor="#ff6600">
+                  
+               </td>
+            </tr>
+            <table>
+               <thead>
+                  <tr>
+                     <th>Title</th>
+                     <th>Url</th>
+                     <th>Text</th>
+                     <th>Upvotes</th>
+                     <th colspan="3"></th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <% @submissions.each do |submission| %>
+                  <tr>
+                     <td><%= submission.title %></td>
+                     <td><%= submission.url %></td>
+                     <td><%= submission.text %></td>
+                     <td><%= submission.UpVotes %></td>
+                     <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
+                     <td><%= link_to 'Show', submission %></td>
+                     <td><%= link_to 'Edit', edit_submission_path(submission) %></td>
+                     <td><%= link_to 'Destroy', submission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+                  </tr>
+                  <% end %>
+               </tbody>
+            </table>
+            <%= link_to 'New Submission', new_submission_path %>
+            </td></tr>
+            <tr>
+               <td>
+                  <img src="s.gif" height="10" width="0">
+                  <table width="100%" cellspacing="0" cellpadding="1">
+                     <tr>
+                        <td bgcolor="#ff6600"></td>
+                     </tr>
+                  </table>
+                  <br>
+                  <center><a href="https://www.ycombinator.com/apply/">
+                     Applications are open for YC Summer 2022
+                     </a>
+                  </center>
+                  <br>
+                  <center>
+                     <span class="yclinks"><a href="newsguidelines.html">Guidelines</a>
+                     | <a href="newsfaq.html">FAQ</a>
+                     | <a href="lists">Lists</a>
+                     | <a href="https://github.com/HackerNews/API">API</a>
+                     | <a href="security.html">Security</a>
+                     | <a href="http://www.ycombinator.com/legal/">Legal</a>
+                     | <a href="http://www.ycombinator.com/apply/">Apply to YC</a>
+                     | <a href="mailto:hn@ycombinator.com">Contact</a></span><br><br>
+                     <form method="get" action="//hn.algolia.com/">Search:
+                        <input type="text" name="q" value="" size="17" autocorrect="off" spellcheck="false" autocapitalize="off" autocomplete="false">
+                     </form>
+                  </center>
+               </td>
+            </tr>
+         </table>
+      </center>
+   </body>
+   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
+</html>
