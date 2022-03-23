@@ -1,1 +1,34 @@
+<p id="notice"><%= notice %></p>
 
+<h1>Hacker News</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Url</th>
+      <th>Text</th>
+      <th>Upvotes</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @submissions.each do |submission| %>
+      <tr>
+        <td><%= submission.title %></td>
+        <td><%= submission.url %></td>
+        <td><%= submission.text %></td>
+        <td><%= submission.UpVotes %></td>
+        <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
+        <td><%= link_to 'Show', submission %></td>
+        <td><%= link_to 'Edit', edit_submission_path(submission) %></td>
+        <td><%= link_to 'Destroy', submission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Submission', new_submission_path %>

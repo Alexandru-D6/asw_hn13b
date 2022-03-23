@@ -10,10 +10,8 @@ Rails.application.routes.draw do
   
   get 'news', to: 'submissions#index'
   get 'newest', to: 'submissions#index', newest: 'true'
+  get 'submit', to: 'submissions#submit'
   
   root 'submissions#index'
-  
-  get 'newest', to: 'submissions#newest'
-  get 'news', to: 'submissions#index'
   
 end

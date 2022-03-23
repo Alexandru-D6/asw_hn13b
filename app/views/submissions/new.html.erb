@@ -11,10 +11,9 @@
         <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
         <tr>
           <td bgcolor="#ff6600">
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px">
-              <tr>
+            <table border="0" cellpadding="0" cellspacing="10" width="100%" style="padding:2px">
                 <td style="width:18px;padding-right:4px">
-                  <a href="https://news.ycombinator.com"> # aquí debería ir nuestro home
+                  <a href="/news">
                     <%= image_tag"logo/y18.gif"%>
                   </a>
                 </td>
@@ -22,14 +21,13 @@
                   <b>Submit</b>
                   </span>
                 </td>
-              </tr>
             </table>
           </td>
         </tr>
         <tr id="pagespace"Submit style="height:10px"></tr>
         <tr>
           <td>
-            <form method="post" action="/r">
+            <form method="post" action="/submissions/new">
               <input type="hidden" name="fnid" value="Hp15LyMkVpf7KCdH1uRCLx">
               <input type="hidden" name="fnop" value="submit-page">
               <script type="text/javascript">function tlen(el) { var n = el.value.length - 80; el.nextSibling.innerText = n > 0 ? n + ' too long' : ''; }</script>
