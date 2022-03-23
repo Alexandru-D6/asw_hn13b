@@ -5,6 +5,10 @@ class SubmissionsController < ApplicationController
   def index
     @submissions = Submission.all
   end
+  
+  def newest
+    @submissions = Submission.all
+  end
 
   # GET /submissions/1 or /submissions/1.json
   def show
