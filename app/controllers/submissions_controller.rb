@@ -3,6 +3,14 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions or /submissions.json
   def index
+    if params[:newest]
+      @submissions = Submission.all.order(created_at: :desc)
+    else
+      @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
+    end
+  end
+  
+  def newest
     @submissions = Submission.all
   end
 
@@ -17,6 +25,16 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions/1/edit
   def edit
+  end
+  
+  def upvote
+    @submission = Submission.find(params[:id])
+    @submission.UpVotes = @submission.UpVotes + 1
+    respond_to do |format|
+      if @submission.save
+        format.html { redirect_to '/news'} #need a way to return to the previous page
+      end
+    end
   end
 
   # POST /submissions or /submissions.json
