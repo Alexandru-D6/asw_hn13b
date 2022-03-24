@@ -1,60 +1,58 @@
 <p id="notice"><%= notice %></p>
 <html lang="en" op="news">
-   <head>
-      <meta name="referrer" content="origin">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" type="text/css" href="news.css?QZejSKY7mNWXnObVdaSN">
-      <link rel="shortcut icon" href="favicon.ico">
-      <link rel="alternate" type="application/rss+xml" title="RSS" href="rss">
-      <title>Hacker News</title>
-   </head>
    <body>
       <center>
          <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
-          
+
             <tr id="pagespace" title="" style="height:10px"></tr>
             <tr>
                <td>
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
                      <% count = 1 %>
                      <% @submissions.each do |submission| %>
-                     <tr class='athing' id='30782735'>
-                        <td align="right" valign="top" class="title"><span class="rank"><%= count %>. <% count = count + 1 %></span></td>
+                     <tr class="athing" id=submission.id>
+                        <td align="right" valign="top" class="title">
+                          <span class="rank"><%=count%>.</span>
+                          <% count = count + 1%>
+                        </td>      
                         <td valign="top" class="votelinks">
-                           <center>
-                              <a id='up_30782735' class='clicky' href='vote?id=30782735&amp;how=up&amp;auth=c0534089f544bb2ce27ffe542a30ddb20b6cb148&amp;goto=news'>
-                                 <div class='votearrow' title='upvote'></div>
-                              </a>
-                           </center>
+                          <center>
+                            <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
+                          </center>
                         </td>
-                        <td class="title"><a href=submission.url class="titlelink"><%= submission.title %></a><span class="sitebit comhead"> (<a href="from?site=spotify.com"><span class="sitestr">spotify.com</span></a>)</span></td>
+                        <td class="title">
+                          <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
+                          <span class="sitebit comhead">
+                             (<a href="news">
+                               <%link = "hola"%>
+                               <script type="text/javascript" >
+                                 link=submission.url.substring(0,10);
+                               </script>
+                               <span class="sitestr"><%=link%></span>
+                             </a>)
+                           </span>
+                       </td>
                      </tr>
-                     <tr>
-                        <td colspan="2"></td>
-                        <td class="subtext">
-                           <span class="score"><%= submission.UpVotes %> points</span> by <a href="user?id=laminarflow" class="hnuser">laminarflow</a> <span class="age" title="2022-03-23T20:11:49"><a href="item?id=30782735">1 hour ago</a></span> <span id="unv_30782735"></span> | <a href="hide?id=30782735&amp;auth=c0534089f544bb2ce27ffe542a30ddb20b6cb148&amp;goto=news" class="clicky">hide</a> | <a href="item?id=30782735">75&nbsp;comments</a>              
-                        </td>
-                     </tr>
-                     <tr class="spacer" style="height:5px"></tr>
                      
-                     <td><%= submission.title %></td>
-                     <td><%= submission.url %></td>
-                     <td><%= submission.text %></td>
-                     <td><%= submission.UpVotes %></td>
-                     <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
-                     <td><%= link_to 'Show', submission %></td>
-                     <td><%= link_to 'Edit', edit_submission_path(submission) %></td>
-                     <td><%= link_to 'Destroy', submission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+                     <tr>
+                       <td colspan="2"></td>
+                         <td class="subtext">
+                          <span class="score" id="score_30782735"><%=submission.UpVotes%></span> 
+                          by 
+                          <a href="news" class="hnuser">author</a> 
+                          <span class="age" title="2022-03-23T20:11:49">
+                            <a href="news"><%=submission.created_at%></a>
+                          </span> 
+                          <span id="unv_30782735"></span> | 
+                          <a href="news" class="clicky">hide</a> | 
+                          <a href="news">&nbsp;comments</a>              
+                        </td>
+                      </tr>
+                     
+                     <tr class="spacer" style="height:5px"></tr>
+
                      </tr>
                      <% end %>
-                     
-                     <tr>
-                        <td colspan="2"></td>
-                        <td class="subtext">
-                           <span class="score" id="score_30777383">123 points</span> by <a href="user?id=belter" class="hnuser">belter</a> <span class="age" title="2022-03-23T11:35:33"><a href="item?id=30777383">9 hours ago</a></span> <span id="unv_30777383"></span> | <a href="hide?id=30777383&amp;auth=2a0698de43806d9b684b2c0084b10bfb2d2a976c&amp;goto=news" class="clicky">hide</a> | <a href="item?id=30777383">84&nbsp;comments</a>              
-                        </td>
-                     </tr>
-                     <tr class="spacer" style="height:5px"></tr>
                      <tr class="morespace" style="height:10px"></tr>
                      <tr>
                         <td colspan="2"></td>
