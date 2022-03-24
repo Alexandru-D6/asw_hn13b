@@ -4,7 +4,7 @@ class SubmissionsController < ApplicationController
   # GET /submissions or /submissions.json
   def index
     if params[:newest]
-      @submissions = Submission.all.order(created_at: :desc)
+      @submissions = Submission.all.order(created_at: :desc, title: :asc)
     else
       @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
     end
@@ -28,7 +28,7 @@ class SubmissionsController < ApplicationController
     @submission.UpVotes = @submission.UpVotes + 1
     respond_to do |format|
       if @submission.save
-        format.html { redirect_to '/news'} #need a way to return to the previous page
+        format.html { redirect_to news_path} #need a way to return to the previous page
       end
     end
   end
@@ -39,10 +39,9 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       if @submission.save
-        format.html { redirect_to submission_url(@submission), notice: "Submission was successfully created." }
-        format.json { render :show, status: :created, location: @submission }
+        format.html { redirect_to news_path}
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render new_submission_path, status: :unprocessable_entity }
         format.json { render json: @submission.errors, status: :unprocessable_entity }
       end
     end
