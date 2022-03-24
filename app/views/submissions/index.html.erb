@@ -20,6 +20,7 @@
         <td><%= submission.url %></td>
         <td><%= submission.text %></td>
         <td><%= submission.UpVotes %></td>
+        <td><%= submission.user_id %></td>
         <td><%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %> </td>
         <td><%= link_to 'Show', submission %></td>
         <td><%= link_to 'Edit', edit_submission_path(submission) %></td>

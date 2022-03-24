@@ -1,32 +1,52 @@
 <%= form_with(model: submission) do |form| %>
-  <% if submission.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(submission.errors.count, "error") %> prohibited this submission from being saved:</h2>
-
-      <ul>
-        <% submission.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+  <td style="display:none;"><%= form.text_field :title, value: "Alexandru"%></td>
+  
+  <table width= 100% cellpadding="2" cellspacing="10" bgcolor="#f6f6ef">
+    <tr>
+      <body>
+        <td></td>
+        <% if submission.errors.any? %>
+          <td><%= submission.errors.first.message %></td>
         <% end %>
-      </ul>
-    </div>
-  <% end %>
+      </body>
+    </tr>
+    <tr>
+      <tbody>
+        <tr>
+          <td>title</td>
+          <td><%= form.text_field :title, size: "70x1" %></td>
+        </tr>
+        <tr>
+          <td>url</td>
+          <td><%= form.text_field :url, size: "70x1" %></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>or</b></td>
+        </tr>
+        <tr>
+          <td>text</td>
+            <td><%= form.text_field :text, size: "70x5" %></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><%= form.submit 'submit' %></td>
+        </tr>
+      </tbody>
+    </tr>
+    <br>
+    <tr>
+      <body>
+        <tr>
+          <td></td>
+          <td>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>You can also submit via <a href='/enlace'>bookmarklet</a></td>
+        </tr>
+      </body>
+    </tr>
+  </table>
 
-  <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div class="field">
-    <%= form.label :url %>
-    <%= form.text_field :url %>
-  </div>
-
-  <div class="field">
-    <%= form.label :text %>
-    <%= form.text_field :text %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
-  </div>
 <% end %>
