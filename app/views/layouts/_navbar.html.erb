@@ -1,12 +1,22 @@
 <header>
-  <div class= 'container'>
+  <br> 
+  <style> body {margin:0; padding:0}</style>
+  <table class="menu" width ="100%" border="0">
+    <div class= 'container'>
     <nav>
-      <ul>
-        <li><%= link_to 'Hacker News', '/news' %></li>
-        <li><%= link_to 'New', '/newest' %></li>
-        <li><%= link_to 'Submit', '/submit' %></li>
-      </ul>
+      <td class= "menu_td">
+        <ul class="nav_links">
+          <style>body{margin:10; padding:4}</style>
+          <%= image_tag"logo/y18.gif"%>
+          <li><a href=/news style="font-weight:bold;"> Hacker News </a></li>
+          <li class="div_bar">  </li>
+          <li><a href=/newest> new </a></li>
+          <li class="div_bar"> | </li>
+          <li><a href=/submit> submit </a></li>
+        </ul>
+      </td>
     </nav>
     
   </div>
+  </table>
 </header>
