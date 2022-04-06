@@ -4,10 +4,41 @@ class SubmissionsController < ApplicationController
   # GET /submissions or /submissions.json
   def index
     if params[:newest]
-      @submissions = Submission.all.order(created_at: :desc, title: :asc)
+       @submissions = Submission.all.order(created_at: :desc, title: :asc)
     else
       @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
     end
+  end
+  
+  def past
+    data = Time.new()
+    if params[:day].present?
+      arrayday = params[:day].split('-')
+      data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
+    end
+    @submissions = Array.new()
+      subm = Submission.all.order(created_at: :desc, title: :asc)
+      subm.each do |submission|
+        if data.year > submission.created_at.year
+          @submissions.push(submission)
+        else
+          if data.year == submission.created_at.year &&  data.month > submission.created_at.month
+            @submissions.push(submission)
+          else
+            if data.year == submission.created_at.year &&  data.month == submission.created_at.month && data.day > submission.created_at.day
+              @submissions.push(submission)
+            end
+          end
+        end
+      end
+      url = "past?day="
+      dataD = data - (3600*24)
+      dataM = data - (3600*24*30)
+      dataY = data - (3600*24*365)
+      p "33333333333333333333333333333333333333333333333333333333333333"
+      @dataD = url+dataD.year.to_s+'-'+dataD.month.to_s+'-'+dataD.day.to_s
+      @dataM = url+dataM.year.to_s+'-'+dataM.month.to_s+'-'+dataM.day.to_s
+      @dataY = url+dataY.year.to_s+'-'+dataY.month.to_s+'-'+dataY.day.to_s
   end
 
   # GET /submissions/1 or /submissions/1.json
