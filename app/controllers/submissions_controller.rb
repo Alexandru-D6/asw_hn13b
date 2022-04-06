@@ -35,10 +35,13 @@ class SubmissionsController < ApplicationController
       dataD = data - (3600*24)
       dataM = data - (3600*24*30)
       dataY = data - (3600*24*365)
-      p "33333333333333333333333333333333333333333333333333333333333333"
-      @dataD = url+dataD.year.to_s+'-'+dataD.month.to_s+'-'+dataD.day.to_s
-      @dataM = url+dataM.year.to_s+'-'+dataM.month.to_s+'-'+dataM.day.to_s
-      @dataY = url+dataY.year.to_s+'-'+dataY.month.to_s+'-'+dataY.day.to_s
+      dataF = data + (3600*24)
+      @date = data.strftime("%F")
+      @dataN = data.strftime("%B %d, %Y (%Z)")
+      @dataD = url+dataD.strftime("%F")
+      @dataM = url+dataM.strftime("%F")
+      @dataY = url+dataY.strftime("%F")
+      @dataF = url+dataF.strftime("%F")
   end
 
   # GET /submissions/1 or /submissions/1.json

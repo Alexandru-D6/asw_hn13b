@@ -10,7 +10,7 @@
                     <tr style="height:6px"></tr>
                     <tr>
                       <td colspan="2"></td>
-                      <td>Stories from April 3, 2022</td>
+                      <td>Stories from <%= @dataN %></td>
                     </tr>
                     <tr style="height:9px"></tr>
                     <tr>
@@ -19,7 +19,7 @@
                         Go back a 
                         <span class="hnmore">
                           <a href= <%= @dataD %>>day</a></span>, <span class="hnmore"><a href=<%= @dataM %>>month</a></span>, or <span class="hnmore"><a href=<%= @dataY %>>year</a></span>.
-                          Go forward a <span class="hnmore"><a href="past?day=2022-04-04">day</a></span>.
+                          Go forward a <span class="hnmore"><a href=<%= @dataF %>>day</a></span>.
                       </td>
                     </tr>
                     <tr style="height:14px"></tr>
