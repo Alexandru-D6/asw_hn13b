@@ -1,13 +1,28 @@
 <p id="notice"><%= notice %></p>
-<html lang="en" op="news">
+<html lang="en" op="past">
    <body>
       <center>
          <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
-
             <tr id="pagespace" title="" style="height:10px"></tr>
             <tr>
                <td>
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
+                    <tr style="height:6px"></tr>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td>Stories from <%= @dataN %></td>
+                    </tr>
+                    <tr style="height:9px"></tr>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td>
+                        Go back a 
+                        <span class="hnmore">
+                          <a href= <%= @dataD %>>day</a></span>, <span class="hnmore"><a href=<%= @dataM %>>month</a></span>, or <span class="hnmore"><a href=<%= @dataY %>>year</a></span>.
+                          Go forward a <span class="hnmore"><a href=<%= @dataF %>>day</a></span>.
+                      </td>
+                    </tr>
+                    <tr style="height:14px"></tr>
                      <% count = 1 %>
                      <% @submissions.each do |submission| %>
                      <tr class="athing" id=submission.id>
