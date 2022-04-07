@@ -10,6 +10,10 @@ class SubmissionsController < ApplicationController
     end
   end
   
+  def ask
+    @submissions = Submission.all.order(created_at: :desc, title: :asc)
+  end
+  
   def past
     data = Time.new()
     if params[:day].present?
