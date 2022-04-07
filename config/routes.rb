@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get 'newest', to: 'submissions#index', newest: 'true'
   get 'submit', to: 'submissions#new'
   get 'past', to: 'submissions#past'
+  get 'ask', to: 'submissions#ask'
   
   root 'submissions#index'
   
