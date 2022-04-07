@@ -97,6 +97,14 @@ class SubmissionsController < ApplicationController
       end
     end
   end
+  
+  def item
+    @submission = Submission.where(id: params[:id])
+    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
+    p @submission
+    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
+
+  end
 
   # DELETE /submissions/1 or /submissions/1.json
   def destroy

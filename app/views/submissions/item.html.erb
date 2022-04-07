@@ -1,5 +1,5 @@
 <p id="notice"><%= notice %></p>
-<html lang="en" op="news">
+<html lang="en" op="item">
    <body>
       <center>
          <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
@@ -8,25 +8,20 @@
             <tr>
                <td>
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
-                     <% count = 1 %>
-                     <% @submissions.each do |submission| %>
-                     <tr class="athing" id=submission.id>
-                        <td align="right" valign="top" class="title">
-                          <span class="rank"><%=count%>.</span>
-                          <% count = count + 1%>
-                        </td>      
+                     <tr><%=@submission%></tr>
+                     <tr class="athing" id=<%=@submission.id%>>
                         <td valign="top" class="votelinks">
                           <center>
-                            <%= link_to upvote_submission_path(submission), method: :put do %> ▲ <% end %>
+                            <%= link_to upvote_submission_path(@submission), method: :put do %> ▲ <% end %>
                           </center>
                         </td>
                         <td class="title">
-                          <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
+                          <a href=<%=@submission.url%> class="titlelink"><%=@submission.title %></a>
                           <span class="sitebit comhead">
-                             (<a href=<%=submission.url%>>
+                             (<a href=<%=@submission.url%>>
                                <%link = "hola"%>
                                <script type="text/javascript" >
-                                 link=submission.url.substring(0,10);
+                                 link=@submission.url.substring(0,10);
                                </script>
                                <span class="sitestr"><%=link%></span>
                              </a>)
@@ -37,11 +32,11 @@
                      <tr>
                        <td colspan="2"></td>
                          <td class="subtext">
-                          <span class="score" id="score_30782735"><%=submission.UpVotes%></span> 
+                          <span class="score" id="score_30782735"><%=@submission.UpVotes%></span> 
                           by 
                           <a href="news" class="hnuser">author</a> 
                           <span class="age" title="2022-03-23T20:11:49">
-                            <a href=<%= "item?id="+submission.id.to_s%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
+                            <a href=<%= "item?id="+@submission.id.to_s%>><%=distance_of_time_in_words(@submission.created_at, Time.new)%> ago</a>
                           </span> 
                           <span id="unv_30782735"></span> | 
                           <a href="news" class="clicky">hide</a> | 
@@ -50,17 +45,17 @@
                       </tr>
                      
                      <tr class="spacer" style="height:5px"></tr>
-
-                     </tr>
-                     <% end %>
                      <tr class="morespace" style="height:10px"></tr>
-                     <tr>
-                        <td colspan="2"></td>
-                        <td class='title'><a href='news?p=2' class='morelink' rel='next'>More</a></td>
-                     </tr>
+                     
                   </table>
                </td>
             </tr>
+            
+            
+            
+            
+            
+            
             <tr>
                <td>
                   <img src="s.gif" height="10" width="0">
