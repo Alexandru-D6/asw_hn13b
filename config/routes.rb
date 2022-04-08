@@ -18,6 +18,6 @@ Rails.application.routes.draw do
   get 'ask', to: 'submissions#ask'
   get 'item', to: 'submissions#item'
   
-  root 'submissions#index'
+  root to: 'submissions#index'
   
 end
