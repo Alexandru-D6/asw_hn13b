@@ -11,7 +11,79 @@ class SubmissionsController < ApplicationController
   end
   
   def ask
-    @submissions = Submission.all.order(created_at: :desc, title: :asc)
+    subm = Submission.all.order(created_at: :desc, title: :asc)
+    @submissions = Array.new()
+    subm.each do |submission|
+      if submission.url == ""
+        @submissions.push(submission)
+      end
+    end
+  end
+  
+
+  # GET /submissions/1 or /submissions/1.json
+  def show
+  end
+
+  # GET /submissions/new
+  def new
+    @submission = Submission.new
+  end
+
+  # GET /submissions/1/edit
+  def edit
+  end
+  
+  def upvote
+    @submission = Submission.find(params[:id])
+    @submission.UpVotes = @submission.UpVotes + 1
+    respond_to do |format|
+      if @submission.save
+        format.html { redirect_to news_path} #need a way to return to the previous page
+      end
+    end
+  end
+
+  # POST /submissions or /submissions.json
+  def create
+    if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
+        respond_to do |format|
+          format.html { redirect_to "/past", notice: "This URL allready exists" }
+        end
+    else 
+      @submission = Submission.new(submission_params)
+      respond_to do |format|
+        if @submission.save
+          format.html { redirect_to news_path}
+        else
+          format.html { render new_submission_path, status: :unprocessable_entity }
+          format.json { render json: @submission.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+  end
+
+  # PATCH/PUT /submissions/1 or /submissions/1.json
+  def update
+    respond_to do |format|
+      if @submission.update(submission_params)
+        format.html { redirect_to submission_url(@submission), notice: "Submission was successfully updated." }
+        format.json { render :show, status: :ok, location: @submission }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @submission.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /submissions/1 or /submissions/1.json
+  def destroy
+    @submission.destroy
+
+    respond_to do |format|
+      format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
+      format.json { head :no_content }
+    end
   end
   
   def past
@@ -46,66 +118,6 @@ class SubmissionsController < ApplicationController
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")
       @dataF = url+dataF.strftime("%F")
-  end
-
-  # GET /submissions/1 or /submissions/1.json
-  def show
-  end
-
-  # GET /submissions/new
-  def new
-    @submission = Submission.new
-  end
-
-  # GET /submissions/1/edit
-  def edit
-  end
-  
-  def upvote
-    @submission = Submission.find(params[:id])
-    @submission.UpVotes = @submission.UpVotes + 1
-    respond_to do |format|
-      if @submission.save
-        format.html { redirect_to news_path} #need a way to return to the previous page
-      end
-    end
-  end
-
-  # POST /submissions or /submissions.json
-  def create
-    @submission = Submission.new(submission_params)
-
-    respond_to do |format|
-      if @submission.save
-        format.html { redirect_to news_path}
-      else
-        format.html { render new_submission_path, status: :unprocessable_entity }
-        format.json { render json: @submission.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /submissions/1 or /submissions/1.json
-  def update
-    respond_to do |format|
-      if @submission.update(submission_params)
-        format.html { redirect_to submission_url(@submission), notice: "Submission was successfully updated." }
-        format.json { render :show, status: :ok, location: @submission }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @submission.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /submissions/1 or /submissions/1.json
-  def destroy
-    @submission.destroy
-
-    respond_to do |format|
-      format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
-      format.json { head :no_content }
-    end
   end
 
   private
