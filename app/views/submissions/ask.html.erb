@@ -21,16 +21,8 @@
                           </center>
                         </td>
                         <td class="title">
-                          <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
-                          <span class="sitebit comhead">
-                             (<a href=<%=submission.url%>>
-                               <%link = "hola"%>
-                               <script type="text/javascript" >
-                                 link=submission.url.substring(0,10);
-                               </script>
-                               <span class="sitestr"><%=link%></span>
-                             </a>)
-                           </span>
+                           <% urlt = "/item?id="+submission.id.to_s%>
+                          <a href=<%=urlt%> class="titlelink"><%= submission.title %></a>
                        </td>
                      </tr>
                      
@@ -41,7 +33,7 @@
                           by 
                           <a href="news" class="hnuser">author</a> 
                           <span class="age" title="2022-03-23T20:11:49">
-                            <a href="news"><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
+                            <a href=<%=urlt%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
                           </span> 
                           <span id="unv_30782735"></span> | 
                           <a href="news" class="clicky">hide</a> | 

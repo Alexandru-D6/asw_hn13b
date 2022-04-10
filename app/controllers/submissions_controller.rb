@@ -47,8 +47,9 @@ class SubmissionsController < ApplicationController
   # POST /submissions or /submissions.json
   def create
     if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
+      idurl = "/item?id="+Submission.find_by(url: submission_pa09rams[:url]).id.to_s
         respond_to do |format|
-          format.html { redirect_to "/past", notice: "This URL allready exists" }
+          format.html { redirect_to idurl, notice: "This URL allready exists" }
         end
     else 
       @submission = Submission.new(submission_params)

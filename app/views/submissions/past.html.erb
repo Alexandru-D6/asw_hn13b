@@ -36,6 +36,9 @@
                           </center>
                         </td>
                         <td class="title">
+                          <% if (submission.url == "")
+                              submission.url = "/item?id="+submission.id.to_s
+                           end %>
                           <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
                           <span class="sitebit comhead">
                              (<a href=<%=submission.url%>>
@@ -53,7 +56,8 @@
                           by 
                           <a href="news" class="hnuser">author</a> 
                           <span class="age" title="2022-03-23T20:11:49">
-                            <a href="news"><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
+                            <% urlt = "/item?id="+submission.id.to_s%>
+                            <a href=<%=urlt%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
                           </span> 
                           <span id="unv_30782735"></span> | 
                           <a href="news" class="clicky">hide</a> | 

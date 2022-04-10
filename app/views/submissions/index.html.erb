@@ -22,7 +22,7 @@
                         </td>
                         <td class="title">
                            <% if (submission.url == "")
-                              submission.url = "/past"
+                              submission.url = "/item?id="+submission.id.to_s
                            end %>
                           <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
                           <span class="sitebit comhead">
