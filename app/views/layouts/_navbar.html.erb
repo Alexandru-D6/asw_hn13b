@@ -23,7 +23,7 @@
           <% if user_signed_in? %>
           
             <li class="div_bar" style="margin-left: 100em;"></li>
-            <li class="div_bar"><%= link_to current_user.username, edit_user_registration_path, class: "#{'font-weight-bold' if current_page?(edit_user_registration_path)}" %> |</li>
+            <li class="div_bar"><%= link_to current_user.name, edit_user_registration_path, class: "#{'font-weight-bold' if current_page?(edit_user_registration_path)}" %> |</li>
             <li class="div_bar"><%= link_to "logout", destroy_user_session_path, method: :delete %></li>
           <% else %>
             <li class="div_bar" style="margin-left: 110em;"></li>
