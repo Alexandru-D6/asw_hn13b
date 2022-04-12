@@ -11,7 +11,6 @@ class User < ApplicationRecord
     
     unless user
       user = User.create(
-        provider: data['provider'],
         name: data['name'],
         username: data['nickname'],
         uid: data['uid'],
