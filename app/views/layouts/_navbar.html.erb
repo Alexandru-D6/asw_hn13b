@@ -19,6 +19,18 @@
           <li><a href=/past> past </a></li>
           <li class="div_bar"> | </li>
           <li><a href=/ask> ask </a></li>
+          
+          <% if user_signed_in? %>
+          
+            <li class="div_bar" style="margin-left: 100em;"></li>
+            <li class="div_bar"><%= link_to current_user.username, edit_user_registration_path, class: "#{'font-weight-bold' if current_page?(edit_user_registration_path)}" %> |</li>
+            <li class="div_bar"><%= link_to "logout", destroy_user_session_path, method: :delete %></li>
+          <% else %>
+            <li class="div_bar" style="margin-left: 110em;"></li>
+            <li class="div_bar"><%= link_to "login", omniauth_authorize_path(User, :github), method: :post, data: { disable_with: "Connecting..." } %></li>
+          <% end %>
+      
+      
         </ul>
       </td>
     </nav>
