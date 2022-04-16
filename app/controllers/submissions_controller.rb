@@ -78,9 +78,7 @@ class SubmissionsController < ApplicationController
   
   def item
     @submission = Submission.where(id: params[:id])
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
     p @submission
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
 
   end
 
