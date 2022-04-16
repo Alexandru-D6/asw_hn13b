@@ -37,6 +37,9 @@ class SubmissionsController < ApplicationController
   def upvote
     @submission = Submission.find(params[:id])
     @submission.UpVotes = @submission.UpVotes + 1
+    current_user.likeSubmissions.append(params[:id])
+    
+    logger.debug "\n\n\n##################\n" + current_user.likeSubmissions.to_s
     respond_to do |format|
       if @submission.save
         format.html { redirect_to news_path} #need a way to return to the previous page

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_08_084857) do
+ActiveRecord::Schema.define(version: 2022_04_16_204518) do
 
   create_table "submissions", force: :cascade do |t|
     t.string "title"
@@ -34,10 +34,11 @@ ActiveRecord::Schema.define(version: 2022_04_08_084857) do
     t.string "uid"
     t.string "name"
     t.string "username"
-    t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.string "about"
+    t.integer "karma", default: 0
+    t.string "likedSubmissions", default: "{}"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["name"], name: "index_users_on_name", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
