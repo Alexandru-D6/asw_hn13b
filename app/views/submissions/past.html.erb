@@ -24,6 +24,7 @@
                     </tr>
                     <tr style="height:14px"></tr>
                      <% count = 1 %>
+                     <% countURL = 0%>
                      <% @submissions.each do |submission| %>
                      <tr class="athing" id=submission.id>
                         <td align="right" valign="top" class="title">
@@ -41,14 +42,18 @@
                            end %>
                           <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
                           <span class="sitebit comhead">
-                             (<a href=<%=submission.url%>>
-                               <%link = "hola"%>
-                               <span class="sitestr"><%=link%></span>
-                             </a>)
+                            <%if(@shorturl[countURL] != "")
+                                url ="("+@shorturl[countURL]+")"
+                              else
+                              url =""
+                             end%>
+                             <a href=<%=submission.url%>>
+                               <span class="sitestr"><%=url%></span>
+                             </a>
+                             <%countURL = countURL+1%>
                            </span>
                        </td>
                      </tr>
-                     
                      <tr>
                        <td colspan="2"></td>
                          <td class="subtext">

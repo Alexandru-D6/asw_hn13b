@@ -8,6 +8,16 @@ class SubmissionsController < ApplicationController
     else
       @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
     end
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
   
   def ask
@@ -79,10 +89,16 @@ class SubmissionsController < ApplicationController
   
   def item
     @submission = Submission.where(id: params[:id])
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
-    p @submission
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
-
+    @shorturl = Array.new();
+    @submission.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
 
   # DELETE /submissions/1 or /submissions/1.json
@@ -101,9 +117,18 @@ class SubmissionsController < ApplicationController
       arrayday = params[:day].split('-')
       data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
     end
+    
+    @shorturl = Array.new();
     @submissions = Array.new()
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
+        if submission.url != ""
+          url =submission.url.split('//')
+          shortu = url[1].split('/')
+          @shorturl.push(shortu[0])
+        else 
+          @shorturl.push("")
+        end
         if data.year > submission.created_at.year
           @submissions.push(submission)
         else
@@ -127,6 +152,7 @@ class SubmissionsController < ApplicationController
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")
       @dataF = url+dataF.strftime("%F")
+      
   end
 
   private
