@@ -19,12 +19,10 @@
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
                      
                      <% count = 1 %>
-                     <% countURL = 0 %>
                      <% @submissions.each do |submission| %>
                         
-                        <%= render 'submission', submission: submission, count: count, url: "/news", countURL: countURL %>
+                        <%= render 'submission', submission: submission, count: count, url: "/newest" %>
                         <% count = count + 1%>
-                        <% countURL = countURL + 1%>
                         
                      <% end %>
                      
@@ -36,7 +34,7 @@
                      <tr>
                         <td colspan="2"></td>
                         <td class='title'>
-                           <a href='news?p=2' class='morelink' rel='next'>More</a>
+                           <a href='newest?p=2' class='morelink' rel='next'>More</a>
                         </td>
                      </tr>
                      

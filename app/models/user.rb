@@ -1,4 +1,11 @@
 class User < ApplicationRecord
+  serialize :LikedSubmissions
+
+  after_initialize do |user|
+    user.LikedSubmissions= [] if user.LikedSubmissions == nil
+  end
+
+  
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

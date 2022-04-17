@@ -1,32 +1,60 @@
 <%= form_with(model: user) do |form| %>
-  <% if user.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
-
-      <ul>
-        <% user.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <body>
+    <div align="left">
+      <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f6f6ef">
+        <tbody>
+          
+          <tr>
+            <body>
+              <% if user.errors.any? %>
+                <td><%= user.errors.first.message %></td>
+              <% end %>
+            </body>
+          </tr>
+          
+          <tr>
+            <td>user:</td>
+            <td><%=user.name%></td>
+          </tr>
+          
+          <tr>
+            <td>created:</td>
+            <td><%=distance_of_time_in_words(user.created_at, Time.new)%></td>
+          </tr>
+          
+          <tr>
+            <td>karma:</td>
+            <td><%=user.karma%></td>
+          </tr>
+          
+          <tr class="field">
+            <td>about:</td>
+            <td><%= form.text_area :about, size: "70x5" %></td>
+          </tr>
+          
+          <tr>
+            <td></td>
+            <td><%= link_to "submissions", "/submitted?id="+current_user.name%></td>
+          </tr>
+          
+          <tr>
+            <td></td>
+            <td><%= link_to "comments", "/threads?id="+current_user.name%></td>
+          </tr>
+          
+          <tr>
+            <td></td>
+            <td><%= link_to "upvoted submissions", "/upvoted?id="+current_user.name%> / <%= link_to "comments", "/upvoted?id="+current_user.name+"&comments=t"%></td>
+          </tr>
+          
+          <tr>
+            <td class="actions">
+              <%= form.submit "update"%>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
     </div>
-  <% end %>
-
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
-  </div>
-
-  <div class="field">
-    <%= form.label :email %>
-    <%= form.text_field :email %>
-  </div>
-
-  <div class="field">
-    <%= form.label :pwd %>
-    <%= form.text_field :pwd %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
-  </div>
+  </body>
 <% end %>
