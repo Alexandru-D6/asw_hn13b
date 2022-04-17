@@ -18,6 +18,11 @@ class CommentsController < ApplicationController
   # GET /comments/1/edit
   def edit
   end
+  
+  def reply
+    CommentsController.new
+    @comments = Comment.where(id: params[:id])
+  end
 
   # POST /comments or /comments.json
   def create

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get 'past', to: 'submissions#past'
   get 'ask', to: 'submissions#ask'
   get 'item', to: 'submissions#item'
+  get 'reply', to: 'comments#reply'
   
   root to: 'submissions#index'
   

@@ -19,8 +19,8 @@
       <tr>
         <td><%= comment.author %></td>
         <td><%= comment.comment %></td>
-        <td><%= comment.root_comment %></td>
-        <td><%= comment.id_reference %></td>
+        <td><%= comment.id_submission %></td>
+        <td><%= comment.id_comment_father %></td>
         <td><%= comment.UpVotes %></td>
         <td><%= link_to 'Show', comment %></td>
         <td><%= link_to 'Edit', edit_comment_path(comment) %></td>

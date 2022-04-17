@@ -10,16 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_16_144553) do
+ActiveRecord::Schema.define(version: 2022_04_16_201118) do
 
   create_table "comments", force: :cascade do |t|
     t.string "author", default: "", null: false
     t.text "comment", default: "", null: false
-    t.boolean "root_comment", default: true
-    t.integer "id_reference", default: 0, null: false
     t.integer "UpVotes", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "id_sons"
+    t.integer "id_submission", default: 0, null: false
+    t.integer "id_comment_father", default: 0, null: false
+    t.integer "num_sons", default: 0, null: false
   end
 
   create_table "submissions", force: :cascade do |t|

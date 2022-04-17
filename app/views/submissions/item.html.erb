@@ -21,14 +21,12 @@
                            <td class="title">
                           <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
                           <span class="sitebit comhead">
-                             <%if(@shorturl[countURL] != "")
-                                url ="("+@shorturl[countURL]+")"
-                              else
-                              url =""
-                             end%>
-                             <a href=<%=submission.url%>>
-                               <span class="sitestr"><%=url%></span>
+                             <%if(@shorturl[countURL] != "")%>
+                               <a href=<%=submission.url%>>
+                               <span class="sitestr"><%="("+@shorturl[countURL]+")"%></span>
                              </a>
+                             <%end%>
+                             
                              <%countURL = countURL+1%>
                            </span>
                        </td>
