@@ -3,10 +3,30 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions or /submissions.json
   def index
-    if params[:newest]
-       @submissions = Submission.all.order(created_at: :desc, title: :asc)
-    else
-      @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
+    @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+  end
+  
+  def newest
+    @submissions = Submission.all.order(created_at: :desc, title: :asc)
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
     end
   end
   
@@ -18,6 +38,16 @@ class SubmissionsController < ApplicationController
         @submissions.push(submission)
       end
     end
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
   
 
@@ -27,7 +57,13 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions/new
   def new
-    @submission = Submission.new
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.new
+    end
   end
 
   # GET /submissions/1/edit
@@ -35,11 +71,46 @@ class SubmissionsController < ApplicationController
   end
   
   def upvote
-    @submission = Submission.find(params[:id])
-    @submission.UpVotes = @submission.UpVotes + 1
-    respond_to do |format|
-      if @submission.save
-        format.html { redirect_to news_path} #need a way to return to the previous page
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.find(params[:id])
+      
+      if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+        @submission.UpVotes = @submission.UpVotes + 1
+        current_user.LikedSubmissions.push(params[:id])
+        current_user.save
+        
+        respond_to do |format|
+          if @submission.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
+  def unvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
+      @submission = Submission.find(params[:id])
+      
+      if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+        @submission.UpVotes = @submission.UpVotes - 1
+        current_user.LikedSubmissions.extract!{|e| e == params[:id]}
+        current_user.save
+  
+        respond_to do |format|
+          if @submission.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
       end
     end
   end
@@ -47,11 +118,14 @@ class SubmissionsController < ApplicationController
   # POST /submissions or /submissions.json
   def create
     if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
+      idurl = "/item?id="+Submission.find_by(url: submission_params[:url]).id.to_s
         respond_to do |format|
-          format.html { redirect_to "/past", notice: "This URL allready exists" }
+          format.html { redirect_to idurl, notice: "This URL allready exists" }
         end
     else 
       @submission = Submission.new(submission_params)
+      logger.debug "\n\n\n#################\n" + submission_params.to_s
+      
       respond_to do |format|
         if @submission.save
           format.html { redirect_to news_path}
@@ -78,10 +152,16 @@ class SubmissionsController < ApplicationController
   
   def item
     @submission = Submission.where(id: params[:id])
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
-    p @submission
-    p "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
-
+    @shorturl = Array.new();
+    @submission.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
 
   # DELETE /submissions/1 or /submissions/1.json
@@ -100,9 +180,18 @@ class SubmissionsController < ApplicationController
       arrayday = params[:day].split('-')
       data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
     end
+    
+    @shorturl = Array.new();
     @submissions = Array.new()
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
+        if submission.url != ""
+          url =submission.url.split('//')
+          shortu = url[1].split('/')
+          @shorturl.push(shortu[0])
+        else 
+          @shorturl.push("")
+        end
         if data.year > submission.created_at.year
           @submissions.push(submission)
         else
@@ -121,11 +210,13 @@ class SubmissionsController < ApplicationController
       dataY = data - (3600*24*365)
       dataF = data + (3600*24)
       @date = data.strftime("%F")
-      @dataN = data.strftime("%B %d, %Y (%Z)")
+      @dataToday = url+data.strftime("%F")
+      @dataN = dataD.strftime("%B %d, %Y (%Z)")
       @dataD = url+dataD.strftime("%F")
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")
       @dataF = url+dataF.strftime("%F")
+      
   end
 
   private
@@ -136,6 +227,6 @@ class SubmissionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def submission_params
-      params.require(:submission).permit(:title, :url, :text, :UpVotes)
+      params.require(:submission).permit(:title, :url, :text, :UpVotes, :author_username)
     end
 end

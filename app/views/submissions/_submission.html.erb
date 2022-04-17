@@ -1,0 +1,57 @@
+<tr class="athing" id=submission.id>
+  <td align="right" valign="top" class="title">
+    <span class="rank"><%=count%>.</span>
+  </td>   
+  
+  <td valign="top" class="votelinks">
+    <center>
+    
+      <% if user_signed_in? && (current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
+        <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+      <%else%>
+        <%if !user_signed_in? %>
+          <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+        <%end%>
+      <%end%>
+    
+    </center>
+  </td>
+  
+  <td class="title">
+    <% if (submission.url == "")
+      submission.url = "/item?id="+submission.id.to_s
+    end %>
+    <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
+    <span class="sitebit comhead">
+      <%if(@shorturl[countURL] != "")
+        _url ="("+@shorturl[countURL]+")"
+      else
+        _url =""
+      end%>
+      <a href=<%=submission.url%>>
+        <span class="sitestr"><%=_url%></span>
+      </a>
+    </span>
+  </td>
+  
+</tr>
+  
+<tr>
+  <td colspan="2"></td>
+  
+  <td class="subtext">
+    <span class="score" id="score_30782735"><%=submission.UpVotes%></span> by 
+    <%= link_to submission.author_username, "/user?id="+submission.author_username%>
+    <span class="age" title="2022-03-23T20:11:49">
+      <a href=<%= "item?id="+submission.id.to_s%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
+    </span> 
+    <span id="unv_30782735"></span> | 
+    
+    <% if user_signed_in? && !(current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
+      <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
+    <%end%>
+    
+    <a href="news" class="clicky">hide</a> | 
+    <a href="news">&nbsp;comments</a>              
+  </td>
+</tr>
