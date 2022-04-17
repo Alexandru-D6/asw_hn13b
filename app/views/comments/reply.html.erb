@@ -1,0 +1,59 @@
+<html lang="en">
+   <body>
+      <center>
+         <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+          <tbody>
+            <tr>
+              <td>
+                <table class="fatitem" border="0">
+                  <tbody>
+                    <tr class="athing">    
+                      <td class="ind"></td>
+                      <td valign="top" class="votelinks">
+                        <center>
+                          <a id=<%=@comments[0].id%> class="clicky" href="news">
+                            <div class="votearrow" title="upvote"></div>
+                          </a>
+                        </center>
+                      </td>
+                      <td class="default">
+                        <div style="margin-top:2px; margin-bottom:-10px;">
+                          <span class="comhead">
+                            <a href="news" class="hnuser"><%=@comments[0].author%></a> 
+                            <span class="age" >
+                              <a href=<%="/reply?id="+@comments[0].id.to_s%>><%=@comments[0].created_at%></a>
+                            </span> 
+                            <span id=<%=@comments[0].id%>></span>
+                            <span class="navs"> | 
+                              <a href="newest">parent</a> | 
+                              <a href="newest" rel="nofollow">context</a>
+                            </span>
+                            <span class="onstory"> |  on: 
+                              <a href=<%="/item?id="+@comments[0].id_submission.to_s%>>Why Are Some Egg Yolks So Orange?</a>
+                            </span>                  
+                          </span>
+                        </div>
+                        <br>
+                        <div class="comment">
+                          <span class="commtext c00">
+                            <%=@comments[0].comment%>
+                          </span>
+                        </div>
+                        <%= render 'form', comment: @comment %>
+                      </td>
+                    </tr>
+                    <tr style="height:10px"></tr>
+                  <tr>
+                  <td colspan="2"></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+          </tbody>
+          </table>
+      </center>
+   </body>
+   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
+</html>

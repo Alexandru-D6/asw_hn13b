@@ -15,12 +15,13 @@
                <td>
                   <table class="fatitem" border="0">
                      <tbody>
-                        
-                        
+                        <% count = 1 %>
+                        <% countURL = 0 %>
                         <% @submission.each do |submission| %>
                            
-                           <%= render 'submission', submission: submission, count: count, url: 'item?id='+submission.id %>
+                           <%= render 'submission', submission: submission, count: count, url: 'item?id='+submission.id, countURL: countURL %>
                            <% count = count + 1%>
+                           <% countURL = countURL + 1%>
                            
                         <% end %>
                         

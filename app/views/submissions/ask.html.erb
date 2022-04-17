@@ -18,10 +18,12 @@
                      
                      
                      <% count = 1 %>
+                     <% countURL = 0 %>
                      <% @submissions.each do |submission| %>
                         
-                        <%= render 'submission', submission: submission, count: count, url: '/ask' %>
+                        <%= render 'submission', submission: submission, count: count, url: '/ask', countURL: countURL %>
                         <% count = count + 1%>
+                        <% countURL = countURL + 1%>
                         
                      <% end %>
                      

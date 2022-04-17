@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :comments
   devise_for :users, :controllers => { :omniauth_callbacks => "callbacks" }
   
   
@@ -25,6 +26,7 @@ Rails.application.routes.draw do
   get 'ask', to: 'submissions#ask'
   get 'item', to: 'submissions#item'
   get 'user', to: 'users#show'
+  get 'reply', to: 'comments#reply'
   
   root to: 'submissions#index'
   

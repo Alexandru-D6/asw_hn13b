@@ -4,10 +4,30 @@ class SubmissionsController < ApplicationController
   # GET /submissions or /submissions.json
   def index
     @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
   
   def newest
     @submissions = Submission.all.order(created_at: :desc, title: :asc)
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
   
   def ask
@@ -88,8 +108,9 @@ class SubmissionsController < ApplicationController
   # POST /submissions or /submissions.json
   def create
     if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
+      idurl = "/item?id="+Submission.find_by(url: submission_pa09rams[:url]).id.to_s
         respond_to do |format|
-          format.html { redirect_to "/past", notice: "This URL allready exists" }
+          format.html { redirect_to idurl, notice: "This URL allready exists" }
         end
     else 
       @submission = Submission.new(submission_params)
@@ -121,8 +142,16 @@ class SubmissionsController < ApplicationController
   
   def item
     @submission = Submission.where(id: params[:id])
-    p @submission
-
+    @shorturl = Array.new();
+    @submission.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
 
   # DELETE /submissions/1 or /submissions/1.json
@@ -141,9 +170,18 @@ class SubmissionsController < ApplicationController
       arrayday = params[:day].split('-')
       data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
     end
+    
+    @shorturl = Array.new();
     @submissions = Array.new()
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
+        if submission.url != ""
+          url =submission.url.split('//')
+          shortu = url[1].split('/')
+          @shorturl.push(shortu[0])
+        else 
+          @shorturl.push("")
+        end
         if data.year > submission.created_at.year
           @submissions.push(submission)
         else
@@ -167,6 +205,7 @@ class SubmissionsController < ApplicationController
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")
       @dataF = url+dataF.strftime("%F")
+      
   end
 
   private
