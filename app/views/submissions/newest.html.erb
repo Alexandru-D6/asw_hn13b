@@ -21,7 +21,7 @@
                      <% count = 1 %>
                      <% @submissions.each do |submission| %>
                         
-                        <%= render 'submission', submission: submission, count: count, url: "/news" %>
+                        <%= render 'submission', submission: submission, count: count, url: "/newest" %>
                         <% count = count + 1%>
                         
                      <% end %>
@@ -34,7 +34,7 @@
                      <tr>
                         <td colspan="2"></td>
                         <td class='title'>
-                           <a href='news?p=2' class='morelink' rel='next'>More</a>
+                           <a href='newest?p=2' class='morelink' rel='next'>More</a>
                         </td>
                      </tr>
                      

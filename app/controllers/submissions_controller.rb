@@ -3,11 +3,11 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions or /submissions.json
   def index
-    if params[:newest]
-       @submissions = Submission.all.order(created_at: :desc, title: :asc)
-    else
-      @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
-    end
+    @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
+  end
+  
+  def newest
+    @submissions = Submission.all.order(created_at: :desc, title: :asc)
   end
   
   def ask
@@ -55,7 +55,7 @@ class SubmissionsController < ApplicationController
         
         respond_to do |format|
           if @submission.save
-            format.html { redirect_to news_path} #need a way to return to the previous page
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
           end
         end
       end
@@ -68,6 +68,7 @@ class SubmissionsController < ApplicationController
         format.html { redirect_to user_session_path}
       end
     else
+      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
       @submission = Submission.find(params[:id])
       
       if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
@@ -77,7 +78,7 @@ class SubmissionsController < ApplicationController
   
         respond_to do |format|
           if @submission.save
-            format.html { redirect_to news_path} #need a way to return to the previous page
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
           end
         end
       end
