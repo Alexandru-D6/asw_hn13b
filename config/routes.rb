@@ -8,6 +8,13 @@ Rails.application.routes.draw do
     end
   end
   
+  resources :submissions do
+    member do
+      put 'unvote'
+    end
+  end
+
+  
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   

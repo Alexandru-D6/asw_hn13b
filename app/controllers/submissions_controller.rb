@@ -27,7 +27,13 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions/new
   def new
-    @submission = Submission.new
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.new
+    end
   end
 
   # GET /submissions/1/edit
@@ -35,14 +41,45 @@ class SubmissionsController < ApplicationController
   end
   
   def upvote
-    @submission = Submission.find(params[:id])
-    @submission.UpVotes = @submission.UpVotes + 1
-    current_user.likeSubmissions.append(params[:id])
-    
-    logger.debug "\n\n\n##################\n" + current_user.likeSubmissions.to_s
-    respond_to do |format|
-      if @submission.save
-        format.html { redirect_to news_path} #need a way to return to the previous page
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.find(params[:id])
+      
+      if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+        @submission.UpVotes = @submission.UpVotes + 1
+        current_user.LikedSubmissions.push(params[:id])
+        current_user.save
+        
+        respond_to do |format|
+          if @submission.save
+            format.html { redirect_to news_path} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
+  def unvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.find(params[:id])
+      
+      if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+        @submission.UpVotes = @submission.UpVotes - 1
+        current_user.LikedSubmissions.extract!{|e| e == params[:id]}
+        current_user.save
+  
+        respond_to do |format|
+          if @submission.save
+            format.html { redirect_to news_path} #need a way to return to the previous page
+          end
+        end
       end
     end
   end
@@ -55,6 +92,8 @@ class SubmissionsController < ApplicationController
         end
     else 
       @submission = Submission.new(submission_params)
+      logger.debug "\n\n\n#################\n" + submission_params.to_s
+      
       respond_to do |format|
         if @submission.save
           format.html { redirect_to news_path}
@@ -137,6 +176,6 @@ class SubmissionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def submission_params
-      params.require(:submission).permit(:title, :url, :text, :UpVotes)
+      params.require(:submission).permit(:title, :url, :text, :UpVotes, :author_username)
     end
 end

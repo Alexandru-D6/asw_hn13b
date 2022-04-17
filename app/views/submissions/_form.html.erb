@@ -16,7 +16,10 @@
             <tbody>
               
                 <tr>
-                  <td></td>
+                  <td style="display:none;">
+                    <% submission.author_username = current_user.name %>
+                    <%= form.text_field :author_username %>
+                    </td>
                 </tr>
                 
                 <tr>
