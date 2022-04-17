@@ -19,10 +19,12 @@
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
                      
                      <% count = 1 %>
+                     <% countURL = 0%>
                      <% @submissions.each do |submission| %>
                         
-                        <%= render 'submission', submission: submission, count: count, url: "/newest" %>
+                        <%= render 'submission', submission: submission, count: count, url: "/newest", countURL: countURL %>
                         <% count = count + 1%>
+                        <% countURL = countURL + 1%>
                         
                      <% end %>
                      

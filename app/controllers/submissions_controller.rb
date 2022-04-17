@@ -38,6 +38,16 @@ class SubmissionsController < ApplicationController
         @submissions.push(submission)
       end
     end
+    @shorturl = Array.new();
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
   end
   
 
@@ -108,7 +118,7 @@ class SubmissionsController < ApplicationController
   # POST /submissions or /submissions.json
   def create
     if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
-      idurl = "/item?id="+Submission.find_by(url: submission_pa09rams[:url]).id.to_s
+      idurl = "/item?id="+Submission.find_by(url: submission_params[:url]).id.to_s
         respond_to do |format|
           format.html { redirect_to idurl, notice: "This URL allready exists" }
         end
@@ -200,7 +210,8 @@ class SubmissionsController < ApplicationController
       dataY = data - (3600*24*365)
       dataF = data + (3600*24)
       @date = data.strftime("%F")
-      @dataN = data.strftime("%B %d, %Y (%Z)")
+      @dataToday = url+data.strftime("%F")
+      @dataN = dataD.strftime("%B %d, %Y (%Z)")
       @dataD = url+dataD.strftime("%F")
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")

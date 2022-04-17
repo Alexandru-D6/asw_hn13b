@@ -19,23 +19,18 @@
   
   <td class="title">
     <% if (submission.url == "")
-      submission.url = "/past"
+      submission.url = "/item?id="+submission.id.to_s
     end %>
-    
     <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
     <span class="sitebit comhead">
-      (<a href=<%=submission.url%>>
-          <%link = "hola"%>
-          
-          <div id="myHTMLWrapper"></div>
-          
-          <script>
-            var wrapper = document.getElementById("myHTMLWrapper");
-            var myHTML = '<span class="test">Testing out my script!</span>';
-            wrapper.innerHTML = myHTML
-          </script>
-        <span class="sitestr"><%=link%></span>
-      </a>)
+      <%if(@shorturl[countURL] != "")
+        _url ="("+@shorturl[countURL]+")"
+      else
+        _url =""
+      end%>
+      <a href=<%=submission.url%>>
+        <span class="sitestr"><%=_url%></span>
+      </a>
     </span>
   </td>
   
