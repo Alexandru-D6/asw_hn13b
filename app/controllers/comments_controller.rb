@@ -72,7 +72,11 @@ class CommentsController < ApplicationController
     end
   end
   
- 
+ def upvoted
+    
+ end
+  
+  
   # POST /comments or /comments.json
   def create
     @comment = Comment.new(comment_params)
