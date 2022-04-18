@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   get 'user', to: 'users#show'
   get 'reply', to: 'comments#reply'
   
+  get 'upvoted', to: 'submissions#upvoted'
+  get 'submitted', to: 'submissions#submitted'
+  
   root to: 'submissions#index'
   
 end
