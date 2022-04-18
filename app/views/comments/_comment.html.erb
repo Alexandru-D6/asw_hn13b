@@ -36,3 +36,16 @@
     </span>
   </td>
 </tr>
+
+<tr>
+  <table>
+      <% comment.comments.each do |sub_comment| %>
+        <tr>
+          <td> -------- </td>
+          <td>
+            <%= render 'comments/comment', comment: sub_comment, url: url, title_submission: title_submission %>
+          </td>
+        </tr>
+      <%end%>
+  </table>
+</tr>

@@ -1,0 +1,16 @@
+<tr>
+  <td></td>
+  <td><%= link_to "submissions", "/submitted?id="+user, user_name: user%></td>
+</tr>
+
+<tr>
+  <td></td>
+  <td><%= link_to "comments", "/threads?id="+user, user_name: user%></td>
+</tr>
+
+<% if user_signed_in? %>
+  <tr>
+    <td></td>
+    <td><%= link_to "upvoted submissions", "/upvoted?id="+user%> / <%= link_to "comments", "/upvoted?id="+user+"&comments=t"%></td>
+  </tr>
+<%end%>

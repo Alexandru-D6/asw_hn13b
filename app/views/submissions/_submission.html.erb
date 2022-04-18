@@ -1,6 +1,8 @@
-<tr class="athing" id=submission.id>
+<tr class="athing" id=<%=submission.id%>>
   <td align="right" valign="top" class="title">
-    <span class="rank"><%=count%>.</span>
+    <% if count != -1 %>
+      <span class="rank"><%=count%>.</span>
+    <%end%>
   </td>   
   
   <td valign="top" class="votelinks">
@@ -11,6 +13,8 @@
       <%else%>
         <%if !user_signed_in? %>
           <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+        <%else%>
+          <%= "⠀"%>
         <%end%>
       <%end%>
     
@@ -40,9 +44,9 @@
   <td colspan="2"></td>
   
   <td class="subtext">
-    <span class="score" id="score_30782735"><%=submission.UpVotes%></span> by 
+    <span class="score"><%=submission.UpVotes%></span> by 
     <%= link_to submission.author_username, "/user?id="+submission.author_username%>
-    <span class="age" title="2022-03-23T20:11:49">
+    <span class="age" title=submission.created_at>
       <a href=<%= "item?id="+submission.id.to_s%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
     </span> 
     <span id="unv_30782735"></span> | 
@@ -51,7 +55,6 @@
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
     
-    <a href="news" class="clicky">hide</a> | 
     <a href="news">&nbsp;comments</a>              
   </td>
 </tr>

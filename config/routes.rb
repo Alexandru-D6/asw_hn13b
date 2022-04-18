@@ -31,6 +31,9 @@ Rails.application.routes.draw do
   get 'deleted_comment', to: 'comments#deleted_comment'
   get 'threads', to: 'comments#threads'
   
+  get 'upvoted', to: 'submissions#upvoted'
+  get 'submitted', to: 'submissions#submitted'
+  
   root to: 'submissions#index'
   
 end
