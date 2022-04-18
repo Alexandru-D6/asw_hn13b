@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   get 'threads', to: 'comments#threads'
   
   get 'upvoted', to: 'submissions#upvoted'
+  get 'upvoted_comments', to: 'comments#upvoted'
   get 'submitted', to: 'submissions#submitted'
   
   root to: 'submissions#index'
