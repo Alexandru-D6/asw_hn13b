@@ -3,7 +3,25 @@ class CommentsController < ApplicationController
 
   # GET /comments or /comments.json
   def index
-    @comments = Comment.all
+    com = Comment.all.order(created_at: :desc, title: :asc)
+    @comments= Array.new()
+    @titles_submissions = Array.new()
+    com.each do |comment|
+      if comment.author != ""
+        @comments.push(comment)
+        submission = Submission.find(comment.id_submission)
+        @titles_submissions.push(submission.title)
+      end
+    end
+  end
+  
+  def threads
+    @comments = Comment.where(author: params[:id]).order(created_at: :desc, title: :asc)
+    @titles_submissions = Array.new()
+    @comments.each do |comment|
+        submission = Submission.find(comment.id_submission)
+        @titles_submissions.push(submission.title)
+    end
   end
 
   # GET /comments/1 or /comments/1.json
@@ -20,10 +38,41 @@ class CommentsController < ApplicationController
   end
   
   def reply
-    CommentsController.new
+    
     @comments = Comment.where(id: params[:id])
+    @title_submission = ""
+    @comments.each do |comment|
+      submission = Submission.find(comment.id_submission)
+      @title_submission = submission.title
+    end
   end
-
+  
+  def comments
+    @comments = Comment.all.order(created_at: :desc, title: :asc)
+    @titles_submissions = Array.new()
+    @comments.each do |comment|
+      submission = Submission.find(comment.id_submission)
+      @titles_submissions.push(submission.title)
+    end
+  end
+  
+  def delete
+    @comment = Comment.find(params[:id])
+    submission = Submission.find(@comment.id_submission)
+    @title_submission = submission.title
+  end
+  
+  
+  def deleted_comment
+    @comment = Comment.find(params[:id])
+    @comment.comment ="[deleted]"
+    @comment.author = ""
+    if @comment.save
+        redirect_to "/reply?id="+@comment.id.to_s
+    end
+  end
+  
+ 
   # POST /comments or /comments.json
   def create
     
@@ -44,8 +93,10 @@ class CommentsController < ApplicationController
   # PATCH/PUT /comments/1 or /comments/1.json
   def update
     respond_to do |format|
+      p "ME HE COLADOOOOO"
       if @comment.update(comment_params)
-        format.html { redirect_to comment_url(@comment), notice: "Comment was successfully updated." }
+        url = "/comments/"+@comment.id.to_s+"/edit"
+        format.html { redirect_to url, notice: "Comment was successfully updated." }
         format.json { render :show, status: :ok, location: @comment }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -68,10 +119,12 @@ class CommentsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_comment
       @comment = Comment.find(params[:id])
+      submission = Submission.find(@comment.id_submission)
+      @title_submission = submission.title
     end
 
     # Only allow a list of trusted parameters through.
     def comment_params
-      params.require(:comment).permit(:author, :comment, :root_comment, :id_reference, :UpVotes)
+      params.require(:comment).permit(:author, :comment, :UpVotes, :id_submission, :id_comment_father)
     end
 end

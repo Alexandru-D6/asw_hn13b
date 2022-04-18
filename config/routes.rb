@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   get 'item', to: 'submissions#item'
   get 'user', to: 'users#show'
   get 'reply', to: 'comments#reply'
+  get 'delete_comment', to: 'comments#delete'
+  get 'deleted_comment', to: 'comments#deleted_comment'
+  get 'threads', to: 'comments#threads'
   
   root to: 'submissions#index'
   

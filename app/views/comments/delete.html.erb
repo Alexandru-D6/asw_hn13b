@@ -1,3 +1,6 @@
+
+
+
 <html lang="en" op="comments">
    <body>
       <center>
@@ -18,18 +21,32 @@
                <td>
                   <% if user_signed_in? && @comment.author == current_user.name %>
                      <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
-                        
                         <%= render 'comment', comment: @comment , title_submission: @title_submission%>
                         <tr class="morespace" style="height:10px">
                            <td></td>
                         </tr>
                         
                         <tr>
-                           <td colspan="2"><%= render 'form', comment: @comment %></td>
+                           <tr>
+                               <td  colspan="3">
+                               Do you want this to be deleted?
+                               </td>
+                             </tr>
+                             <tr>
+                               <td colspan="1">
+                                 <%url = "/deleted_comment?id="+@comment.id.to_s%>
+                                 <a href = <%=url%>>
+                                   <%= button_to 'Yes'%>  
+                                 </a>
+                               </td>
+                               <td colspan="2">
+                                 <%= button_to 'No', "/comments/"+@comment.id.to_s+"/edit", method: :get%>
+                               </td>
+                             </tr>
                         </tr>
                      </table>
                   <%else%>
-                     You can't edit this comment
+                     You can't delete this comment
                   <%end%>
                </td>
             </tr>
