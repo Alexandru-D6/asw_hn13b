@@ -13,6 +13,12 @@
             <li class="div_bar">  </li>
             <li><a href=/newest> new </a></li>
             <li class="div_bar"> | </li>
+            <% if user_signed_in? %>
+              <li><a href=<%="/threads?id="+current_user.name%>> threads </a></li>
+              <li class="div_bar"> | </li>
+            <%end%>
+            <li><a href=/comments> comments </a></li>
+            <li class="div_bar"> | </li>
             <li><a href=/submit> submit </a></li>
             <li class="div_bar"> | </li>
             <li><a href=<%='/past'%>> past </a></li>
