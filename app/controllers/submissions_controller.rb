@@ -150,17 +150,62 @@ class SubmissionsController < ApplicationController
     end
   end
   
-  def item
-    @submission = Submission.where(id: params[:id])
-    @shorturl = Array.new();
-    @submission.each do |submission|
-      if submission.url != ""
-        url =submission.url.split('//')
-        shortu = url[1].split('/')
-        @shorturl.push(shortu[0])
-      else 
-        @shorturl.push("")
+  def upvoted
+    if !params[:id].nil?
+      @user_name = params[:id].to_s
+      user = User.find_by(name: params[:id])
+      
+      if !user.nil? && !user.LikedSubmissions.nil?
+        @submission = Submission.where(id: user.LikedSubmissions)
+        @submission.order(created_at: :desc, title: :asc)
       end
+      
+      if !@submission.nil?
+        @shorturl = Array.new();
+        @submission.each do |submission|
+          if submission.url != ""
+            url =submission.url.split('//')
+            shortu = url[1].split('/')
+            @shorturl.push(shortu[0])
+          else 
+            @shorturl.push("")
+          end
+        end
+      end
+    end
+  end
+  
+  def submitted
+    if !params[:id].nil?
+      @user_name = params[:id].to_s
+      
+      @submission = Submission.where(author_username: @user_name)
+      @submission.order(created_at: :desc, title: :asc)
+      
+      if !@submission.nil?
+        @shorturl = Array.new();
+        @submission.each do |submission|
+          if submission.url != ""
+            url =submission.url.split('//')
+            shortu = url[1].split('/')
+            @shorturl.push(shortu[0])
+          else 
+            @shorturl.push("")
+          end
+        end
+      end
+    end
+  end
+  
+  def item
+    @submission = Submission.find_by(id: params[:id])
+    @shorturl = Array.new();
+    if @submission.url != ""
+      url =@submission.url.split('//')
+      shortu = url[1].split('/')
+      @shorturl.push(shortu[0])
+    else 
+      @shorturl.push("")
     end
   end
 
