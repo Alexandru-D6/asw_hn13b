@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_17_115054) do
+ActiveRecord::Schema.define(version: 2022_04_18_172839) do
 
   create_table "comments", force: :cascade do |t|
     t.string "author", default: "", null: false
@@ -23,6 +23,10 @@ ActiveRecord::Schema.define(version: 2022_04_17_115054) do
     t.text "title_submission", default: "", null: false
     t.integer "id_comment_father", default: 0, null: false
     t.integer "num_sons", default: 0, null: false
+    t.integer "submission_id"
+    t.integer "comment_id"
+    t.index ["comment_id"], name: "index_comments_on_comment_id"
+    t.index ["submission_id"], name: "index_comments_on_submission_id"
   end
 
   create_table "submissions", force: :cascade do |t|
@@ -55,4 +59,6 @@ ActiveRecord::Schema.define(version: 2022_04_17_115054) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "comments", "comments"
+  add_foreign_key "comments", "submissions"
 end

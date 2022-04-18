@@ -38,7 +38,6 @@ class CommentsController < ApplicationController
   end
   
   def reply
-    
     @comments = Comment.where(id: params[:id])
     @title_submission = ""
     @comments.each do |comment|
@@ -48,6 +47,7 @@ class CommentsController < ApplicationController
   end
   
   def comments
+    
     @comments = Comment.all.order(created_at: :desc, title: :asc)
     @titles_submissions = Array.new()
     @comments.each do |comment|
@@ -75,10 +75,20 @@ class CommentsController < ApplicationController
  
   # POST /comments or /comments.json
   def create
-    
     @comment = Comment.new(comment_params)
     @comment.author = current_user.name
-    ##@comment.id_reference = params[:id]
+      
+    if comment_params[:id_comment_father].nil?
+      submission = Submission.find(@comment.id_submission)
+      submission.comments << @comment
+      submission.save
+    else
+      comment_father = Comment.find(comment_params[:id_comment_father])
+      comment_father.comments << @comment
+      comment_father.save
+    end
+    
+    
     respond_to do |format|
       if @comment.save
         format.html { redirect_to comment_url(@comment), notice: "Comment was successfully created." }
