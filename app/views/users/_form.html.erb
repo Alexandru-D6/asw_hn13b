@@ -32,20 +32,7 @@
             <td><%= form.text_area :about, size: "70x5" %></td>
           </tr>
           
-          <tr>
-            <td></td>
-            <td><%= link_to "submissions", "/submitted?id="+current_user.name%></td>
-          </tr>
-          
-          <tr>
-            <td></td>
-            <td><%= link_to "comments", "/threads?id="+current_user.name%></td>
-          </tr>
-          
-          <tr>
-            <td></td>
-            <td><%= link_to "upvoted submissions", "/upvoted?id="+current_user.name%> / <%= link_to "comments", "/upvoted?id="+current_user.name+"&comments=t"%></td>
-          </tr>
+          <%= render 'links', user: user.name %>
           
           <tr>
             <td class="actions">

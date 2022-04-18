@@ -1,0 +1,58 @@
+<html lang="en" op="item">
+   <body>
+      <center>
+         <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tbody>
+               <%= notice %>
+            </tbody>
+         </table>
+         
+         <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            
+            <tr id="pagespace" title="" style="height:10px"></tr>
+            
+            <tr>
+              <td>
+                <table class="fatitem" border="0">
+                  <tbody>
+                    <% count = 1 %>
+                    <% countURL = 0 %>
+                    
+                    
+                    <% if !@submission.nil? %>
+                      <% @submission.each do |submission| %>
+                        
+                        <%= render 'submission', submission: submission, count: count, url: '/submitted?id='+@user_name, countURL: countURL %>
+                        <% count = count + 1%>
+                        <% countURL = countURL + 1%>
+                        
+                      <% end %>
+                    <% end %>
+                    
+                    <tr class="morespace" style="height:10px">
+                      <td></td>
+                    </tr>
+                    
+                    <tr>
+                      <td colspan="2"></td>
+                      <td class='title'>
+                        <a href='newest?p=2' class='morelink' rel='next'>More</a>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+         
+            <tr>
+               <td>
+                  <%= render 'bottomURL'%>
+               </td>
+            </tr>
+            
+         </table>
+      </center>
+   </body>
+   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
+</html>
