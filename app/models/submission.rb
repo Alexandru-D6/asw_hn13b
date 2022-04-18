@@ -9,6 +9,8 @@ class UrlValidator < ActiveModel::EachValidator
 end
 
 class Submission < ApplicationRecord
+  has_many :comments
+  
   validates :title, length: {maximum: 40}, presence: {message: "Title can't be blank."}
   validates :url, presence: false, url: true
 end

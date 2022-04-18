@@ -198,16 +198,14 @@ class SubmissionsController < ApplicationController
   end
   
   def item
-    @submission = Submission.where(id: params[:id])
+    @submission = Submission.find_by(id: params[:id])
     @shorturl = Array.new();
-    @submission.each do |submission|
-      if submission.url != ""
-        url =submission.url.split('//')
-        shortu = url[1].split('/')
-        @shorturl.push(shortu[0])
-      else 
-        @shorturl.push("")
-      end
+    if @submission.url != ""
+      url =@submission.url.split('//')
+      shortu = url[1].split('/')
+      @shorturl.push(shortu[0])
+    else 
+      @shorturl.push("")
     end
   end
 
