@@ -12,17 +12,34 @@
   <% end %>
 
   <div class="field">
-    <%= form.label :comment %>
     <%= form.text_area :comment %>
   </div>
-
-  <div class="field">
-    
+  
+  <div style="display:none;">
+    <%if comment.id.nil? && id_submission != 0
+    comment.id_submission = id_submission%>
+    <%=form.text_field :id_submission%>
+    <%end%>
   </div>
-
-
+  
+  <div style="display:none;">
+    <%if comment.id.nil? && id_father != 0
+    comment.id_comment_father = id_father%>
+    <%=form.text_field :id_comment_father %>
+    <%end%>
+  </div>
+  
+  
 
   <div class="actions">
-    <%= form.submit %>
+    <%if comment.id.nil?%>
+      <%if comment.id_comment_father != 0%>
+        <%=form.submit "reply"%>
+      <%else%>
+        <%=form.submit "add comment"%>
+      <%end%>
+    <%else%>
+     <%=form.submit "Update"%>
+    <%end%>
   </div>
 <% end %>

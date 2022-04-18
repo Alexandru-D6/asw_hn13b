@@ -36,15 +36,7 @@
             <td><%=@user.about%></td>
           </tr>
           
-          <tr>
-            <td></td>
-            <td><%= link_to "submissions", "/submitted?id="+@user.name%></td>
-          </tr>
-          
-          <tr>
-            <td></td>
-            <td><%= link_to "comments", "/threads?id="+@user.name%></td>
-          </tr>
+          <%= render 'links', user: @user.name %>
         <% end %>
         
       </tbody>
