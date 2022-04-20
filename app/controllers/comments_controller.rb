@@ -157,7 +157,7 @@ class CommentsController < ApplicationController
       submission = Submission.find(@comment.id_submission)
       
       if submission.comments.nil? 
-        submission.comments = Array.new(0)  
+        submission.comments = Array.new(1)  
       end
       
       submission.comments.push(@comment)
@@ -166,7 +166,7 @@ class CommentsController < ApplicationController
       comment_father = Comment.find(comment_params[:id_comment_father])
       
       if comment_father.comments.nil? 
-        comment_father.comments = Array.new(0)  
+        comment_father.comments = Array.new(1)  
       end
       
       comment_father.comments.push(@comment)
