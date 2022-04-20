@@ -7,14 +7,17 @@
   
   <td valign="top" class="votelinks">
     <center>
-    
-      <% if user_signed_in? && (current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
-        <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+      <% if user_signed_in? && current_user.name == submission.author_username%>
+        <font color="#ff6600">*</font>
       <%else%>
-        <%if !user_signed_in? %>
+        <% if user_signed_in? && (current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
           <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
         <%else%>
-          <%= "⠀"%>
+          <%if !user_signed_in? %>
+            <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+          <%else%>
+            <%= "⠀"%>
+          <%end%>
         <%end%>
       <%end%>
     
@@ -51,10 +54,14 @@
     </span> 
     <span id="unv_30782735"></span> | 
     
+    <% if user_signed_in? && submission.author_username == current_user.name %>
+      <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
+    <%end%>
+    
     <% if user_signed_in? && !(current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
     
-    <a href="news">&nbsp;comments</a>              
+    <%= link_to "comments", "item?id="+submission.id.to_s, url: url %>
   </td>
 </tr>
