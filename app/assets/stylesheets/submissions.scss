@@ -47,10 +47,14 @@ a:visited { color:#828282; text-decoration:none; }
 .topsel a:link, .topsel a:visited { color:#ffffff; }
 
 .subtext a:link, .subtext a:visited { color:#828282; }
-.subtext a:hover { text-decoration:underline; }
+.subtext a:hover { 
+  text-decoration:underline; 
+}
 
 .comhead a:link, .subtext a:visited { color:#828282; }
-.comhead a:hover { text-decoration:underline; }
+.comhead a:hover { 
+  text-decoration:underline; 
+}
 
 .hnmore a:link, a:visited { color:#828282; }
 .hnmore { text-decoration:underline; }

@@ -142,9 +142,10 @@ class SubmissionsController < ApplicationController
     else 
       comment = Comment.new()
       if submission_params[:url] != "" && submission_params[:text] != ""
+        logger.debug "\n\n\n#################\n"
         comment.comment = submission_params[:text]
         comment.author = submission_params[:author_username]
-        submission_params[:text] = ""
+        submission_params[:text] = nil
       end
       @submission = Submission.new(submission_params)
       logger.debug "\n\n\n#################\n" + submission_params.to_s
@@ -154,6 +155,10 @@ class SubmissionsController < ApplicationController
           if comment.author.present? && comment.author == submission_params[:author_username]
             comment.id_submission = @submission.id
             comment.save
+            
+            @submission.comments.push(comment)
+            @submission.text = ""
+            @submission.save
           end
           format.html { redirect_to news_path}
         else
