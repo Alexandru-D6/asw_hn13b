@@ -45,7 +45,7 @@ class CommentsController < ApplicationController
     else
       @comment = Comment.find(params[:id])
       
-      if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+      if current_user.LikedComments.detect{|e| e == params[:id]}.nil?
         @comment.UpVotes = @comment.UpVotes + 1
         current_user.LikedComments.push(params[:id])
         current_user.save
