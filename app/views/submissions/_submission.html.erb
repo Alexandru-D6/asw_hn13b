@@ -70,3 +70,11 @@
     <%= link_to "comments", "item?id="+submission.id.to_s, url: url %>
   </td>
 </tr>
+<%if url == ("/item?id="+submission.id.to_s)%>
+<tr>
+  <td colspan="2"></td>
+  <td>
+      <%=submission.text%>
+  </td>
+</tr>
+<%end%>

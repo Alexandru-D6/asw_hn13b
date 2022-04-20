@@ -35,7 +35,9 @@
                   </table>
                   
                      <% @submission.comments.each do |comment| %>
-                        <%= render '/comments/comment_tree', comment: comment, title_submission: @submission.title, url: '/item?id='+@submission.id.to_s %>
+                        <% if comment.author != ""%>
+                           <%= render '/comments/comment_tree', comment: comment, title_submission: @submission.title, url: '/item?id='+@submission.id.to_s %>
+                        <%end%>
                      <%end%>
 
                   <br><br>

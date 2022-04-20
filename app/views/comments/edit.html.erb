@@ -29,6 +29,11 @@
                            <td colspan="2"><%= render 'form', comment: @comment %></td>
                         </tr>
                      </table>
+                     <tr>
+                        <td>
+                           <%= render 'submissions/bottomURL'%>
+                        </td>
+                     </tr>
                   <%else%>
                      You can't edit this comment
                   <%end%>

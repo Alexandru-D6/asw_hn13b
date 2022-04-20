@@ -116,7 +116,6 @@ class SubmissionsController < ApplicationController
         format.html { redirect_to user_session_path}
       end
     else
-      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
       @submission = Submission.find(params[:id])
       
       if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
@@ -141,11 +140,21 @@ class SubmissionsController < ApplicationController
           format.html { redirect_to idurl, notice: "This URL allready exists" }
         end
     else 
+      comment = Comment.new()
+      if submission_params[:url] != "" && submission_params[:text] != ""
+        comment.comment = submission_params[:text]
+        comment.author = submission_params[:author_username]
+        submission_params[:text] = ""
+      end
       @submission = Submission.new(submission_params)
       logger.debug "\n\n\n#################\n" + submission_params.to_s
       
       respond_to do |format|
         if @submission.save
+          if comment.author.present? && comment.author == submission_params[:author_username]
+            comment.id_submission = @submission.id
+            comment.save
+          end
           format.html { redirect_to news_path}
         else
           format.html { render new_submission_path, status: :unprocessable_entity }
@@ -273,32 +282,25 @@ class SubmissionsController < ApplicationController
   end
   
   def past
-    data = Time.new()
+    data = Time.new()- (3600*24)
     if params[:day].present?
       arrayday = params[:day].split('-')
-      data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
+      data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i,23,59,59)
     end
     
     @shorturl = Array.new();
     @submissions = Array.new()
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
-        if submission.url != "" && submission.author_username != ""
-          url =submission.url.split('//')
-          shortu = url[1].split('/')
-          @shorturl.push(shortu[0])
-        else 
-          @shorturl.push("")
-        end
-        if data.year > submission.created_at.year
+        
+        if data>=submission.created_at && submission.author_username != ""
           @submissions.push(submission)
-        else
-          if data.year == submission.created_at.year &&  data.month > submission.created_at.month
-            @submissions.push(submission)
-          else
-            if data.year == submission.created_at.year &&  data.month == submission.created_at.month && data.day > submission.created_at.day
-              @submissions.push(submission)
-            end
+          if submission.url != "" 
+            url =submission.url.split('//')
+            shortu = url[1].split('/')
+            @shorturl.push(shortu[0])
+          else 
+            @shorturl.push("")
           end
         end
       end
@@ -309,7 +311,7 @@ class SubmissionsController < ApplicationController
       dataF = data + (3600*24)
       @date = data.strftime("%F")
       @dataToday = url+data.strftime("%F")
-      @dataN = dataD.strftime("%B %d, %Y (%Z)")
+      @dataN = data.strftime("%B %d, %Y (%Z)")
       @dataD = url+dataD.strftime("%F")
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")
