@@ -1,3 +1,5 @@
+<table>
+  <tbody>
 <tr class="athing" id=<%=comment.id%>>
   <td valign="top" class="votelinks">
     <center>
@@ -37,14 +39,24 @@
   </td>
 </tr>
 <tr>
-  <table>
-      <% comment.comments.each do |sub_comment| %>
-        <tr>
-          <td> -------- </td>
-          <td>
-            <%= render 'comments/comment', comment: sub_comment, url: url, title_submission: title_submission %>
-          </td>
-        </tr>
-      <%end%>
-  </table>
+  <td colspan="1"></td>
+  <td style="font-size:9px"><u>
+      <%= link_to "reply", "/reply?id="+ comment.id.to_s%>
+    </u>
+  </td>
 </tr>
+  </tbody>
+</table>
+  
+    <table>
+      <td &emsp></td>
+      <td &emsp></td>
+      <td &emsp></td>
+      <td>
+        <% comment.comments.each do |sub_comment| %>
+          <%= render 'comments/comment_tree', comment: sub_comment, title_submission: title_submission %>
+        <%end%>
+      </td>
+    </table>
+
+  
