@@ -15,7 +15,7 @@
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
                      <%count = 0%>
                      <% @comments.each do |comment| %>
-                        <%= render 'comment', comment: comment, url: "/comments", title_submission: @titles_submissions[count] %>
+                        <%= render 'comment', comment: comment, url: "/threads", title_submission: @titles_submissions[count] %>
                         <%count = count + 1%>
                      <% end %>
                      

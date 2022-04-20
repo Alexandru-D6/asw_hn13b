@@ -1,3 +1,5 @@
+require 'SoftDeleteComments'
+
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[ show edit update destroy ]
 
@@ -16,7 +18,15 @@ class CommentsController < ApplicationController
   end
   
   def threads
-    @comments = Comment.where(author: params[:id]).order(created_at: :desc, title: :asc)
+    temp = Comment.where(author: params[:id]).order(created_at: :desc, title: :asc)
+    
+    @comments = Array.new()
+    temp.each do |com|
+      if com.author != ""
+        @comments.push(com)
+      end
+    end
+    
     @titles_submissions = Array.new()
     @comments.each do |comment|
         submission = Submission.find(comment.id_submission)
@@ -192,7 +202,33 @@ class CommentsController < ApplicationController
   end
   
   def soft_delete
-    #SoftDeleteComments.softDC(id: params[:id])
+    comment = Comment.find(params[:id])
+    id = comment.id
+    if comment.author != ""
+      comment.comment = "[deleted]"
+      comment.author = ""
+      comment.id_sons = []
+      comment.UpVotes = 0
+      
+      comment.title_submission = ""
+      comment.num_sons = 0
+      
+      comment.comments.each do |comment_son| ##<- delete all of them
+        SoftDeleteComments.softDC(comment_son.id)
+        #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+        #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
+      end
+      
+      respond_to do |format|
+        if comment.save
+            format.html { redirect_to "/reply?id="+id.to_s, notice: "Submission was successfully destroyed." }
+            format.json { head :no_content }
+        else
+          format.html { redirect_to "/news", notice: "There was some error ¯\_(ツ)_/¯." }
+          format.json { head :no_content }
+        end
+      end
+    end
   end
 
   private
