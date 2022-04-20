@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     end
   end
   
-  resources :commnents do
+  resources :comments do
     member do
       put 'upvote'
     end
