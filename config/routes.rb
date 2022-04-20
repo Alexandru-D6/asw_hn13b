@@ -14,6 +14,18 @@ Rails.application.routes.draw do
       put 'unvote'
     end
   end
+  
+  resources :submissions do
+    member do
+      put 'soft_delete'
+    end
+  end
+  
+  resources :comments do
+    member do
+      put 'soft_delete'
+    end
+  end
 
   
   resources :users

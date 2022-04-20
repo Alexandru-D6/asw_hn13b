@@ -1,3 +1,5 @@
+require 'soft_delete_comments'
+
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[ show edit update destroy ]
 
@@ -127,6 +129,10 @@ class CommentsController < ApplicationController
       format.html { redirect_to comments_url, notice: "Comment was successfully destroyed." }
       format.json { head :no_content }
     end
+  end
+  
+  def soft_delete
+    #SoftDeleteComments.softDC(id: params[:id])
   end
 
   private
