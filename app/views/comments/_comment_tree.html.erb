@@ -19,7 +19,9 @@
       <td &emsp></td>
       <td>
         <% comment.comments.each do |sub_comment| %>
-          <%= render 'comments/comment_tree', comment: sub_comment, title_submission: title_submission, url: url %>
+          <%if sub_comment.author != ""%>
+            <%= render 'comments/comment_tree', comment: sub_comment, title_submission: title_submission, url: url %>
+          <%end%>
         <%end%>
       </td>
     </table>

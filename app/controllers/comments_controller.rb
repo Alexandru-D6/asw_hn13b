@@ -75,7 +75,6 @@ class CommentsController < ApplicationController
         format.html { redirect_to user_session_path}
       end
     else
-      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
       @comment = Comment.find(params[:id])
       
       if !current_user.LikedComments.detect{|e| e == params[:id]}.nil?

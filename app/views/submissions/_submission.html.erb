@@ -59,6 +59,10 @@
       <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
     <%end%>
     
+    <% if user_signed_in? && submission.author_username == current_user.name %>
+      <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
+    <%end%>
+    
     <% if user_signed_in? && !(current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
@@ -66,3 +70,11 @@
     <%= link_to "comments", "item?id="+submission.id.to_s, url: url %>
   </td>
 </tr>
+<%if url == ("/item?id="+submission.id.to_s)%>
+<tr>
+  <td colspan="2"></td>
+  <td>
+      <%=submission.text%>
+  </td>
+</tr>
+<%end%>
