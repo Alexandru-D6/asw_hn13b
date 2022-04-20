@@ -4,6 +4,6 @@ class Comment < ApplicationRecord
   has_many :comments
 
   after_initialize do |comment|
-    comment.id_sons= Array.new(1) if comment.id_sons == nil
+    comment.id_sons= '{}' if comment.id_sons == nil
   end
 end

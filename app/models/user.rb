@@ -3,8 +3,8 @@ class User < ApplicationRecord
   serialize :LikedComments
 
   after_initialize do |user|
-    user.LikedSubmissions= Array.new(1) if user.LikedSubmissions == nil
-    user.LikedComments= Array.new(1) if user.LikedComments == nil
+    user.LikedSubmissions= '{}' if user.LikedSubmissions == nil
+    user.LikedComments= '{}' if user.LikedComments == nil
   end
   
 
