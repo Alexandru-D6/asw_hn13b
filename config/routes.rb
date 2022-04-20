@@ -15,12 +15,24 @@ Rails.application.routes.draw do
     end
   end
   
+  resources :comments do
+    member do
+      put 'upvote'
+    end
+  end
+  
   resources :submissions do
     member do
       put 'soft_delete'
     end
   end
   
+  resources :comments do
+    member do
+      put 'unvote'
+    end
+  end
+
   resources :comments do
     member do
       put 'soft_delete'

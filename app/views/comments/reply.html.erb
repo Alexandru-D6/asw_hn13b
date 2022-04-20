@@ -8,10 +8,10 @@
                   <table class="fatitem" border="0">
                     <tbody>
                       <tr class="athing">    
-                        <%= render 'comment', comment: @comments[0], url: "/comments", title_submission: @title_submission%>
+                        <%= render 'comment', comment: @comments[0], url: @return_URL, title_submission: @title_submission%>
                         <%if @comments[0].author != ""%>
                           <td colspan = "2">
-                            <%= render 'form', comment: Comment.new, id_father: @comments[0].id, id_submission: @comments[0].id_submission%>
+                            <%= render 'form', comment: Comment.new, id_father: @comments[0].id, id_submission: @comments[0].id_submission, url: @return_URL%>
                           </td>
                         <%end%>
                       </tr>
