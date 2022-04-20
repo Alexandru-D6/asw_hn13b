@@ -20,8 +20,8 @@ class User < ApplicationRecord
       @user.name = access_token.info.nickname
       @user.provider = access_token.provider
       @user.uid = access_token.uid
-      @user.LikedComments = Array.new(0)
-      @user.LikedSubmissions = Array.new(0)
+      @user.LikedComments = Array.new(1, -1)
+      @user.LikedSubmissions = Array.new(1, -1)
       @user.save
       
       logger.debug "#{data}"
