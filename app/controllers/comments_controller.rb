@@ -37,7 +37,53 @@ class CommentsController < ApplicationController
   def edit
   end
   
+  def upvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @comment = Comment.find(params[:id])
+      
+      if current_user.LikedComments.detect{|e| e == params[:id]}.nil?
+        @comment.UpVotes = @comment.UpVotes + 1
+        current_user.LikedComments.push(params[:id])
+        current_user.save
+        
+        respond_to do |format|
+          if @comment.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
+  def unvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
+      @comment = Comment.find(params[:id])
+      
+      if !current_user.LikedComments.detect{|e| e == params[:id]}.nil?
+        @comment.UpVotes = @comment.UpVotes - 1
+        current_user.LikedComments.extract!{|e| e == params[:id]}
+        current_user.save
+  
+        respond_to do |format|
+          if @comment.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
   def reply
+    @return_URL = params[:url]
     @comments = Comment.where(id: params[:id])
     @title_submission = ""
     @comments.each do |comment|
@@ -73,7 +119,23 @@ class CommentsController < ApplicationController
   end
   
  def upvoted
-    
+    if !params[:id].nil?
+      @user_name = params[:id].to_s
+      user = User.find_by(name: params[:id])
+      
+      if !user.nil? && !user.LikedComments.nil?
+        temp = Comment.where(id: user.LikedComments)
+        temp.order(created_at: :desc, title: :asc)
+        
+        @comment = Array.new()
+        temp.each do |temp|
+          if temp.author != ""
+            temp.title_submission = Submission.find(temp.id_submission).title
+            @comment.push(temp)  
+          end
+        end
+      end
+    end
  end
   
   
@@ -95,7 +157,7 @@ class CommentsController < ApplicationController
     
     respond_to do |format|
       if @comment.save
-        format.html { redirect_to comment_url(@comment), notice: "Comment was successfully created." }
+        format.html { redirect_to "/item?id="+comment_params[:id_submission].to_s, notice: "Comment was successfully created." }
         format.json { render :show, status: :created, location: @comment }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -127,6 +189,10 @@ class CommentsController < ApplicationController
       format.html { redirect_to comments_url, notice: "Comment was successfully destroyed." }
       format.json { head :no_content }
     end
+  end
+  
+  def soft_delete
+    #SoftDeleteComments.softDC(id: params[:id])
   end
 
   private
