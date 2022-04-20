@@ -37,6 +37,51 @@ class CommentsController < ApplicationController
   def edit
   end
   
+  def upvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @comment = Comment.find(params[:id])
+      
+      if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+        @comment.UpVotes = @comment.UpVotes + 1
+        current_user.LikedComments.push(params[:id])
+        current_user.save
+        
+        respond_to do |format|
+          if @comment.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
+  def unvote
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
+      @comment = Comment.find(params[:id])
+      
+      if !current_user.LikedComments.detect{|e| e == params[:id]}.nil?
+        @comment.UpVotes = @comment.UpVotes - 1
+        current_user.LikedComments.extract!{|e| e == params[:id]}
+        current_user.save
+  
+        respond_to do |format|
+          if @comment.save
+            format.html { redirect_to params[:url].to_s} #need a way to return to the previous page
+          end
+        end
+      end
+    end
+  end
+  
   def reply
     @comments = Comment.where(id: params[:id])
     @title_submission = ""

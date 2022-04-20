@@ -1,12 +1,17 @@
 <tr class="athing" id=<%=comment.id%>>
   <td valign="top" class="votelinks">
     <center>
-      <% if user_signed_in? && comment.author == current_user.name%>
-        <font color="#ff6600">*</font>
+      <% if user_signed_in? %>
+        <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
       <%else%>
-        ▲
+        <%if !user_signed_in? %>
+          <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
+        <%else%>
+          <%= "⠀"%>
+        <%end%>
       <%end%>
-    
+       
+
     </center>
   </td>
   
