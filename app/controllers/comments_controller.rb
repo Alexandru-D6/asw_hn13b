@@ -6,8 +6,8 @@ class CommentsController < ApplicationController
   # GET /comments or /comments.json
   def index
     com = Comment.all.order(created_at: :desc, comment: :asc)
-    @comments= Array.new
-    @titles_submissions = Array.new
+    @comments= Array.new(0)
+    @titles_submissions = Array.new(0)
     com.each do |comment|
       if comment.author != ""
         @comments.push(comment)
@@ -20,14 +20,14 @@ class CommentsController < ApplicationController
   def threads
     temp = Comment.where(author: params[:id]).order(created_at: :desc, comment: :asc)
     
-    @comments = Array.new
+    @comments = Array.new(0)
     temp.each do |com|
       if com.author != ""
         @comments.push(com)
       end
     end
     
-    @titles_submissions = Array.new
+    @titles_submissions = Array.new(0)
     @comments.each do |comment|
         submission = Submission.find(comment.id_submission)
         @titles_submissions.push(submission.title)
@@ -104,7 +104,7 @@ class CommentsController < ApplicationController
   def comments
     
     @comments = Comment.all.order(created_at: :desc, comment: :asc)
-    @titles_submissions = Array.new
+    @titles_submissions = Array.new(0)
     @comments.each do |comment|
       submission = Submission.find(comment.id_submission)
       @titles_submissions.push(submission.title)
@@ -136,7 +136,7 @@ class CommentsController < ApplicationController
         temp = Comment.where(id: user.LikedComments)
         temp.order(created_at: :desc, title: :asc)
         
-        @comment = Array.new
+        @comment = Array.new(0)
         temp.each do |temp|
           if temp.author != ""
             temp.title_submission = Submission.find(temp.id_submission).title
