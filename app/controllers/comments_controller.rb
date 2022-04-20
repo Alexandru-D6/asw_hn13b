@@ -5,7 +5,7 @@ class CommentsController < ApplicationController
 
   # GET /comments or /comments.json
   def index
-    com = Comment.all.order(created_at: :desc, title: :asc)
+    com = Comment.all.order(created_at: :desc, comment: :asc)
     @comments= Array.new()
     @titles_submissions = Array.new()
     com.each do |comment|
@@ -18,7 +18,7 @@ class CommentsController < ApplicationController
   end
   
   def threads
-    temp = Comment.where(author: params[:id]).order(created_at: :desc, title: :asc)
+    temp = Comment.where(author: params[:id]).order(created_at: :desc, comment: :asc)
     
     @comments = Array.new()
     temp.each do |com|
@@ -103,7 +103,7 @@ class CommentsController < ApplicationController
   
   def comments
     
-    @comments = Comment.all.order(created_at: :desc, title: :asc)
+    @comments = Comment.all.order(created_at: :desc, comment: :asc)
     @titles_submissions = Array.new()
     @comments.each do |comment|
       submission = Submission.find(comment.id_submission)
