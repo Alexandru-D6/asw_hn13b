@@ -17,6 +17,8 @@ module SoftDeleteComments
           #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
         end
       end
+      
+      comment.save
     end
   end
   

@@ -17,8 +17,6 @@
   </td>
   
   <td class="subtext">
-    <%= comment.UpVotes %>
-    
     <%= link_to comment.author, "/user?id="+comment.author, url: url%>
     <span class="age" title=<%comment.created_at%>>
       <%= link_to distance_of_time_in_words(comment.created_at, Time.new) + " ago", "/reply?id="+comment.id.to_s, url: url%>
