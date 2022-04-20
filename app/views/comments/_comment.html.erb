@@ -1,18 +1,23 @@
 <tr class="athing" id=<%=comment.id%>>
   <td valign="top" class="votelinks">
     <center>
-      <% if user_signed_in? && comment.author == current_user.name%>
-        <font color="#ff6600">*</font>
-      <%else%>
-        ▲
-      <%end%>
+      <% if user_signed_in? && (current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?)%>
+          <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
+        <%else%>
+          <%if !user_signed_in? %>
+            <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
+          <%else%>
+            <%= "⠀"%>
+          <%end%>
+        <%end%>
     
     </center>
   </td>
   
   <td class="subtext">
+    <%= comment.UpVotes %>
     
-    <%= link_to comment.author, "/user?id="+comment.author%>
+    <%= link_to comment.author, "/user?id="+comment.author, url: url%>
     <span class="age" title=<%comment.created_at%>>
       <a href=<%= "reply?id="+comment.id.to_s%>><%=distance_of_time_in_words(comment.created_at, Time.new)%> ago</a>
     </span> 
@@ -22,6 +27,9 @@
     <% if user_signed_in? && comment.author == current_user.name %>
       <a href=<%="/comments/"+comment.id.to_s+'/edit'%> class="clicky">edit</a> | 
       <a href=<%="/delete_comment?id="+comment.id.to_s%> class="clicky">delete</a> | 
+    <%end%>
+    <% if user_signed_in? && !(current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?) %>
+      <%= link_to "unvote", unvote_comment_path(comment, url: url), method: :put%> |
     <%end%>
     <a href=<%="item?id="+comment.id_submission.to_s%> class="clicky">context</a> | on: 
     <a href=<%="item?id="+comment.id_submission.to_s%> class="clicky"><%= title_submission%></a>

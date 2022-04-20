@@ -3,8 +3,16 @@ class SubmissionsController < ApplicationController
 
   # GET /submissions or /submissions.json
   def index
-    @submissions = Submission.all.order(UpVotes: :desc, title: :asc)
-    @shorturl = Array.new();
+    temp = Submission.all.order(UpVotes: :desc, title: :asc)
+    
+    @submissions = Array.new()
+    temp.each do |temp|
+      if temp.author_username != ""
+        @submissions.push(temp)  
+      end
+    end
+    
+    @shorturl = Array.new()
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -17,7 +25,15 @@ class SubmissionsController < ApplicationController
   end
   
   def newest
-    @submissions = Submission.all.order(created_at: :desc, title: :asc)
+    temp = Submission.all.order(created_at: :desc, title: :asc)
+    
+    @submissions = Array.new()
+    temp.each do |temp|
+      if temp.author_username != ""
+        @submissions.push(temp)  
+      end
+    end
+    
     @shorturl = Array.new();
     @submissions.each do |submission|
       if submission.url != ""
@@ -34,7 +50,7 @@ class SubmissionsController < ApplicationController
     subm = Submission.all.order(created_at: :desc, title: :asc)
     @submissions = Array.new()
     subm.each do |submission|
-      if submission.url == ""
+      if submission.url == "" && submission.author_username != ""
         @submissions.push(submission)
       end
     end
@@ -156,8 +172,15 @@ class SubmissionsController < ApplicationController
       user = User.find_by(name: params[:id])
       
       if !user.nil? && !user.LikedSubmissions.nil?
-        @submission = Submission.where(id: user.LikedSubmissions)
-        @submission.order(created_at: :desc, title: :asc)
+        temp = Submission.where(id: user.LikedSubmissions)
+        temp.order(created_at: :desc, title: :asc)
+        
+        @submission = Array.new()
+        temp.each do |temp|
+          if temp.author_username != ""
+            @submission.push(temp)  
+          end
+        end
       end
       
       if !@submission.nil?
@@ -199,6 +222,7 @@ class SubmissionsController < ApplicationController
   
   def item
     @submission = Submission.find_by(id: params[:id])
+    
     @shorturl = Array.new();
     if @submission.url != ""
       url =@submission.url.split('//')
@@ -219,6 +243,33 @@ class SubmissionsController < ApplicationController
     end
   end
   
+  def soft_delete
+    @submission = Submission.find(params[:id])
+    if @submission.author_username == current_user.name
+      @submission.title = "[deleted]"
+      @submission.url = ""
+      @submission.text = ""
+      @submission.UpVotes = 0
+      @submission.author_username = ""
+      
+      @submission.comments.each do |comment| ##<- delete all of them
+        include SoftDeleteComments.softDC(comment.id)
+        ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+        ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+      end
+      
+      if @submission.save
+        respond_to do |format|
+          format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
+          format.json { head :no_content }
+        end
+      else
+        format.html { redirect_to submissions_url, notice: "There was some error ¯\_(ツ)_/¯." }
+        format.json { head :no_content }
+      end
+    end
+  end
+  
   def past
     data = Time.new()
     if params[:day].present?
@@ -230,7 +281,7 @@ class SubmissionsController < ApplicationController
     @submissions = Array.new()
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
-        if submission.url != ""
+        if submission.url != "" && submission.author_username != ""
           url =submission.url.split('//')
           shortu = url[1].split('/')
           @shorturl.push(shortu[0])
