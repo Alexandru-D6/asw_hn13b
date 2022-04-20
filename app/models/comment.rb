@@ -4,6 +4,6 @@ class Comment < ApplicationRecord
   has_many :comments
 
   after_initialize do |comment|
-    comment.id_sons= [] if comment.id_sons == nil
+    comment.id_sons= [].to_yaml if comment.id_sons == nil
   end
 end
