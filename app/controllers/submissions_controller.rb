@@ -7,14 +7,14 @@ class SubmissionsController < ApplicationController
   def index
     temp = Submission.all.order(UpVotes: :desc, title: :asc)
     
-    @submissions = Array.new()
+    @submissions = Array.new
     temp.each do |temp|
       if temp.author_username != ""
         @submissions.push(temp)  
       end
     end
     
-    @shorturl = Array.new()
+    @shorturl = Array.new
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -29,14 +29,14 @@ class SubmissionsController < ApplicationController
   def newest
     temp = Submission.all.order(created_at: :desc, title: :asc)
     
-    @submissions = Array.new()
+    @submissions = Array.new
     temp.each do |temp|
       if temp.author_username != ""
         @submissions.push(temp)  
       end
     end
     
-    @shorturl = Array.new();
+    @shorturl = Array.new;
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -50,13 +50,13 @@ class SubmissionsController < ApplicationController
   
   def ask
     subm = Submission.all.order(created_at: :desc, title: :asc)
-    @submissions = Array.new()
+    @submissions = Array.new
     subm.each do |submission|
       if submission.url == "" && submission.author_username != ""
         @submissions.push(submission)
       end
     end
-    @shorturl = Array.new();
+    @shorturl = Array.new;
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -186,7 +186,7 @@ class SubmissionsController < ApplicationController
         temp = Submission.where(id: user.LikedSubmissions)
         temp.order(created_at: :desc, title: :asc)
         
-        @submission = Array.new()
+        @submission = Array.new
         temp.each do |temp|
           if temp.author_username != ""
             @submission.push(temp)  
@@ -195,7 +195,7 @@ class SubmissionsController < ApplicationController
       end
       
       if !@submission.nil?
-        @shorturl = Array.new();
+        @shorturl = Array.new;
         @submission.each do |submission|
           if submission.url != ""
             url =submission.url.split('//')
@@ -217,7 +217,7 @@ class SubmissionsController < ApplicationController
       @submission.order(created_at: :desc, title: :asc)
       
       if !@submission.nil?
-        @shorturl = Array.new();
+        @shorturl = Array.new;
         @submission.each do |submission|
           if submission.url != ""
             url =submission.url.split('//')
@@ -234,7 +234,7 @@ class SubmissionsController < ApplicationController
   def item
     @submission = Submission.find_by(id: params[:id])
     
-    @shorturl = Array.new();
+    @shorturl = Array.new;
     if @submission.url != ""
       url =@submission.url.split('//')
       shortu = url[1].split('/')
@@ -288,8 +288,8 @@ class SubmissionsController < ApplicationController
       data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i,23,59,59)
     end
     
-    @shorturl = Array.new();
-    @submissions = Array.new()
+    @shorturl = Array.new;
+    @submissions = Array.new
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
         
