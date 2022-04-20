@@ -18,29 +18,26 @@
                         <% count = -1 %>
                         <% countURL = 0 %>
                         
-                        
-                        <%= render 'submission', submission: @submission, count: count, url: '/item?id='+@submission.id.to_s, countURL: countURL %>
-                        
                         <tr>
-                           <td>
-                              <% @submission.comments.each do |comment| %>
-                                 <%= render '/comments/comment', comment: comment, url: '/item?id='+@submission.id.to_s, title_submission: @submission.title %>
-                              <%end%>
-                           </td>
+                           <%= render 'submission', submission: @submission, count: count, url: '/item?id='+@submission.id.to_s, countURL: countURL %>
                         </tr>
                         
-                        
+                  
                         <tr style="height:10px"></tr>
                         
                         <tr>
                            <td colspan="2"></td>
                            <td>
-                              <%= render '/comments/form', comment: Comment.new, id_submission: @submission.id, id_father: 0%>
+                              <%= render '/comments/form', comment: Comment.new, id_submission: @submission.id, id_father: 0, url: '/item?id='+@submission.id.to_s%>
                            </td>
                         </tr>
                      </tbody>
                   </table>
                   
+                     <% @submission.comments.each do |comment| %>
+                        <%= render '/comments/comment_tree', comment: comment, title_submission: @submission.title, url: '/item?id='+@submission.id.to_s %>
+                     <%end%>
+
                   <br><br>
                
                </td>

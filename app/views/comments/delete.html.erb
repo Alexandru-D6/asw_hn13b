@@ -34,10 +34,7 @@
                              </tr>
                              <tr>
                                <td colspan="1">
-                                 <%url = "/deleted_comment?id="+@comment.id.to_s%>
-                                 <a href = <%=url%>>
-                                   <%= button_to 'Yes'%>  
-                                 </a>
+                                 <%= button_to 'yes', soft_delete_comment_path(@comment.id), method: :put%>
                                </td>
                                <td colspan="2">
                                  <%= button_to 'No', "/comments/"+@comment.id.to_s+"/edit", method: :get%>
