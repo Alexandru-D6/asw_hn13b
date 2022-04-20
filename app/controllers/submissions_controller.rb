@@ -96,6 +96,10 @@ class SubmissionsController < ApplicationController
     else
       @submission = Submission.find(params[:id])
       
+      if current_user.LikedSubmissions.nil?
+        current_user.LikedSubmissions = Array.new(0)
+      end
+      
       if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
         @submission.UpVotes = @submission.UpVotes + 1
         current_user.LikedSubmissions.push(params[:id])
@@ -117,6 +121,10 @@ class SubmissionsController < ApplicationController
       end
     else
       @submission = Submission.find(params[:id])
+      
+      if current_user.LikedSubmissions.nil?
+        current_user.LikedSubmissions = Array.new(0)
+      end
       
       if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
         @submission.UpVotes = @submission.UpVotes - 1
