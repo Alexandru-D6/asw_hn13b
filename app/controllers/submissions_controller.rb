@@ -1,3 +1,5 @@
+require 'SoftDeleteComments'
+
 class SubmissionsController < ApplicationController
   before_action :set_submission, only: %i[ show edit update destroy ]
 
@@ -157,7 +159,7 @@ class SubmissionsController < ApplicationController
   def update
     respond_to do |format|
       if @submission.update(submission_params)
-        format.html { redirect_to submission_url(@submission), notice: "Submission was successfully updated." }
+        format.html { redirect_to "/submissions/"+@submission.id.to_s+"/edit", notice: "Submission was successfully updated." }
         format.json { render :show, status: :ok, location: @submission }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -253,19 +255,19 @@ class SubmissionsController < ApplicationController
       @submission.author_username = ""
       
       @submission.comments.each do |comment| ##<- delete all of them
-        include SoftDeleteComments.softDC(comment.id)
+        SoftDeleteComments.softDC(comment.id)
         ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
         ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
       end
       
-      if @submission.save
-        respond_to do |format|
-          format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
+      respond_to do |format|
+        if @submission.save
+            format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
+            format.json { head :no_content }
+        else
+          format.html { redirect_to submissions_url, notice: "There was some error ¯\_(ツ)_/¯." }
           format.json { head :no_content }
         end
-      else
-        format.html { redirect_to submissions_url, notice: "There was some error ¯\_(ツ)_/¯." }
-        format.json { head :no_content }
       end
     end
   end
