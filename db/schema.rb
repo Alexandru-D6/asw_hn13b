@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_20_155143) do
+ActiveRecord::Schema.define(version: 2022_04_18_172839) do
 
   create_table "comments", force: :cascade do |t|
     t.string "author", default: "", null: false
@@ -54,7 +54,6 @@ ActiveRecord::Schema.define(version: 2022_04_20_155143) do
     t.string "about"
     t.integer "karma", default: 0
     t.text "LikedSubmissions"
-    t.text "LikedComments"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["name"], name: "index_users_on_name", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
