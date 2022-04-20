@@ -65,7 +65,6 @@ class CommentsController < ApplicationController
         format.html { redirect_to user_session_path}
       end
     else
-      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
       @comment = Comment.find(params[:id])
       
       if !current_user.LikedComments.detect{|e| e == params[:id]}.nil?
@@ -169,7 +168,6 @@ class CommentsController < ApplicationController
   # PATCH/PUT /comments/1 or /comments/1.json
   def update
     respond_to do |format|
-      p "ME HE COLADOOOOO"
       if @comment.update(comment_params)
         url = "/comments/"+@comment.id.to_s+"/edit"
         format.html { redirect_to url, notice: "Comment was successfully updated." }
