@@ -188,7 +188,6 @@ class CommentsController < ApplicationController
   # PATCH/PUT /comments/1 or /comments/1.json
   def update
     respond_to do |format|
-      p "ME HE COLADOOOOO"
       if @comment.update(comment_params)
         url = "/comments/"+@comment.id.to_s+"/edit"
         format.html { redirect_to url, notice: "Comment was successfully updated." }
@@ -222,10 +221,12 @@ class CommentsController < ApplicationController
       comment.title_submission = ""
       comment.num_sons = 0
       
-      comment.comments.each do |comment_son| ##<- delete all of them
-        SoftDeleteComments.softDC(comment_son.id)
-        #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
-        #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
+      if !comment.comments.nill?
+        comment.comments.each do |comment_son| ##<- delete all of them
+          SoftDeleteComments.softDC(comment_son.id)
+          #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+          #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
+        end
       end
       
       respond_to do |format|

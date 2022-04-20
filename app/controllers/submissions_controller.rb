@@ -263,10 +263,12 @@ class SubmissionsController < ApplicationController
       @submission.UpVotes = 0
       @submission.author_username = ""
       
-      @submission.comments.each do |comment| ##<- delete all of them
-        SoftDeleteComments.softDC(comment.id)
-        ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
-        ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+      if !@submission.comments.nil?
+        @submission.comments.each do |comment| ##<- delete all of them
+          SoftDeleteComments.softDC(comment.id)
+          ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+          ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+        end
       end
       
       respond_to do |format|

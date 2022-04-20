@@ -10,7 +10,7 @@ module SoftDeleteComments
       comment.title_submission = ""
       comment.num_sons = 0
       
-      if comment.comments.nil?
+      if !comment.comments.nil?
         comment.comments.each do |comment_son| ##<- delete all of them
           SoftDeleteComments.softDC(comment_son.id)
           #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
