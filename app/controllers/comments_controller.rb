@@ -154,18 +154,21 @@ class CommentsController < ApplicationController
     @comment.author = current_user.name
       
     if comment_params[:id_comment_father].nil?
+      submission = Submission.find(@comment.id_submission)
+      
       if submission.comments.nil? 
         submission.comments = Array.new(0)  
       end
       
-      submission = Submission.find(@comment.id_submission)
       submission.comments.push(@comment)
       submission.save
     else
+      comment_father = Comment.find(comment_params[:id_comment_father])
+      
       if comment_father.comments.nil? 
         comment_father.comments = Array.new(0)  
       end
-      comment_father = Comment.find(comment_params[:id_comment_father])
+      
       comment_father.comments.push(@comment)
       comment_father.save
     end
