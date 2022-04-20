@@ -62,6 +62,6 @@
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
     
-    <a href="news">&nbsp;comments</a>              
+    <%= link_to "comments", "item?id="+submission.id.to_s, url: url %>
   </td>
 </tr>

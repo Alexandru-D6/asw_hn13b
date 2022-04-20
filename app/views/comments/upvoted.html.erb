@@ -15,15 +15,10 @@
               <td>
                 <table class="fatitem" border="0">
                   <tbody>
-                    <% count = 1 %>
-                    <% countURL = 0 %>
-                    
                     <% if !@comment.nil? %>
                       <% @comment.each do |comment| %>
                         
-                        <%= render 'comment', submission: submission, count: count, url: '/upvoted_comments?id='+@user_name, countURL: countURL %>
-                        <% count = count + 1%>
-                        <% countURL = countURL + 1%>
+                        <%= render 'comment', comment: comment, title_submission: comment.title_submission , url: '/upvoted_comments?id='+@user_name %>
                         
                       <% end %>
                     <% end %>
@@ -49,7 +44,7 @@
          
             <tr>
                <td>
-                  <%= render 'bottomURL'%>
+                  <%= render 'submissions/bottomURL'%>
                </td>
             </tr>
             

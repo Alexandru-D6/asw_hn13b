@@ -173,6 +173,7 @@ class SubmissionsController < ApplicationController
       
       if !user.nil? && !user.LikedSubmissions.nil?
         temp = Submission.where(id: user.LikedSubmissions)
+        temp.order(created_at: :desc, title: :asc)
         
         @submission = Array.new()
         temp.each do |temp|
@@ -180,8 +181,6 @@ class SubmissionsController < ApplicationController
             @submission.push(temp)  
           end
         end
-    
-        @submission.order(created_at: :desc, title: :asc)
       end
       
       if !@submission.nil?

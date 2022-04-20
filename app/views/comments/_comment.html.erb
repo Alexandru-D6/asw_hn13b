@@ -1,10 +1,7 @@
 <tr class="athing" id=<%=comment.id%>>
   <td valign="top" class="votelinks">
     <center>
-      <% if user_signed_in? && comment.author == current_user.name%>
-        <font color="#ff6600">*</font>
-      <%else%>
-          <% if user_signed_in? && (current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?)%>
+      <% if user_signed_in? && (current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?)%>
           <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
         <%else%>
           <%if !user_signed_in? %>
@@ -13,7 +10,6 @@
             <%= "⠀"%>
           <%end%>
         <%end%>
-      <%end%>
     
     </center>
   </td>
@@ -21,7 +17,7 @@
   <td class="subtext">
     <%= comment.UpVotes %>
     
-    <%= link_to comment.author, "/user?id="+comment.author%>
+    <%= link_to comment.author, "/user?id="+comment.author, url: url%>
     <span class="age" title=<%comment.created_at%>>
       <a href=<%= "reply?id="+comment.id.to_s%>><%=distance_of_time_in_words(comment.created_at, Time.new)%> ago</a>
     </span> 
