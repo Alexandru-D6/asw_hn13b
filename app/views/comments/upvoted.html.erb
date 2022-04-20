@@ -21,7 +21,7 @@
                     <% if !@comment.nil? %>
                       <% @comment.each do |comment| %>
                         
-                        <%= render 'comment', comment: comment, count: count, url: '/upvoted?id='+@user_name, countURL: countURL %>
+                        <%= render 'comment', submission: submission, count: count, url: '/upvoted_comments?id='+@user_name, countURL: countURL %>
                         <% count = count + 1%>
                         <% countURL = countURL + 1%>
                         
