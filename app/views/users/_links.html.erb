@@ -8,7 +8,7 @@
   <td><%= link_to "comments", "/threads?id="+user, user_name: user%></td>
 </tr>
 
-<% if user_signed_in? %>
+<% if user_signed_in? && current_user.name == @user.name%>
   <tr>
     <td></td>
     <td><%= link_to "upvoted submissions", "/upvoted?id="+user%> / <%= link_to "comments", "/upvoted_comments?id="+user%></td>

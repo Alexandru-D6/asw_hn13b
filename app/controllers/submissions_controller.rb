@@ -1,3 +1,5 @@
+require 'SoftDeleteComments'
+
 class SubmissionsController < ApplicationController
   before_action :set_submission, only: %i[ show edit update destroy ]
 
@@ -5,14 +7,14 @@ class SubmissionsController < ApplicationController
   def index
     temp = Submission.all.order(UpVotes: :desc, title: :asc)
     
-    @submissions = Array.new()
+    @submissions = Array.new(0)
     temp.each do |temp|
       if temp.author_username != ""
         @submissions.push(temp)  
       end
     end
     
-    @shorturl = Array.new()
+    @shorturl = Array.new(0)
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -27,14 +29,14 @@ class SubmissionsController < ApplicationController
   def newest
     temp = Submission.all.order(created_at: :desc, title: :asc)
     
-    @submissions = Array.new()
+    @submissions = Array.new(0)
     temp.each do |temp|
       if temp.author_username != ""
         @submissions.push(temp)  
       end
     end
     
-    @shorturl = Array.new();
+    @shorturl = Array.new(0);
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -48,13 +50,13 @@ class SubmissionsController < ApplicationController
   
   def ask
     subm = Submission.all.order(created_at: :desc, title: :asc)
-    @submissions = Array.new()
+    @submissions = Array.new(0)
     subm.each do |submission|
       if submission.url == "" && submission.author_username != ""
         @submissions.push(submission)
       end
     end
-    @shorturl = Array.new();
+    @shorturl = Array.new(0);
     @submissions.each do |submission|
       if submission.url != ""
         url =submission.url.split('//')
@@ -96,7 +98,7 @@ class SubmissionsController < ApplicationController
       
       if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
         @submission.UpVotes = @submission.UpVotes + 1
-        current_user.LikedSubmissions.push(params[:id])
+        current_user.LikedSubmissions.push(params[:id].to_s)
         current_user.save
         
         respond_to do |format|
@@ -114,7 +116,6 @@ class SubmissionsController < ApplicationController
         format.html { redirect_to user_session_path}
       end
     else
-      logger.debug "\n\n\n\n ########### \n"+params[:url].to_s
       @submission = Submission.find(params[:id])
       
       if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
@@ -133,21 +134,42 @@ class SubmissionsController < ApplicationController
 
   # POST /submissions or /submissions.json
   def create
-    if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
-      idurl = "/item?id="+Submission.find_by(url: submission_params[:url]).id.to_s
-        respond_to do |format|
-          format.html { redirect_to idurl, notice: "This URL allready exists" }
-        end
-    else 
-      @submission = Submission.new(submission_params)
-      logger.debug "\n\n\n#################\n" + submission_params.to_s
-      
+    if !user_signed_in?
       respond_to do |format|
-        if @submission.save
-          format.html { redirect_to news_path}
-        else
-          format.html { render new_submission_path, status: :unprocessable_entity }
-          format.json { render json: @submission.errors, status: :unprocessable_entity }
+        format.html { redirect_to user_session_path}
+      end
+    else
+      if Submission.find_by(url: submission_params[:url]).present? && submission_params[:url] != ""
+        idurl = "/item?id="+Submission.find_by(url: submission_params[:url]).id.to_s
+          respond_to do |format|
+            format.html { redirect_to idurl, notice: "This URL allready exists" }
+          end
+      else 
+        comment = Comment.new()
+        if submission_params[:url] != "" && submission_params[:text] != ""
+          logger.debug "\n\n\n#################\n"
+          comment.comment = submission_params[:text]
+          comment.author = submission_params[:author_username]
+          submission_params[:text] = nil
+        end
+        @submission = Submission.new(submission_params)
+        logger.debug "\n\n\n#################\n" + submission_params.to_s
+        
+        respond_to do |format|
+          if @submission.save
+            if comment.author.present? && comment.author == submission_params[:author_username]
+              comment.id_submission = @submission.id
+              comment.save
+              
+              @submission.comments.push(comment)
+              @submission.text = ""
+              @submission.save
+            end
+            format.html { redirect_to news_path}
+          else
+            format.html { render new_submission_path, status: :unprocessable_entity }
+            format.json { render json: @submission.errors, status: :unprocessable_entity }
+          end
         end
       end
     end
@@ -155,43 +177,55 @@ class SubmissionsController < ApplicationController
 
   # PATCH/PUT /submissions/1 or /submissions/1.json
   def update
-    respond_to do |format|
-      if @submission.update(submission_params)
-        format.html { redirect_to submission_url(@submission), notice: "Submission was successfully updated." }
-        format.json { render :show, status: :ok, location: @submission }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @submission.errors, status: :unprocessable_entity }
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      respond_to do |format|
+        if @submission.update(submission_params)
+          format.html { redirect_to "/submissions/"+@submission.id.to_s+"/edit", notice: "Submission was successfully updated." }
+          format.json { render :show, status: :ok, location: @submission }
+        else
+          format.html { render :edit, status: :unprocessable_entity }
+          format.json { render json: @submission.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
   
   def upvoted
-    if !params[:id].nil?
-      @user_name = params[:id].to_s
-      user = User.find_by(name: params[:id])
-      
-      if !user.nil? && !user.LikedSubmissions.nil?
-        temp = Submission.where(id: user.LikedSubmissions)
-        temp.order(created_at: :desc, title: :asc)
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      if !params[:id].nil?
+        @user_name = params[:id].to_s
+        user = User.find_by(name: params[:id])
         
-        @submission = Array.new()
-        temp.each do |temp|
-          if temp.author_username != ""
-            @submission.push(temp)  
+        if !user.nil? && !user.LikedSubmissions.nil?
+          temp = Submission.where(id: user.LikedSubmissions)
+          temp.order(created_at: :desc, title: :asc)
+          
+          @submission = Array.new(0)
+          temp.each do |temp|
+            if temp.author_username != ""
+              @submission.push(temp)  
+            end
           end
         end
-      end
-      
-      if !@submission.nil?
-        @shorturl = Array.new();
-        @submission.each do |submission|
-          if submission.url != ""
-            url =submission.url.split('//')
-            shortu = url[1].split('/')
-            @shorturl.push(shortu[0])
-          else 
-            @shorturl.push("")
+        
+        if !@submission.nil?
+          @shorturl = Array.new(0);
+          @submission.each do |submission|
+            if submission.url != ""
+              url =submission.url.split('//')
+              shortu = url[1].split('/')
+              @shorturl.push(shortu[0])
+            else 
+              @shorturl.push("")
+            end
           end
         end
       end
@@ -206,7 +240,7 @@ class SubmissionsController < ApplicationController
       @submission.order(created_at: :desc, title: :asc)
       
       if !@submission.nil?
-        @shorturl = Array.new();
+        @shorturl = Array.new(0);
         @submission.each do |submission|
           if submission.url != ""
             url =submission.url.split('//')
@@ -223,7 +257,7 @@ class SubmissionsController < ApplicationController
   def item
     @submission = Submission.find_by(id: params[:id])
     
-    @shorturl = Array.new();
+    @shorturl = Array.new(0);
     if @submission.url != ""
       url =@submission.url.split('//')
       shortu = url[1].split('/')
@@ -235,68 +269,75 @@ class SubmissionsController < ApplicationController
 
   # DELETE /submissions/1 or /submissions/1.json
   def destroy
-    @submission.destroy
-
-    respond_to do |format|
-      format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
-      format.json { head :no_content }
-    end
-  end
-  
-  def soft_delete
-    @submission = Submission.find(params[:id])
-    if @submission.author_username == current_user.name
-      @submission.title = "[deleted]"
-      @submission.url = ""
-      @submission.text = ""
-      @submission.UpVotes = 0
-      @submission.author_username = ""
-      
-      @submission.comments.each do |comment| ##<- delete all of them
-        include SoftDeleteComments.softDC(comment.id)
-        ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
-        ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
       end
-      
-      if @submission.save
-        respond_to do |format|
-          format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
-          format.json { head :no_content }
-        end
-      else
-        format.html { redirect_to submissions_url, notice: "There was some error ¯\_(ツ)_/¯." }
+    else
+      @submission.destroy
+  
+      respond_to do |format|
+        format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
         format.json { head :no_content }
       end
     end
   end
   
+  def soft_delete
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @submission = Submission.find(params[:id])
+      if @submission.author_username == current_user.name
+        @submission.title = "[deleted]"
+        @submission.url = ""
+        @submission.text = ""
+        @submission.UpVotes = 0
+        @submission.author_username = ""
+        
+        if !@submission.comments.nil?
+          @submission.comments.each do |comment| ##<- delete all of them
+            SoftDeleteComments.softDC(comment.id)
+            ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+            ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+          end
+        end
+        
+        respond_to do |format|
+          if @submission.save
+              format.html { redirect_to submissions_url, notice: "Submission was successfully destroyed." }
+              format.json { head :no_content }
+          else
+            format.html { redirect_to submissions_url, notice: "There was some error ¯\_(ツ)_/¯." }
+            format.json { head :no_content }
+          end
+        end
+      end
+    end
+  end
+  
   def past
-    data = Time.new()
+    data = Time.new()- (3600*24)
     if params[:day].present?
       arrayday = params[:day].split('-')
-      data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i)
+      data = Time.new(arrayday[0].to_i,arrayday[1].to_i,arrayday[2].to_i,23,59,59)
     end
     
-    @shorturl = Array.new();
-    @submissions = Array.new()
+    @shorturl = Array.new(0);
+    @submissions = Array.new(0)
       subm = Submission.all.order(created_at: :desc, title: :asc)
       subm.each do |submission|
-        if submission.url != "" && submission.author_username != ""
-          url =submission.url.split('//')
-          shortu = url[1].split('/')
-          @shorturl.push(shortu[0])
-        else 
-          @shorturl.push("")
-        end
-        if data.year > submission.created_at.year
+        
+        if data>=submission.created_at && submission.author_username != ""
           @submissions.push(submission)
-        else
-          if data.year == submission.created_at.year &&  data.month > submission.created_at.month
-            @submissions.push(submission)
-          else
-            if data.year == submission.created_at.year &&  data.month == submission.created_at.month && data.day > submission.created_at.day
-              @submissions.push(submission)
-            end
+          if submission.url != "" 
+            url =submission.url.split('//')
+            shortu = url[1].split('/')
+            @shorturl.push(shortu[0])
+          else 
+            @shorturl.push("")
           end
         end
       end
@@ -307,7 +348,7 @@ class SubmissionsController < ApplicationController
       dataF = data + (3600*24)
       @date = data.strftime("%F")
       @dataToday = url+data.strftime("%F")
-      @dataN = dataD.strftime("%B %d, %Y (%Z)")
+      @dataN = data.strftime("%B %d, %Y (%Z)")
       @dataD = url+dataD.strftime("%F")
       @dataM = url+dataM.strftime("%F")
       @dataY = url+dataY.strftime("%F")

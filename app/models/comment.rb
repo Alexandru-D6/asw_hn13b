@@ -1,9 +1,7 @@
 class Comment < ApplicationRecord
-  serialize :id_sons
+  #serialize :id_sons
   
   has_many :comments
-
-  after_initialize do |comment|
-    comment.id_sons= [] if comment.id_sons == nil
-  end
+  
+  validates :comment, length: { minimum: 5, maximum: 256}, presence: {message: "Comment can't be blank."}
 end

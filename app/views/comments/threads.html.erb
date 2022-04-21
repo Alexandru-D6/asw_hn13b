@@ -15,7 +15,7 @@
                   <table border="0" cellpadding="0" cellspacing="0" class="itemlist">
                      <%count = 0%>
                      <% @comments.each do |comment| %>
-                        <%= render 'comment', comment: comment, url: "/comments", title_submission: @titles_submissions[count] %>
+                        <%= render 'comment', comment: comment, url: "/threads", title_submission: @titles_submissions[count] %>
                         <%count = count + 1%>
                      <% end %>
                      
@@ -24,10 +24,14 @@
                         <td></td>
                      </tr>
                   </table>
+                  <tr>
+                     <td>
+                        <%= render 'submissions/bottomURL'%>
+                     </td>
+                  </tr>
                </td>
             </tr>
          </table>
       </center>
    </body>
-   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
 </html>
