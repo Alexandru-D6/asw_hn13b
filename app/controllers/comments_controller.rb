@@ -112,35 +112,53 @@ class CommentsController < ApplicationController
   end
   
   def delete
-    @comment = Comment.find(params[:id])
-    submission = Submission.find(@comment.id_submission)
-    @title_submission = submission.title
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @comment = Comment.find(params[:id])
+      submission = Submission.find(@comment.id_submission)
+      @title_submission = submission.title
+    end
   end
   
   
   def deleted_comment
-    @comment = Comment.find(params[:id])
-    @comment.comment ="[deleted]"
-    @comment.author = ""
-    if @comment.save
-        redirect_to "/reply?id="+@comment.id.to_s
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @comment = Comment.find(params[:id])
+      @comment.comment ="[deleted]"
+      @comment.author = ""
+      if @comment.save
+          redirect_to "/reply?id="+@comment.id.to_s
+      end
     end
   end
   
  def upvoted
-    if !params[:id].nil?
-      @user_name = params[:id].to_s
-      user = User.find_by(name: params[:id])
-      
-      if !user.nil? && !user.LikedComments.nil?
-        temp = Comment.where(id: user.LikedComments)
-        temp.order(created_at: :desc, title: :asc)
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      if !params[:id].nil?
+        @user_name = params[:id].to_s
+        user = User.find_by(name: params[:id])
         
-        @comment = Array.new(0)
-        temp.each do |temp|
-          if temp.author != ""
-            temp.title_submission = Submission.find(temp.id_submission).title
-            @comment.push(temp)  
+        if !user.nil? && !user.LikedComments.nil?
+          temp = Comment.where(id: user.LikedComments)
+          temp.order(created_at: :desc, title: :asc)
+          
+          @comment = Array.new(0)
+          temp.each do |temp|
+            if temp.author != ""
+              temp.title_submission = Submission.find(temp.id_submission).title
+              @comment.push(temp)  
+            end
           end
         end
       end
@@ -150,92 +168,116 @@ class CommentsController < ApplicationController
   
   # POST /comments or /comments.json
   def create
-    @comment = Comment.new(comment_params)
-    @comment.author = current_user.name
-      
-    if comment_params[:id_comment_father].nil?
-      submission = Submission.find(@comment.id_submission)
-      
-      if submission.comments.nil? 
-        submission.comments = Array.new(1)  
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
       end
-      
-      submission.comments.push(@comment)
-      submission.save
     else
-      comment_father = Comment.find(comment_params[:id_comment_father])
-      
-      if comment_father.comments.nil? 
-        comment_father.comments = Array.new(1)  
+      @comment = Comment.new(comment_params)
+      @comment.author = current_user.name
+        
+      if comment_params[:id_comment_father].nil?
+        submission = Submission.find(@comment.id_submission)
+        
+        if submission.comments.nil? 
+          submission.comments = Array.new(1)  
+        end
+        
+        submission.comments.push(@comment)
+        submission.save
+      else
+        comment_father = Comment.find(comment_params[:id_comment_father])
+        
+        if comment_father.comments.nil? 
+          comment_father.comments = Array.new(1)  
+        end
+        
+        comment_father.comments.push(@comment)
+        comment_father.save
       end
       
-      comment_father.comments.push(@comment)
-      comment_father.save
-    end
-    
-    
-    respond_to do |format|
-      if @comment.save
-        format.html { redirect_to "/item?id="+comment_params[:id_submission].to_s, notice: "Comment was successfully created." }
-        format.json { render :show, status: :created, location: @comment }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @comment.errors, status: :unprocessable_entity }
+      
+      respond_to do |format|
+        if @comment.save
+          format.html { redirect_to "/item?id="+comment_params[:id_submission].to_s, notice: "Comment was successfully created." }
+          format.json { render :show, status: :created, location: @comment }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @comment.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
 
   # PATCH/PUT /comments/1 or /comments/1.json
   def update
-    respond_to do |format|
-      if @comment.update(comment_params)
-        url = "/comments/"+@comment.id.to_s+"/edit"
-        format.html { redirect_to url, notice: "Comment was successfully updated." }
-        format.json { render :show, status: :ok, location: @comment }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @comment.errors, status: :unprocessable_entity }
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      respond_to do |format|
+        if @comment.update(comment_params)
+          url = "/comments/"+@comment.id.to_s+"/edit"
+          format.html { redirect_to url, notice: "Comment was successfully updated." }
+          format.json { render :show, status: :ok, location: @comment }
+        else
+          format.html { render :edit, status: :unprocessable_entity }
+          format.json { render json: @comment.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
 
   # DELETE /comments/1 or /comments/1.json
   def destroy
-    @comment.destroy
-
-    respond_to do |format|
-      format.html { redirect_to comments_url, notice: "Comment was successfully destroyed." }
-      format.json { head :no_content }
+    if !user_signed_in?
+      respond_to do |format|
+        format.html { redirect_to user_session_path}
+      end
+    else
+      @comment.destroy
+  
+      respond_to do |format|
+        format.html { redirect_to comments_url, notice: "Comment was successfully destroyed." }
+        format.json { head :no_content }
+      end
     end
   end
   
   def soft_delete
-    comment = Comment.find(params[:id])
-    id = comment.id
-    if comment.author != ""
-      comment.comment = "[deleted]"
-      comment.author = ""
-      comment.id_sons = []
-      comment.UpVotes = 0
-      
-      comment.title_submission = ""
-      comment.num_sons = 0
-      
-      if !comment.comments.nil?
-        comment.comments.each do |comment_son| ##<- delete all of them
-          SoftDeleteComments.softDC(comment_son.id)
-          #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
-          #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
-        end
-      end
-      
+    if !user_signed_in?
       respond_to do |format|
-        if comment.save
-            format.html { redirect_to "/reply?id="+id.to_s, notice: "Submission was successfully destroyed." }
+        format.html { redirect_to user_session_path}
+      end
+    else
+      comment = Comment.find(params[:id])
+      id = comment.id
+      if comment.author != ""
+        comment.comment = "[deleted]"
+        comment.author = ""
+        comment.id_sons = []
+        comment.UpVotes = 0
+        
+        comment.title_submission = ""
+        comment.num_sons = 0
+        
+        if !comment.comments.nil?
+          comment.comments.each do |comment_son| ##<- delete all of them
+            SoftDeleteComments.softDC(comment_son.id)
+            #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+            #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
+          end
+        end
+        
+        respond_to do |format|
+          if comment.save
+              format.html { redirect_to "/reply?id="+id.to_s, notice: "Submission was successfully destroyed." }
+              format.json { head :no_content }
+          else
+            format.html { redirect_to "/news", notice: "There was some error ¯\_(ツ)_/¯." }
             format.json { head :no_content }
-        else
-          format.html { redirect_to "/news", notice: "There was some error ¯\_(ツ)_/¯." }
-          format.json { head :no_content }
+          end
         end
       end
     end

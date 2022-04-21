@@ -10,12 +10,12 @@
       <% if user_signed_in? && current_user.name == submission.author_username%>
         <font color="#ff6600">*</font>
       <%else%>
-        <% if user_signed_in? && !current_user.LikedSubmissions.nil?%>
+        <% if user_signed_in?%>
         
           <% if current_user.LikedSubmissions.nil?%>
             <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
           <% else %>
-            <% if current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil? %>  
+            <% if current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>  
               <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
             <% end %>
           <% end %>
@@ -62,12 +62,11 @@
       <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
     <%end%>
     
-    <% if user_signed_in? && !current_user.LikedSubmissions.nil?%>
-      <% if !current_user.LikedSubmissions.nil?%>
-        <% if current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil? %>  
-          <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
-        <% end %>
-      <% end %>
+    <%= current_user.LikedSubmissions %>
+    <%= submission.id.to_i %>
+    <%= current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>
+    <% if user_signed_in? && !current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>
+      <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
     
     <%= link_to "comments", "item?id="+submission.id.to_s, url: url %>
