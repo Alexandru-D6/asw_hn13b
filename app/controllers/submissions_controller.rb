@@ -97,7 +97,7 @@ class SubmissionsController < ApplicationController
       @submission = Submission.find(params[:id])
       
       if current_user.LikedSubmissions.nil?
-        current_user.LikedSubmissions = Array.new(0)
+        current_user.LikedSubmissions = Array.new(1, "-1")
       end
       
       if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
@@ -123,7 +123,7 @@ class SubmissionsController < ApplicationController
       @submission = Submission.find(params[:id])
       
       if current_user.LikedSubmissions.nil?
-        current_user.LikedSubmissions = Array.new(0)
+        current_user.LikedSubmissions = Array.new(1, "-1")
       end
       
       if !current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
