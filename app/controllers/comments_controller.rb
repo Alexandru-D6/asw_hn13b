@@ -202,8 +202,7 @@ class CommentsController < ApplicationController
           format.html { redirect_to "/item?id="+comment_params[:id_submission].to_s, notice: "Comment was successfully created." }
           format.json { render :show, status: :created, location: @comment }
         else
-          format.html { render :new, status: :unprocessable_entity }
-          format.json { render json: @comment.errors, status: :unprocessable_entity }
+          format.html { redirect_to "/item?id="+comment_params[:id_submission].to_s, notice: @comment.errors.first.full_message }
         end
       end
     end

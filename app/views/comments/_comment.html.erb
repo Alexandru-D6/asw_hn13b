@@ -23,11 +23,11 @@
     </span> 
     <span id=<%=comment.id.to_s%>></span> | 
     
-    <% if comment.id_comment_father == 0%>
-      <%= link_to "parent", "/reply?id="+comment.id_comment_father.to_s, url: url%> |
-    <% else %>
+    <% if comment.id_comment_father == 0 %>
       <%= link_to "parent", "/item?id="+comment.id_submission.to_s, url: url%> |
-    <%end%>
+    <% else %>
+      <%= link_to "parent", "/reply?id="+comment.id_comment_father.to_s, url: url%> |
+    <% end %>
     <% if user_signed_in? && comment.author == current_user.name %>
       <%= link_to "edit", "/comments/"+comment.id.to_s+'/edit', url: url%> |
       <%= link_to "delete", "/delete_comment?id="+comment.id.to_s, url: url%> |
@@ -36,8 +36,8 @@
     <% if user_signed_in? && !(current_user.LikedComments.detect{|e| e.to_i == comment.id.to_i}.nil?) %>
       <%= link_to "unvote", unvote_comment_path(comment, url: url), method: :put%> |
     <%end%>
-    <%= link_to "context", "item?id="+comment.id_submission.to_s, url: url, method: :put%> |
-    <%= link_to title_submission, "item?id="+comment.id_submission.to_s, url: url, method: :put%> |
+    <%= link_to "context", "/item?id="+comment.id_submission.to_s, url: url%> |
+    <%= link_to title_submission, "/item?id="+comment.id_submission.to_s, url: url%> |
     
   </td>
 </tr>
