@@ -4,7 +4,7 @@
       <% if user_signed_in? && current_user.name == comment.author%>
         <font color="#ff6600">*</font>
       <%else%>
-        <% if user_signed_in? && (current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?)%>
+        <% if user_signed_in? && !current_user.LikedComments.nil?  && (current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?)%>
           <%= link_to "▲", upvote_comment_path(comment, url: url), method: :put%>
         <%else%>
           <%if !user_signed_in? %>
@@ -32,7 +32,7 @@
       <%= link_to "edit", "/comments/"+comment.id.to_s+'/edit', url: url%> |
       <%= link_to "delete", "/delete_comment?id="+comment.id.to_s, url: url%> |
     <%end%>
-    <% if user_signed_in? && !(current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?) %>
+    <% if user_signed_in? && !current_user.LikedComments.nil? && !(current_user.LikedComments.detect{|e| e == comment.id.to_s}.nil?) %>
       <%= link_to "unvote", unvote_comment_path(comment, url: url), method: :put%> |
     <%end%>
     <%= link_to "context", "item?id="+comment.id_submission.to_s, url: url, method: :put%> |

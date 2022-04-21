@@ -20,8 +20,6 @@ class User < ApplicationRecord
       @user.name = access_token.info.nickname
       @user.provider = access_token.provider
       @user.uid = access_token.uid
-      @user.LikedComments = ["{-1}"]
-      @user.LikedSubmissions = ["{-1}"]
       @user.save
       
     end
