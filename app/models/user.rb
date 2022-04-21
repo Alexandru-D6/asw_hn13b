@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  #serialize :LikedSubmissions
-  #serialize :LikedComments
+  serialize :LikedSubmissions
+  serialize :LikedComments
   
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
