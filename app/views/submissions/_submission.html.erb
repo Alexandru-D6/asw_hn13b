@@ -10,14 +10,17 @@
       <% if user_signed_in? && current_user.name == submission.author_username%>
         <font color="#ff6600">*</font>
       <%else%>
-        <% if user_signed_in? && (current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
-          <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
-        <%else%>
-          <%if !user_signed_in? %>
+        <% if user_signed_in?%>
+        
+          <% if current_user.LikedSubmissions.nil?%>
             <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
-          <%else%>
-            <%= "⠀"%>
-          <%end%>
+          <% else %>
+            <% if current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>  
+              <%= link_to "▲", upvote_submission_path(submission, url: url), method: :put%>
+            <% end %>
+          <% end %>
+        <%else%>
+          <%= "▲"%>
         <%end%>
       <%end%>
     
@@ -30,7 +33,7 @@
     end %>
     <a href=<%=submission.url%> class="titlelink"><%= submission.title %></a>
     <span class="sitebit comhead">
-      <%if(@shorturl[countURL] != "")
+      <%if(!@shorturl.nil? && @shorturl[countURL] != "")
         _url ="("+@shorturl[countURL]+")"
       else
         _url =""
@@ -53,12 +56,13 @@
       <a href=<%= "item?id="+submission.id.to_s%>><%=distance_of_time_in_words(submission.created_at, Time.new)%> ago</a>
     </span> 
     <span id="unv_30782735"></span> | 
-    
+
     <% if user_signed_in? && submission.author_username == current_user.name %>
+      <%= link_to "edit", "/submissions/"+submission.id.to_s+"/edit"%> |
       <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
     <%end%>
     
-    <% if user_signed_in? && !(current_user.LikedSubmissions.detect{|e| e == submission.id.to_s}.nil?) %>
+    <% if user_signed_in? && !current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>
     

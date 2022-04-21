@@ -35,7 +35,7 @@
                   </table>
                   
                      <% @submission.comments.each do |comment| %>
-                        <%if comment.author != ""%>
+                        <% if comment.author != ""%>
                            <%= render '/comments/comment_tree', comment: comment, title_submission: @submission.title, url: '/item?id='+@submission.id.to_s %>
                         <%end%>
                      <%end%>
@@ -54,5 +54,4 @@
          </table>
       </center>
    </body>
-   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
 </html>
