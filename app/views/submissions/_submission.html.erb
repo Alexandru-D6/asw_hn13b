@@ -62,9 +62,6 @@
       <%= link_to "delete", soft_delete_submission_path(submission), method: :put%> |
     <%end%>
     
-    <%= current_user.LikedSubmissions %>
-    <%= submission.id.to_i %>
-    <%= current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>
     <% if user_signed_in? && !current_user.LikedSubmissions.detect{|e| e.to_i == submission.id.to_i}.nil? %>
       <%= link_to "unvote", unvote_submission_path(submission, url: url), method: :put%> |
     <%end%>

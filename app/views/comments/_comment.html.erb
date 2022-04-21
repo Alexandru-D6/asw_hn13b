@@ -32,7 +32,7 @@
       <%= link_to "edit", "/comments/"+comment.id.to_s+'/edit', url: url%> |
       <%= link_to "delete", "/delete_comment?id="+comment.id.to_s, url: url%> |
     <%end%>
-    <%= current_user.LikedComments %>
+
     <% if user_signed_in? && !(current_user.LikedComments.detect{|e| e.to_i == comment.id.to_i}.nil?) %>
       <%= link_to "unvote", unvote_comment_path(comment, url: url), method: :put%> |
     <%end%>
