@@ -102,7 +102,7 @@ class SubmissionsController < ApplicationController
       
       if current_user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
         @submission.UpVotes = @submission.UpVotes + 1
-        current_user.LikedSubmissions.push(params[:id])
+        current_user.LikedSubmissions.push(params[:id].to_s)
         current_user.save
         
         respond_to do |format|
