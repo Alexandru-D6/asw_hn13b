@@ -17,11 +17,18 @@
                       </tr>
                     </tbody>
                   </table>
+                  
+                  <% @comments[0].comments.each do |comment| %>
+                    <% if comment.author != ""%>
+                       <%= render '/comments/comment_tree', comment: comment, title_submission: @title_submission, url: '/reply?id='+@comments[0].id.to_s %>
+                    <%end%>
+                  <%end%>
+
+                  <br><br>
                 </td>
               </tr>
             </tbody>
           </table>
       </center>
    </body>
-   <script type='text/javascript' src='hn.js?QZejSKY7mNWXnObVdaSN'></script>
 </html>

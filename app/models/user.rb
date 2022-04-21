@@ -1,13 +1,6 @@
 class User < ApplicationRecord
-  serialize :LikedSubmissions
-  serialize :LikedComments
-
-  after_initialize do |user|
-    user.LikedSubmissions= [] if user.LikedSubmissions == nil
-    user.LikedComments= [] if user.LikedComments == nil
-  end
-  
-
+  #serialize :LikedSubmissions
+  #serialize :LikedComments
   
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -27,9 +20,10 @@ class User < ApplicationRecord
       @user.name = access_token.info.nickname
       @user.provider = access_token.provider
       @user.uid = access_token.uid
+      @user.LikedComments = ["{-1}"]
+      @user.LikedSubmissions = ["{-1}"]
       @user.save
       
-      logger.debug "#{data}"
     end
     
     @user

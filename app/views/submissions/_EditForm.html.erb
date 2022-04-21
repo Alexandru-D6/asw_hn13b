@@ -38,7 +38,7 @@
                   <td><%= form.text_field :title, size: "70x1" %></td>
                 </tr>
                 
-                <% if submission.url != "" %>
+                <% if submission.text == "" %>
                   <tr>
                     <td>url</td>
                     <td><%= submission.url%></td>
