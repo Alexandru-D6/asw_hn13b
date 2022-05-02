@@ -10,6 +10,7 @@ class UsersController < ApplicationController
   def show
     if !params[:id].nil?
       @user = User.find_by(name: params[:id])
+
     end
   end
 
