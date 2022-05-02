@@ -48,20 +48,6 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
-    get:
-      tags:
-      - comments
-      summary: Retrieves all the Comments
-      operationId: getAllComments
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
   /comment/{id}:
     get:
       tags:
@@ -140,8 +126,51 @@ paths:
                   $ref: '#/components/examples/error403'
       security:
       - ApiKeyAuth: []
-  /comments/{commentId}/upvote:
+  /comments/{id}/edit:
     post:
+      tags:
+      - comments
+      summary: Edit a Comment given its ID
+      operationId: editComment
+      requestBody:
+        description: Provide the author & content of the new Comment
+        content:
+          application/json:
+            schema:
+              required:
+              - author
+              - content
+              type: object
+              properties:
+                author:
+                  type: string
+                  minLength: 4
+                  example: 'My name'
+                content:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: 'My content'
+        required: true
+      responses:
+        201:
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCommentResult'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+  
+  /comments/{id}/upvote:
+    put:
       tags:
       - comments
       summary: Upvote a Comment
@@ -170,6 +199,130 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
+  /comments/{id}/unvote:
+    put:
+      tags:
+      - comments
+      summary: Unvote a Comment
+      operationId: unvoteComment
+      parameters:
+      - name: commentId
+        in: path
+        description: Comment id to unvote
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Unvoted Comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/votedComments:
+    get:
+      tags:
+      - user
+      summary: Retrieves all comments voted by a user
+      description: Returns all the comments voted of a user
+      operationId: getCommentById
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/comments:
+    get:
+      tags:
+      - user
+      summary: Retrieves all comments done by a user
+      description: Returns all the comments of a user
+      operationId: getCommentById
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/edit:
+    post:
+      tags:
+      - user
+      summary: Edit about information
+      description: Returns ??
+      operationId: getCommentById ??
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  
 components:
   schemas:
     Comment:
