@@ -1,19 +1,19 @@
 openapi: 3.0.1
 info:
   version: 1.0.0
-  title: Wall of Tweets
-  description: "This is the Open API documentation for the REST API of our beloved application **Wall of Tweets** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteTweet`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the tweet."
+  title: Hacker news - HBN13
+  description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
 servers:
   - url: 'https://asw-api-demo.herokuapp.com/'
 paths:
-  /tweets:
+  /comments:
     post:
       tags:
-      - tweets
-      summary: Adds a new Tweet to the Wall of Tweets
-      operationId: addTweet
+      - comments
+      summary: Adds a new Comment to the Hacker News
+      operationId: addComment
       requestBody:
-        description: Provide the author & content of the new Tweet
+        description: Provide the author & content of the new Comment
         content:
           application/json:
             schema:
@@ -34,11 +34,11 @@ paths:
         required: true
       responses:
         201:
-          description: Tweet created
+          description: Comment created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
+                $ref: '#/components/schemas/AddCommentResult'
         400:
           description: 'Error: Bad Request'
           content:
@@ -50,9 +50,9 @@ paths:
                   $ref: '#/components/examples/error400'
     get:
       tags:
-      - tweets
-      summary: Retrieves all the Tweets
-      operationId: getAllTweets
+      - comments
+      summary: Retrieves all the Comments
+      operationId: getAllComments
       responses:
         200:
           description: successful operation
@@ -61,18 +61,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tweet'
-  /tweets/{tweetId}:
+                  $ref: '#/components/schemas/Comment'
+  /comment/{id}:
     get:
       tags:
-      - tweets
-      summary: Finds a Tweet by its ID
-      description: Returns a single Tweet
-      operationId: getTweetById
+      - comments
+      summary: Finds a Commnent by its ID
+      description: Returns a single Comment
+      operationId: getCommentById
       parameters:
-      - name: tweetId
+      - name: commentId
         in: path
-        description: ID of Tweet to return
+        description: ID of Comment to return
         required: true
         schema:
           type: integer
@@ -83,7 +83,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tweet'
+                $ref: '#/components/schemas/Comment'
         404:
           description: 'Error: Not Found'
           content:
@@ -95,20 +95,20 @@ paths:
                   $ref: '#/components/examples/error404'
     delete:
       tags:
-      - tweets
-      summary: Deletes a Tweet
-      operationId: deleteTweet
+      - comments
+      summary: Deletes a Comment
+      operationId: deleteComment
       parameters:
-      - name: tweetId
+      - name: commentId
         in: path
-        description: Tweet id to delete
+        description: Comment id to delete
         required: true
         schema:
           type: integer
           format: int64
       responses:
         204:
-          description: Tweet deleted
+          description: Comment deleted
           content:
             application/json: {}
         404:
@@ -140,27 +140,27 @@ paths:
                   $ref: '#/components/examples/error403'
       security:
       - ApiKeyAuth: []
-  /tweets/{tweetId}/likes:
+  /comments/{commentId}/upvote:
     post:
       tags:
-      - tweets
-      summary: Likes a Tweet
-      operationId: likeTweet
+      - comments
+      summary: Upvote a Comment
+      operationId: upvoteComment
       parameters:
-      - name: tweetId
+      - name: commentId
         in: path
-        description: Tweet id to like
+        description: Comment id to upvote
         required: true
         schema:
           type: integer
           format: int64
       responses:
         200:
-          description: Liked Tweet
+          description: Upvoted Comment
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tweet'
+                $ref: '#/components/schemas/Comment'
         404:
           description: 'Error: Not Found'
           content:
@@ -172,7 +172,7 @@ paths:
                   $ref: '#/components/examples/error404'
 components:
   schemas:
-    Tweet:
+    Comment:
       type: object
       properties:
         id:
@@ -200,12 +200,12 @@ components:
             self:
               type: string
               format: url
-              example: 'https://asw-api-demo.herokuapp.com/tweets/2'
-    AddTweetResult:
+              example: 'https://asw-api-demo.herokuapp.com/comment/2'
+    AddCommentResult:
       type: object
       properties:
-        new_tweet:
-          $ref: '#/components/schemas/Tweet'
+        new_comment:
+          $ref: '#/components/schemas/Comment'
         api_key:
           type: string
           example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
@@ -240,7 +240,7 @@ components:
       value:
         status: 404
         error: "Not Found"
-        message: "No Tweet with that ID"
+        message: "No Comment with that ID"
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
