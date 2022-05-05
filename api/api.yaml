@@ -1,82 +1,65 @@
 openapi: 3.0.1
 info:
   version: 1.0.0
-  title: Wall of Tweets
-  description: "This is the Open API documentation for the REST API of our beloved application **Wall of Tweets** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteTweet`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the tweet."
+  title: Hacker news - HBN13
+  description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
 servers:
   - url: 'https://asw-api-demo.herokuapp.com/'
 paths:
-  /tweets:
-    post:
+  /submission/news:
+    get:
       tags:
-      - tweets
-      summary: Adds a new Tweet to the Wall of Tweets
-      operationId: addTweet
-      requestBody:
-        description: Provide the author & content of the new Tweet
-        content:
-          application/json:
-            schema:
-              required:
-              - author
-              - content
-              type: object
-              properties:
-                author:
-                  type: string
-                  minLength: 4
-                  example: 'My name'
-                content:
-                  type: string
-                  minLength: 4
-                  maxLength: 280
-                  example: 'My content'
-        required: true
+      - Submissions
+      summary: Obté el llistat de submissions de tipus news.
+      operationId: getNewsSubmissions
       responses:
-        201:
-          description: Tweet created
+        200:
+          description: operació finalitzada amb éxit
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-        400:
-          description: 'Error: Bad Request'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error400'
+  /submission/newest:
     get:
       tags:
-      - tweets
-      summary: Retrieves all the Tweets
-      operationId: getAllTweets
+      - Submissions
+      summary: Obté el llistat de submissions de tipus newest.
+      operationId: getNewestSubmissions
       responses:
         200:
-          description: successful operation
+          description: operació finalitzada amb éxit
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Tweet'
-  /tweets/{tweetId}:
+                $ref: '#/components/schemas/AddTweetResult'
+  /submission/ask:
     get:
       tags:
-      - tweets
-      summary: Finds a Tweet by its ID
-      description: Returns a single Tweet
-      operationId: getTweetById
+      - Submissions
+      summary: Obté el llistat de submissions de tipus ask.
+      operationId: getAskSubmissions
+      responses:
+        200:
+          description: operació finalitzada amb éxit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTweetResult'
+  
+  /submission/{submissionId}:
+    get:
+      tags:
+      - Submissions
+      summary: Troba una submission segons el seu ID.
+      description: Retorna tant el contingut de a submission com tots els seus comentaris. 
+      operationId: getTSubmissionById
       parameters:
-      - name: tweetId
+      - name: submissionId
         in: path
-        description: ID of Tweet to return
+        description: ID de la Submission a buscar
         required: true
         schema:
           type: integer
-          format: int64
       responses:
         200:
           description: successful operation
@@ -95,20 +78,19 @@ paths:
                   $ref: '#/components/examples/error404'
     delete:
       tags:
-      - tweets
-      summary: Deletes a Tweet
-      operationId: deleteTweet
+      - Submissions
+      summary: Esborra la submission amb submissionId
+      operationId: deleteSubmission
       parameters:
-      - name: tweetId
+      - name: submissionId
         in: path
-        description: Tweet id to delete
+        description: Submission ID a esborrar
         required: true
         schema:
           type: integer
-          format: int64
       responses:
         204:
-          description: Tweet deleted
+          description: Submission esborrat
           content:
             application/json: {}
         404:
@@ -140,23 +122,22 @@ paths:
                   $ref: '#/components/examples/error403'
       security:
       - ApiKeyAuth: []
-  /tweets/{tweetId}/likes:
-    post:
+    
+    put:
       tags:
-      - tweets
-      summary: Likes a Tweet
-      operationId: likeTweet
+      - Submissions
+      summary: Edita una submission
+      operationId: editSubmission
       parameters:
-      - name: tweetId
+      - name: submissionId
         in: path
-        description: Tweet id to like
+        description: ID de la submission a editar
         required: true
         schema:
           type: integer
-          format: int64
       responses:
         200:
-          description: Liked Tweet
+          description: Edited submission
           content:
             application/json:
               schema:
@@ -170,8 +151,534 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
+  
+  /submission/post/:apiKey/:title/:text/{url}:
+    post:
+      tags:
+      - Submissions
+      summary: Crea una submission
+      operationId: createSubmission
+      parameters:
+      - name: apiKey
+        in: path
+        description: apiKey de l'usuari que vol crear la submission
+        required: true
+        schema:
+          type: string
+      - name: title
+        in: path
+        description: titol de la submission a crear
+        required: true
+        schema:
+          type: string
+      - name: url
+        in: query
+        description: url de la submission a crear
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: Created submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        404:
+          description: 'Error: Already created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  
+  /submission/vote/submissionID:
+    put:
+      tags:
+      - Submissions
+      summary: Vota una submission
+      operationId: voteSubmission
+      parameters:
+      - name: submissionId
+        in: path
+        description: ID de la submission a votar. 
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Voted submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /submission/unvote/submissionID:
+    put:
+      tags:
+      - Submissions
+      summary: Desfà la votació d'una submission
+      operationId: unvoteSubmission
+      parameters:
+      - name: submissionId
+        in: path
+        description: ID de la submission a desvotar. 
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Unvoted submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  
+  /comments:
+    post:
+      tags:
+      - comments
+      summary: Adds a new Comment to the Hacker News
+      operationId: addComment
+      requestBody:
+        description: Provide the author & content of the new Comment
+        content:
+          application/json:
+            schema:
+              required:
+              - author
+              - content
+              type: object
+              properties:
+                author:
+                  type: string
+                  minLength: 4
+                  example: 'My name'
+                content:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: 'My content'
+        required: true
+      responses:
+        201:
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCommentResult'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+  /comment/{id}:
+    get:
+      tags:
+      - comments
+      summary: Finds a Commnent by its ID
+      description: Returns a single Comment
+      operationId: getCommentById
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+    delete:
+      tags:
+      - comments
+      summary: Deletes a Comment
+      operationId: deleteComment
+      parameters:
+      - name: commentId
+        in: path
+        description: Comment id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: Comment deleted
+          content:
+            application/json: {}
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+      security:
+      - ApiKeyAuth: []
+  /comments/{id}/edit:
+    post:
+      tags:
+      - comments
+      summary: Edit a Comment given its ID
+      operationId: editComment
+      requestBody:
+        description: Provide the author & content of the new Comment
+        content:
+          application/json:
+            schema:
+              required:
+              - author
+              - content
+              type: object
+              properties:
+                author:
+                  type: string
+                  minLength: 4
+                  example: 'My name'
+                content:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: 'My content'
+        required: true
+      responses:
+        201:
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCommentResult'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+  
+  /comments/{id}/upvote:
+    put:
+      tags:
+      - comments
+      summary: Upvote a Comment
+      operationId: upvoteComment
+      parameters:
+      - name: commentId
+        in: path
+        description: Comment id to upvote
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Upvoted Comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /comments/{id}/unvote:
+    put:
+      tags:
+      - comments
+      summary: Unvote a Comment
+      operationId: unvoteComment
+      parameters:
+      - name: commentId
+        in: path
+        description: Comment id to unvote
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Unvoted Comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/votedComments:
+    get:
+      tags:
+      - user
+      summary: Retrieves all comments voted by a user
+      description: Returns all the comments voted of a user
+      operationId: getCommentById
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/comments:
+    get:
+      tags:
+      - user
+      summary: Retrieves all comments done by a user
+      description: Returns all the comments of a user
+      operationId: getCommentById
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/{id}/edit:
+    post:
+      tags:
+      - user
+      summary: Edit about information
+      description: Returns ??
+      operationId: getCommentById ??
+      parameters:
+      - name: commentId
+        in: path
+        description: ID of Comment to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /user/submissions/userID:
+    get:
+      tags:
+      - user
+      summary: Obté el llistat de submissions de l'usuari amb userID.
+      operationId: getUserSubmissions
+      parameters:
+        - name: userID
+          in: path
+          description: ID de l'usuari del que volem el llistat de submissions.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: operació finalitzada amb éxit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTweetResult'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  
+  /user/submissions/voted/userID:
+    get:
+      tags:
+      - user
+      summary: Obté el llistat de submissions que ha votat l'usuari amb userID.
+      operationId: getUserVotedSubmissions
+      parameters:
+        - name: userID
+          in: path
+          description: ID de l'usuari del que volem el llistat de submissions votades.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: operació finalitzada amb éxit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTweetResult'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'     
+  
 components:
   schemas:
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        author:
+          type: string
+          minLength: 4
+          example: 'My name'
+        content:
+          type: string
+          minLength: 4
+          maxLength: 280
+          example: 'My content'
+        likes:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+        _links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: 'https://asw-api-demo.herokuapp.com/comment/2'
+    AddCommentResult:
+      type: object
+      properties:
+        new_comment:
+          $ref: '#/components/schemas/Comment'
+        api_key:
+          type: string
+          example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
+    ErrorResult:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum: [400, 401, 403, 404, 409]
+        error: 
+          type: string
+          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+        message: 
+          type: string
     Tweet:
       type: object
       properties:
@@ -209,17 +716,6 @@ components:
         api_key:
           type: string
           example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
-    ErrorResult:
-      type: object
-      properties:
-        status:
-          type: integer
-          enum: [400, 401, 403, 404, 409]
-        error: 
-          type: string
-          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
-        message: 
-          type: string
   examples:
     error400:
       value:
@@ -240,7 +736,7 @@ components:
       value:
         status: 404
         error: "Not Found"
-        message: "No Tweet with that ID"
+        message: "No Comment with that ID"
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

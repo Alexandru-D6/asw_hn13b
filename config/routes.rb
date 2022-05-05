@@ -59,6 +59,12 @@ Rails.application.routes.draw do
   get 'upvoted_comments', to: 'comments#upvoted'
   get 'submitted', to: 'submissions#submitted'
   
+  
+  ##API
+  
+  get '/API/v1.0/index', to: 'submissions#index_api'
+  get '/API/v1.0/upvoted', to: 'submissions#upvoted_api'
+  
   root to: 'submissions#index'
   
 end

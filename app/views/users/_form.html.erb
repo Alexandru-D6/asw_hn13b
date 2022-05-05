@@ -27,6 +27,11 @@
             <td><%=user.karma%></td>
           </tr>
           
+          <tr>
+            <td><%='Apikey: '%></td>
+            <td><%=user.auth_token%></td>
+          </tr>
+          
           <tr class="field">
             <td>about:</td>
             <td><%= form.text_area :about, size: "70x5" %></td>
