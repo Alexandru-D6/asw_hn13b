@@ -4,7 +4,7 @@ info:
   title: Hacker news - HBN13
   description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
 servers:
-  - url: 'https://asw-api-demo.herokuapp.com/'
+  - url: 'http://3.85.16.48:8080/API/v1.0'
 paths:
   /submission/news:
     get:
