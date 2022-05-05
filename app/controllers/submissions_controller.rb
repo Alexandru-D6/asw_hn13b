@@ -386,7 +386,7 @@ class SubmissionsController < ApplicationController
     end
     
     ##delete temp, it's to show that you can send even private variables
-    render json: {submissions: @submissions, shorturl: @shorturl, temp: temp}, status: :ok
+    render json: {submissions: @submissions, shorturl: @shorturl, temp: temp}, status: 200
     
   end
   
