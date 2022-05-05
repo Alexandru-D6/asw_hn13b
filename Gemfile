@@ -25,6 +25,7 @@ gem 'devise'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-rails_csrf_protection'
+gem 'rack-cors'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

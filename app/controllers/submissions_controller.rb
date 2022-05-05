@@ -355,6 +355,82 @@ class SubmissionsController < ApplicationController
       @dataF = url+dataF.strftime("%F")
       
   end
+  
+  ###############
+  ##           ##
+  ##           ##
+  ##    API    ##
+  ##           ##
+  ##           ##
+  ###############
+  
+  def index_api
+    temp = Submission.all.order(UpVotes: :desc, title: :asc)
+    
+    @submissions = Array.new(0)
+    temp.each do |temp|
+      if temp.author_username != ""
+        @submissions.push(temp)  
+      end
+    end
+    
+    @shorturl = Array.new(0)
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+    
+    ##delete temp, it's to show that you can send even private variables
+    render json: {submissions: @submissions, shorturl: @shorturl, temp: temp}, status: :ok
+    
+  end
+  
+  def upvoted_api
+    if !user_signed_in?
+      render json: {error: "You're not logged in!!!"}, status: 400
+    else
+      if !params[:id].nil?
+        @user_name = params[:id].to_s
+        user = User.find_by(name: params[:id])
+        
+        if !user.nil? && !user.LikedSubmissions.nil?
+          temp = Submission.where(id: user.LikedSubmissions)
+          temp.order(created_at: :desc, title: :asc)
+          
+          @submission = Array.new(0)
+          temp.each do |temp|
+            if temp.author_username != ""
+              @submission.push(temp)  
+            end
+          end
+        end
+        
+        if !@submission.nil?
+          @shorturl = Array.new(0);
+          @submission.each do |submission|
+            if submission.url != ""
+              url =submission.url.split('//')
+              shortu = url[1].split('/')
+              @shorturl.push(shortu[0])
+            else 
+              @shorturl.push("")
+            end
+          end
+        end
+        
+        render json: {submissions: @submissions, shorturl: @shorturl}, status: 200
+        ##para evitar llamar mas de un render json a la vez
+        return;
+      end
+      
+      render json: {error: "There isn't any id as paramater"}, status: 401
+    end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
