@@ -299,13 +299,13 @@ paths:
     get:
       tags:
       - comments
-      summary: Finds a Commnent by its ID
-      description: Returns a single Comment
+      summary: Troba un Comentari pel seu identificador
+      description: Retorna un únic Comentari
       operationId: getCommentById
       parameters:
       - name: commentId
         in: path
-        description: ID of Comment to return
+        description: ID del Comentari a retornar
         required: true
         schema:
           type: integer
@@ -317,6 +317,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         404:
           description: 'Error: Not Found'
           content:
@@ -329,12 +338,12 @@ paths:
     delete:
       tags:
       - comments
-      summary: Deletes a Comment
-      operationId: deleteComment
+      summary: Esborra un Comentari
+      operationId: deleteCommentById
       parameters:
       - name: commentId
         in: path
-        description: Comment id to delete
+        description: ID del commentari a esborrar
         required: true
         schema:
           type: integer
@@ -344,6 +353,15 @@ paths:
           description: Comment deleted
           content:
             application/json: {}
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         404:
           description: 'Error: Not Found'
           content:
@@ -640,26 +658,36 @@ components:
           example: 2
         author:
           type: string
-          minLength: 4
-          example: 'My name'
-        content:
+          example: 'Electrike'
+        comment:
           type: string
-          minLength: 4
-          maxLength: 280
-          example: 'My content'
-        likes:
+          minLength: 5
+          maxLength: 256
+          example: 'Ejemplo de comentario.'
+        upVotes:
           type: integer
           format: int32
         created_at:
           type: string
           format: date-time
-        _links:
-          type: object
-          properties:
-            self:
-              type: string
-              format: url
-              example: 'https://asw-api-demo.herokuapp.com/comment/2'
+        updated_at:
+          type: string
+          format: date-time
+        id_submission:
+          type: integer
+          format: int64
+          example: 1
+        id_comment_father:
+          type: integer
+          format: int64
+        submission_id:
+          type: integer
+          format: int64
+          example: 1
+        comment_id:
+          type: integer
+          format: int64
+          example: null
     AddCommentResult:
       type: object
       properties:
