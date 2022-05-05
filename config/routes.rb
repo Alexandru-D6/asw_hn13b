@@ -62,7 +62,7 @@ Rails.application.routes.draw do
   
   ##API
   
-  get '/API/v1.0/news', to: 'submissions#index_api'
+  get '/API/v1.0/submissions/news', to: 'submissions#index_api'
   get '/API/v1.0/upvoted', to: 'submissions#upvoted_api'
   get '/API/v1.0/upvoted', to: 'submissions#upvoted_api'
   
