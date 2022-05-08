@@ -34,7 +34,7 @@
                              </tr>
                              <tr>
                                <td colspan="1">
-                                 <%= button_to 'yes', soft_delete_comment_path(@comment.id), method: :put%>
+                                 <%= button_to 'yes', soft_delete_comment_path(@comment.id), method: :delete%>
                                </td>
                                <td colspan="2">
                                  <%= button_to 'No', "/comments/"+@comment.id.to_s+"/edit", method: :get%>

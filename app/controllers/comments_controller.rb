@@ -311,7 +311,7 @@ class CommentsController < ApplicationController
       return
     else
       if params[:id].nil?
-        render json: {error: "Insuficient parameters"}, status: 400
+        render json: {error: "Insuficient parameters, missing comment_id"}, status: 400
         return
       end
       
@@ -360,12 +360,91 @@ class CommentsController < ApplicationController
           if comment.save
             render json: {correct: "Comment with id: " + id.to_s + " was successfully deleted."}, status: 202
           else
-            render json: {error: "There was some error ¯\_(ツ)_/¯."}, status: 410
+            render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: comment.errors}, status: 410
           end
         end
       end
     end
   end
+
+  def create_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      if params[:id_submission].nil?
+        render json: {error: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
+      if params[:comment].nil?
+        render json: {error: "Insuficient parameters, missing comment"}, status: 400
+        return
+      end
+      
+      if !params[:id_comment_father].nil? && !Comment.exists?(params[:id_comment_father])
+        render json: {error: "Comment with father id: " + params[:id_comment_father] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if !Submission.exists?(params[:id_submission])
+        render json: {error: "Submission with id: " + params[:id_submission] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      submission = Submission.find(params[:id_submission])
+      
+      if submission.author_username == ""
+        render json: {error: "Submission with id: " + params[:id_submission] + " was deleted before."}, status: 405
+        return
+      end
+      
+      if !User.exists?(auth_token: request.headers["x-api-key"])
+        render json: {error: "User with provided apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      @comment = Comment.new(comment: params[:comment], author: user.name, id_submission: params[:id_submission])
+      
+      if params[:id_comment_father].nil?
+        
+        if submission.comments.nil? 
+          submission.comments = Array.new(1)  
+        end
+        
+        submission.comments.push(@comment)
+        ##comprobar que se guarda bien :D
+        submission.save
+      else
+        comment_father = Comment.find(params[:id_comment_father])
+        
+        if comment_father.comments.nil? 
+          comment_father.comments = Array.new(1)  
+        end
+        
+        comment_father.comments.push(@comment)
+        comment_father.save
+        
+        @comment.id_comment_father = params[:id_comment_father]
+      end
+      
+      if @comment.save
+        render json: {correct: "Comment with id: " + @comment.id.to_s + " was successfully created."}, status: 201
+      else
+        render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: @comment.errors}, status: 410
+      end
+      
+    end
+  end
+
+
+
+
+
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

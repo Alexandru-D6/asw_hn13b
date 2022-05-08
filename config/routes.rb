@@ -69,7 +69,7 @@ Rails.application.routes.draw do
   
   #comments
   get '/API/v1.0/comment', to: 'comments#show_api'
-  post '/API/v1.0/comments', to: 'comments#create_api'
+  post '/API/v1.0/comment', to: 'comments#create_api'
   delete '/API/v1.0/comment', to: 'comments#soft_delete_api'
   
   root to: 'submissions#index'
