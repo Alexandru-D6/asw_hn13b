@@ -431,6 +431,30 @@ class SubmissionsController < ApplicationController
       render json: {error: "There isn't any id as paramater"}, status: 401
     end
   end
+  
+  def newest_api
+    temp = Submission.all.order(created_at: :desc, title: :asc)
+    
+    @submissions = Array.new(0)
+    temp.each do |temp|
+      if temp.author_username != ""
+        @submissions.push(temp)  
+      end
+    end
+    
+    @shorturl = Array.new(0);
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+    
+    render json: {submissions: @submissions, shorturl: @shorturl}, status: 200
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

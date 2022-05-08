@@ -2,6 +2,7 @@ require 'SoftDeleteComments'
 
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
 
   # GET /comments or /comments.json
   def index
@@ -276,6 +277,90 @@ class CommentsController < ApplicationController
           else
             format.html { redirect_to "/news", notice: "There was some error ¯\_(ツ)_/¯." }
             format.json { head :no_content }
+          end
+        end
+      end
+    end
+  end
+  
+  ###############
+  ##           ##
+  ##           ##
+  ##    API    ##
+  ##           ##
+  ##           ##
+  ###############
+  
+  def show_api
+    if params[:id].nil?
+      render json: {error: "param ID not found"}, status: 400
+    else 
+      if !Comment.exists?(params[:id])
+        render json: {error: "ID not found"}, status: 404
+      else
+        comment = Comment.find(params[:id])
+      
+        render json: {comment: comment}, status: 200
+      end
+    end
+  end
+  
+  def soft_delete_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {error: "Insuficient parameters"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {error: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {error: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 405
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {error: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(name: comment.author)
+      
+      if (user.auth_token != request.headers["x-api-key"])
+        render json: {error: "Incorrect apiKey"}, status: 403
+        return
+      else
+        
+        id = comment.id
+        if comment.author != ""
+          comment.comment = "[deleted]"
+          comment.author = ""
+          comment.id_sons = []
+          comment.UpVotes = 0
+          
+          comment.title_submission = ""
+          comment.num_sons = 0
+          
+          if !comment.comments.nil?
+            comment.comments.each do |comment_son| ##<- delete all of them
+              SoftDeleteComments.softDC(comment_son.id)
+              #comment_son.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+              #@comment.comments.delete(comment_son) ##this removes the comment from has_many list of submisssion
+            end
+          end
+          
+          if comment.save
+            render json: {correct: "Comment with id: " + id.to_s + " was successfully deleted."}, status: 202
+          else
+            render json: {error: "There was some error ¯\_(ツ)_/¯."}, status: 410
           end
         end
       end
