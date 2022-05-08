@@ -291,6 +291,18 @@ class CommentsController < ApplicationController
   ##           ##
   ###############
   
+  ##Get comments tree
+  def getCommentsTree(a)
+    temp = [];
+    
+    a.comments.each do |c|
+      temp2 = c
+      temp.push(temp2.as_json.merge(comments: getCommentsTree(c)))
+    end
+    
+    return temp;
+  end
+  
   def show_api
     if params[:id].nil?
       render json: {error: "param ID not found"}, status: 400
@@ -300,7 +312,7 @@ class CommentsController < ApplicationController
       else
         comment = Comment.find(params[:id])
       
-        render json: {comment: comment}, status: 200
+        render json: {comment: comment.as_json.merge({comments: getCommentsTree(comment)})}, status: 200
       end
     end
   end
@@ -439,7 +451,115 @@ class CommentsController < ApplicationController
     end
   end
 
-
+  def upvote_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {error: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {error: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {error: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 405
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {error: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      if (user.name == comment.author)
+        render json: {error: "User with id: " + user.id.to_s + " is the author of the comment with id: " + comment.id.to_s}, status: 410
+        return
+      else
+        ##logic HERE
+        
+        if user.LikedComments.detect{|e| e == params[:id]}.nil?
+          comment.UpVotes = comment.UpVotes + 1
+          user.LikedComments.push(params[:id])
+          
+          if !user.save
+            render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: user.errors}, status: 410
+          end
+          
+          if comment.save
+            render json: {correct: "User with id: " + user.id.to_s + " has successfully upvoted comment with id: " + comment.id.to_s}, status: 200
+          else
+            render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: comment.errors}, status: 410
+          end
+        else
+          render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: "User with id: " + user.id.to_s + " has already upvoted comment with id: " + comment.id.to_s}, status: 410
+        end
+      end
+    end
+  end
+  
+  def unvote_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {error: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {error: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {error: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 405
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {error: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      if (user.name == comment.author)
+        render json: {error: "User with id: " + user.id.to_s + " is the author of the comment with id: " + comment.id.to_s}, status: 410
+        return
+      else
+        ##logic HERE
+        
+        if !user.LikedComments.detect{|e| e == params[:id]}.nil?
+          comment.UpVotes = comment.UpVotes - 1
+          user.LikedComments.extract!{|e| e == params[:id]}
+          
+          if !user.save
+            render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: user.errors}, status: 410
+          end
+          
+          if comment.save
+            render json: {correct: "User with id: " + user.id.to_s + " has successfully unvoted comment with id: " + comment.id.to_s}, status: 200
+          else
+            render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: comment.errors}, status: 410
+          end
+        else
+          render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: "User with id: " + user.id.to_s + " has already unvoted comment with id: " + comment.id.to_s}, status: 410
+        end
+      end
+    end
+  end
 
 
 
