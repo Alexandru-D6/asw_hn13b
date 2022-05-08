@@ -2,6 +2,7 @@ require 'SoftDeleteComments'
 
 class SubmissionsController < ApplicationController
   before_action :set_submission, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
 
   # GET /submissions or /submissions.json
   def index
@@ -429,17 +430,20 @@ class SubmissionsController < ApplicationController
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
+      return
     end
   end
   
   def item_api 
     if params[:id].nil?
       render json: {error: "Insuficient parameters: missing ID"}, status: 400
+      return
     else 
       submissionID = params[:id]
       @submission = Submission.find_by(id: submissionID)
       if @submission.nil?
         render json: {error: "Not found"}, status: 404
+        return
       
       else 
         @shorturl = Array.new(0);
@@ -454,6 +458,32 @@ class SubmissionsController < ApplicationController
       end 
     end
   end
+  
+  def update_api
+    if request.headers["x-api-key"].nil? or params[:id].nil? or params[:title].nil?
+      render json: {error: "Insuficient parameters: there are some parameters missing"}, status: 400
+    else 
+      if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+        render json: {error: "User not found"}, status: 404
+        return
+      end
+      
+      submissionID = params[:id]
+      @submission = Submission.find_by(id: submissionID)
+      if @submission.nil?
+        render json: {error: "Not found"}, status: 404
+        return 
+      else
+        @submission = Submission.update(title: params[:title])
+        if @submission
+          render json: {text: "Successfully updated"}, status: 203
+        else 
+          render json: {error: "Something went wrong"}, status: 410
+        end 
+      end
+    end
+  end
+  
 
   private
     # Use callbacks to share common setup or constraints between actions.
