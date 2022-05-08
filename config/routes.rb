@@ -35,7 +35,7 @@ Rails.application.routes.draw do
 
   resources :comments do
     member do
-      put 'soft_delete'
+      delete 'soft_delete'
     end
   end
 
@@ -62,8 +62,15 @@ Rails.application.routes.draw do
   
   ##API
   
-  get '/API/v1.0/index', to: 'submissions#index_api'
-  get '/API/v1.0/upvoted', to: 'submissions#upvoted_api'
+  #submission
+  get '/API/v1.0/submission/index', to: 'submissions#index_api'
+  get '/API/v1.0/submission/upvoted', to: 'submissions#upvoted_api'
+  get '/API/v1.0/submission/newest', to: 'submissions#newest_api'
+  
+  #comments
+  get '/API/v1.0/comment', to: 'comments#show_api'
+  post '/API/v1.0/comments', to: 'comments#create_api'
+  delete '/API/v1.0/comment', to: 'comments#soft_delete_api'
   
   root to: 'submissions#index'
   
