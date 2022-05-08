@@ -431,6 +431,29 @@ class SubmissionsController < ApplicationController
       render json: {error: "There isn't any id as paramater"}, status: 401
     end
   end
+  
+  def item_api 
+    if params[:id].nil?
+      render json: {error: "Insuficient parameters: missing ID"}, status: 400
+    else 
+      submissionID = params[:id]
+      @submission = Submission.find_by(id: submissionID)
+      if @submission.nil?
+        render json: {error: "Not found"}, status: 404
+      
+      else 
+        @shorturl = Array.new(0);
+        if @submission.url != ""
+          url =@submission.url.split('//')
+          shortu = url[1].split('/')
+          @shorturl.push(shortu[0])
+        else 
+          @shorturl.push("")
+        end
+        render json: {submission: @submission, comments: @submission.comments}
+      end 
+    end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
