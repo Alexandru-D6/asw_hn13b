@@ -347,6 +347,8 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
+                400_insuficient_parameters:
+                  $ref: '#/components/examples/error400_insuficient_parameters'
         404:
           description: 'Error: Not Found'
           content:
@@ -676,7 +678,7 @@ components:
         id:
           type: integer
           format: int64
-          example: 2
+          example: 3
         author:
           type: string
           example: 'Electrike'
@@ -691,9 +693,6 @@ components:
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
         id_submission:
           type: integer
           format: int64
@@ -701,67 +700,49 @@ components:
         id_comment_father:
           type: integer
           format: int64
-        submission_id:
-          type: integer
-          format: int64
-          example: 1
-        comment_id:
-          type: integer
-          format: int64
-          example: null
+          example: 2
+        comments: 
+          type: array
+          example: []
+
     Comment_with_sons:
       type: object
       properties:
-        id:
+        status:
           type: integer
-          format: int64
-          example: 2
-        author:
-          type: string
-          example: 'Electrike'
+          enum: [201]
         comment:
-          type: string
-          minLength: 5
-          maxLength: 256
-          example: 'Ejemplo de comentario.'
-        upVotes:
-          type: integer
-          format: int32
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        id_sons:
-          type: integer
-          format: int64
-          example: null
-        id_submission:
-          type: integer
-          format: int64
-          example: 1
-        title_submission:
-          type: string
-          example: ''
-        id_comment_father:
-          type: integer
-          format: int64
-          example: 10
-        num_sons:
-          type: integer
-          format: int64
-          example: 0
-        submission_id:
-          type: integer
-          format: int64
-          example: null
-        comment_id:
-          type: integer
-          format: int64
-          example: 10
-        comments: 
-          $ref: '#/components/schemas/Comment'     
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 2
+            author:
+              type: string
+              example: 'Electrike'
+            comment:
+              type: string
+              minLength: 5
+              maxLength: 256
+              example: 'Ejemplo de comentario.'
+            upVotes:
+              type: integer
+              format: int32
+            created_at:
+              type: string
+              format: date-time
+            id_submission:
+              type: integer
+              format: int64
+              example: 1
+            id_comment_father:
+              type: integer
+              format: int64
+            comments: 
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'     
     AddCommentResult:
       type: object
       properties:
