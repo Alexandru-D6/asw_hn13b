@@ -2,6 +2,8 @@ require 'SoftDeleteComments'
 
 class SubmissionsController < ApplicationController
   before_action :set_submission, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
+
 
   # GET /submissions or /submissions.json
   def index
@@ -385,18 +387,112 @@ class SubmissionsController < ApplicationController
       end
     end
     
-    ##delete temp, it's to show that you can send even private variables
-    render json: {submissions: @submissions, shorturl: @shorturl, temp: temp}, status: :ok
+
+    render json: {submissions: @submissions.except("updated_at")}, status: 200
     
+  end
+
+  def ask_api
+    subm = Submission.all.order(created_at: :desc, title: :asc)
+    @submissions = Array.new(0)
+    subm.each do |submission|
+      if submission.url == "" && submission.author_username != ""
+        @submissions.push(submission)
+      end
+    end
+    @shorturl = Array.new(0);
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+    render json: {submissions: @submissions.except("updated_at"), shorturl: @shorturl}, status: :ok
+  end
+  
+  def post_submission_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    end
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    if user.nil?
+      render json: {error: "User not found"}, status: 404
+      return
+    end
+    if params[:url].nil? and params[:text].nil?
+      render json: {error: "Field url and text not found"}, status: 400
+      return
+    end
+    if Submission.find_by(url: params[:url]).present? && params[:url] != ""
+      render json: {error: "There is a submission with the entered url"}, status: 409
+      return
+    end
+    comment = Comment.new()
+    if params[:url] != "" && params[:text] != ""
+      comment.comment = params[:text]
+      comment.author = User.find_by(auth_token: request.headers["x-api-key"]).name
+      params[:text] = nil
+    end
+    if (params[:url].nil?)
+      @submission = Submission.new(title: params["title"], url: "", text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+    else
+      @submission = Submission.new(title: params["title"], url: params["url"], text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+    end
+    if @submission.save
+      if comment.author.present? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
+        comment.id_submission = @submission.id
+        comment.save
+        
+        @submission.comments.push(comment)
+        @submission.text = ""
+        @submission.save
+      end
+       render json: {correct: "Submission with id: " + @submission.id.to_s + " was successfully created."}, status: 201
+    else
+      render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: @submission.errors}, status: 410
+    end
+  end
+  
+  def submitted_api
+    if params[:id].nil?
+      render json:{error: "Insuficient parameters, you need to add the name of the user"}, status: 400
+    else
+      if User.find_by(name: params[:id]).nil?
+        render json:{error: "User not found"}, status: 404
+      else
+        @user_name = params[:id].to_s
+        @submission = Submission.where(author_username: @user_name)
+        @submission.order(created_at: :desc, title: :asc)
+        
+        if !@submission.nil?
+          @shorturl = Array.new(0);
+          @submission.each do |submission|
+            if submission.url != ""
+              url =submission.url.split('//')
+              shortu = url[1].split('/')
+              @shorturl.push(shortu[0])
+            else 
+              @shorturl.push("")
+            end
+          end
+        end
+        render json:{submissions: @submission, short_url: @shorturl}, status: 200
+      end
+    end
   end
   
   def upvoted_api
-    if !user_signed_in?
-      render json: {error: "You're not logged in!!!"}, status: 400
+    if request.headers["x-api-key"].nil?
+      render json:{error: "Header api key not found" }, status: 400
     else
-      if !params[:id].nil?
-        @user_name = params[:id].to_s
-        user = User.find_by(name: params[:id])
+      if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+         render json:{error: "User not found"}, status: 404
+      else
+        user = User.find_by(auth_token: request.headers["x-api-key"])
         
         if !user.nil? && !user.LikedSubmissions.nil?
           temp = Submission.where(id: user.LikedSubmissions)
@@ -422,16 +518,181 @@ class SubmissionsController < ApplicationController
             end
           end
         end
-        
-        render json: {submissions: @submissions, shorturl: @shorturl}, status: 200
-        ##para evitar llamar mas de un render json a la vez
-        return;
+        render json: {submissions: @submission , short_url: @short_url}, status: 200
       end
-      
-      render json: {error: "There isn't any id as paramater"}, status: 401
     end
   end
-
+  
+  def update_ask_api
+    if request.headers["x-api-key"].nil?
+      render json:{error: "Insuficient parameters, header api key not found" }, status: 400
+      return
+    end
+    if params[:id].nil?
+      render json:{error: "Insuficient parameters, Parameter id not found"}, status: 400
+      return
+    end
+    if params[:title].nil? && params[:text].nil?
+      render json:{error: "Insuficient parameters, Parameter title and text not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{error: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 404
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{error: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username != User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{error: "You are not the author of the submission " + params[:id]}, status: 410
+      return
+    end
+    if Submission.find_by(id: params[:id]).url != ""
+      render json:{error: "You are trying to edit a submission of type url"},status: 410
+      return
+    end
+    @submission = Submission.find_by(id: params[:id])
+    titol = @submission.title
+    updatetext = @submission.text
+    if !params[:title].nil?
+      titol = params[:title]
+    end
+    if !params[:text].nil?
+      updatetext = params[:text]
+    end
+    if @submission.update(title: titol, text: updatetext)
+      render json:{update: "Submission edited"}, status: 203
+    else
+      render json:{joke: "There was some error ¯\_(ツ)_/¯.", error: @submission.errors}, staus: 410
+    end
+  end
+  
+  def delete_api
+    if request.headers["x-api-key"].nil?
+      render json:{error: "Insuficient parameters, header api key not found" }, status: 400
+      return
+    end
+    if params[:id].nil?
+      render json:{error: "Insuficient parameters, Parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{error: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 404
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{error: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username != User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{error: "You are not the author of the submission " + params[:id]}, status: 410
+      return
+    end
+    @submission = Submission.find(params[:id])
+    @submission.title = "[deleted]"
+    @submission.url = ""
+    @submission.text = ""
+    @submission.UpVotes = 0
+    @submission.author_username = ""
+    
+    if !@submission.comments.nil?
+      @submission.comments.each do |comment| ##<- delete all of them
+        SoftDeleteComments.softDC(comment.id)
+        ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+        ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+      end
+    end
+    if @submission.save
+        render json:{delete: "Submission deleted"}, staus: 202
+    else
+      render json:{joke: "There was some error ¯\_(ツ)_/¯.", error: @submission.errors}, staus: 410
+    end
+  end
+  
+  def upvote_api
+    if request.headers["x-api-key"].nil?
+      render json:{error: "Insuficient parameters, header api key not found" }, status: 400
+      return
+    end
+    if params[:id].nil?
+      render json:{error: "Insuficient parameters, Parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{error: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 404
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{error: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{error: "You are the author of the submission " + params[:id]}, status: 410
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == ""
+      render json:{error: "You can't vote a submission that is deleted"}, status: 410
+      return
+    end
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    @submission = Submission.find(params[:id])
+    if user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+      @submission.UpVotes = @submission.UpVotes + 1
+      user.LikedSubmissions.push(params[:id].to_s)
+      user.save
+      if @submission.save
+        render json:{upvote: "Submission upvoted"}, staus: 203
+      else 
+        render json:{joke: "There was some error ¯\_(ツ)_/¯.", error: @submission.errors}, staus: 410
+      end
+    else 
+      render json:{error: "You have already vote this submission"}, staus: 410
+    end
+  end
+  
+  def unvote_api
+    if request.headers["x-api-key"].nil?
+      render json:{error: "Insuficient parameters, header api key not found" }, status: 400
+      return
+    end
+    if params[:id].nil?
+      render json:{error: "Insuficient parameters, Parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{error: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 404
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{error: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{error: "You are the author of the submission " + params[:id]}, status: 410
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == ""
+      render json:{error: "You can't unvote a submission that is deleted"}, status: 410
+      return
+    end
+    @submission = Submission.find(params[:id])
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    if !user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+      @submission.UpVotes = @submission.UpVotes - 1
+      user.LikedSubmissions.extract!{|e| e == params[:id]}
+      user.save
+      if @submission.save
+        render json:{unvote: "Submission unvoted"}, staus: 203
+      else
+        render json:{joke: "There was some error ¯\_(ツ)_/¯.", error: @submission.errors}, staus: 410
+      end
+    else
+      render json:{error: "You don't have vote this submission"}, staus: 410
+    end
+  
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_submission
