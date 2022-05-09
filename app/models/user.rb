@@ -2,7 +2,7 @@ class User < ApplicationRecord
   #serialize :LikedSubmissions
   #serialize :LikedComments
   has_secure_token
-  has_secure_token :auth_token
+  #has_secure_token :auth_token
   
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
