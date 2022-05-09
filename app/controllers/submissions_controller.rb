@@ -461,7 +461,17 @@ class SubmissionsController < ApplicationController
   
   def update_api
     if request.headers["x-api-key"].nil? or params[:id].nil? or params[:title].nil?
-      render json: {error: "Insuficient parameters: there are some parameters missing"}, status: 400
+      render json: {error: "Insuficient parameters: your apiKey is missing"}, status: 400
+      return
+    end
+    if params[:id].nil?
+      render json: {error: "Insuficient parameters: the ID is missing"}, status: 400
+      return
+    end
+    if params[:title].nil?
+      render json: {error: "Insuficient parameters: the title is missing"}, status: 400
+      return
+    
     else 
       if User.find_by(auth_token: request.headers["x-api-key"]).nil?
         render json: {error: "User not found"}, status: 404
@@ -474,12 +484,16 @@ class SubmissionsController < ApplicationController
         render json: {error: "Not found"}, status: 404
         return 
       else
-        @submission = Submission.update(title: params[:title])
-        if @submission
-          render json: {text: "The submission with id " + @submission.id + " has been updated"}, status: 203
+        if @submission.url.nil?
+          @submission = Submission.update(title: params[:title], text: params[:text])
         else 
+          @submission = Submission.update(title: params[:title])
+        end
+        if @submission.nil?
           render json: {error: "Something went wrong"}, status: 410
-        end 
+        else 
+          render json: {text: "The submission with id " + @submission.id.to_s + " has been updated"}, status: 203
+        end
       end
     end
   end
