@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
 
   # GET /users or /users.json
   def index
@@ -10,7 +11,6 @@ class UsersController < ApplicationController
   def show
     if !params[:id].nil?
       @user = User.find_by(name: params[:id])
-
     end
   end
 
@@ -59,6 +59,58 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to users_url, notice: "User was successfully destroyed." }
       format.json { head :no_content }
+    end
+  end
+  
+  
+  ###############
+  ##           ##
+  ##           ##
+  ##    API    ##
+  ##           ##
+  ##           ##
+  ###############
+  
+  def show_api
+    if params[:name].nil?
+      render json: {error: "Insuficient parameters, missing about"}, status: 400
+      return
+    else
+      if !User.exists?(name: params[:name])
+        render json: {error: "User with name: " + params[:name] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      @user = User.find_by(name: params[:name])
+      @user.auth_token = nil
+      @user.uid = nil
+      render json: {user: @user},status: 200
+    end
+  end
+  
+  def edit_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      
+      if params[:about].nil?
+        render json: {error: "Insuficient parameters, missing about"}, status: 400
+        return
+      end
+      
+      if !User.exists?(auth_token: request.headers["x-api-key"])
+        render json: {error: "User with apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      if user.update(about: params[:about])
+        render json: {correct: "User with name: " + user.name.to_s + " was successfully edited."}, status: 203
+      else
+        render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: user.errors}, status: 410
+      end
     end
   end
 
