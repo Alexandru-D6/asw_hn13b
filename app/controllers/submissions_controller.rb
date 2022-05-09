@@ -492,7 +492,7 @@ class SubmissionsController < ApplicationController
         if @submission.nil?
           render json: {error: "Something went wrong"}, status: 410
         else 
-          render json: {text: "The submission with id " + @submission.id.to_s + " has been updated"}, status: 203
+          render json: {text: "The submission with id " +params[:id].to_s + " has been updated"}, status: 203
         end
       end
     end
