@@ -2,18 +2,24 @@ openapi: 3.0.1
 info:
   version: 1.0.0
   title: Hacker news - HBN13
-  description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
+  description: >-
+    This is the Open API documentation for the REST API of our beloved
+    application **Hacker news** deployed at
+    <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable.
+    Only one operation requires authentication: `deleteComment`. In this case,
+    you must **Authorize** your request by providing the api_key vaule you got
+    when you created the comment.
 servers:
-  - url: 'https://asw-api-demo.herokuapp.com/'
+  - url: http://54.160.71.228:8080/API/v1.0/
 paths:
   /submission/news:
     get:
       tags:
-      - Submissions
+        - Submissions
       summary: Obté el llistat de submissions de tipus news.
       operationId: getNewsSubmissions
       responses:
-        200:
+        '200':
           description: operació finalitzada amb éxit
           content:
             application/json:
@@ -22,11 +28,11 @@ paths:
   /submission/newest:
     get:
       tags:
-      - Submissions
+        - Submissions
       summary: Obté el llistat de submissions de tipus newest.
       operationId: getNewestSubmissions
       responses:
-        200:
+        '200':
           description: operació finalitzada amb éxit
           content:
             application/json:
@@ -35,39 +41,38 @@ paths:
   /submission/ask:
     get:
       tags:
-      - Submissions
+        - Submissions
       summary: Obté el llistat de submissions de tipus ask.
       operationId: getAskSubmissions
       responses:
-        200:
+        '200':
           description: operació finalitzada amb éxit
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-  
   /submission/{submissionId}:
     get:
       tags:
-      - Submissions
+        - Submissions
       summary: Troba una submission segons el seu ID.
-      description: Retorna tant el contingut de a submission com tots els seus comentaris. 
+      description: Retorna tant el contingut de a submission com tots els seus comentaris.
       operationId: getTSubmissionById
       parameters:
-      - name: submissionId
-        in: path
-        description: ID de la Submission a buscar
-        required: true
-        schema:
-          type: integer
+        - name: submissionId
+          in: path
+          description: ID de la Submission a buscar
+          required: true
+          schema:
+            type: integer
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -78,31 +83,22 @@ paths:
                   $ref: '#/components/examples/error404'
     delete:
       tags:
-      - Submissions
+        - Submissions
       summary: Esborra la submission amb submissionId
       operationId: deleteSubmission
       parameters:
-      - name: submissionId
-        in: path
-        description: Submission ID a esborrar
-        required: true
-        schema:
-          type: integer
+        - name: submissionId
+          in: path
+          description: Submission ID a esborrar
+          required: true
+          schema:
+            type: integer
       responses:
-        204:
+        '204':
           description: Submission esborrat
           content:
             application/json: {}
-        404:
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-        401:
+        '401':
           description: 'Error: Unauthorized'
           content:
             application/json:
@@ -111,7 +107,7 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error401'
-        403:
+        '403':
           description: 'Error: Forbidden'
           content:
             application/json:
@@ -120,29 +116,7 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error403'
-      security:
-      - ApiKeyAuth: []
-    
-    put:
-      tags:
-      - Submissions
-      summary: Edita una submission
-      operationId: editSubmission
-      parameters:
-      - name: submissionId
-        in: path
-        description: ID de la submission a editar
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Edited submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -151,40 +125,69 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-  
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - Submissions
+      summary: Edita una submission
+      operationId: editSubmission
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID de la submission a editar
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Edited submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
   /submission/post/:apiKey/:title/:text/{url}:
     post:
       tags:
-      - Submissions
+        - Submissions
       summary: Crea una submission
       operationId: createSubmission
       parameters:
-      - name: apiKey
-        in: path
-        description: apiKey de l'usuari que vol crear la submission
-        required: true
-        schema:
-          type: string
-      - name: title
-        in: path
-        description: titol de la submission a crear
-        required: true
-        schema:
-          type: string
-      - name: url
-        in: query
-        description: url de la submission a crear
-        required: false
-        schema:
-          type: string
+        - name: apiKey
+          in: path
+          description: apiKey de l'usuari que vol crear la submission
+          required: true
+          schema:
+            type: string
+        - name: title
+          in: path
+          description: titol de la submission a crear
+          required: true
+          schema:
+            type: string
+        - name: url
+          in: query
+          description: url de la submission a crear
+          required: false
+          schema:
+            type: string
       responses:
-        200:
+        '200':
           description: Created submission
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '404':
           description: 'Error: Already created'
           content:
             application/json:
@@ -193,28 +196,27 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-  
   /submission/vote/submissionID:
     put:
       tags:
-      - Submissions
+        - Submissions
       summary: Vota una submission
       operationId: voteSubmission
       parameters:
-      - name: submissionId
-        in: path
-        description: ID de la submission a votar. 
-        required: true
-        schema:
-          type: integer
+        - name: submissionId
+          in: path
+          description: ID de la submission a votar.
+          required: true
+          schema:
+            type: integer
       responses:
-        200:
+        '200':
           description: Voted submission
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -226,24 +228,24 @@ paths:
   /submission/unvote/submissionID:
     put:
       tags:
-      - Submissions
+        - Submissions
       summary: Desfà la votació d'una submission
       operationId: unvoteSubmission
       parameters:
-      - name: submissionId
-        in: path
-        description: ID de la submission a desvotar. 
-        required: true
-        schema:
-          type: integer
+        - name: submissionId
+          in: path
+          description: ID de la submission a desvotar.
+          required: true
+          schema:
+            type: integer
       responses:
-        200:
+        '200':
           description: Unvoted submission
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -252,41 +254,41 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-  
   /comments:
     post:
       tags:
-      - comments
-      summary: Adds a new Comment to the Hacker News
-      operationId: addComment
+        - comments
+      summary: Afegeix un nou Comentari a una Submission de Hacker News
       requestBody:
-        description: Provide the author & content of the new Comment
+        description: Proporcioneu el contingut del nou Comentari
         content:
           application/json:
             schema:
               required:
-              - author
-              - content
+                - comment
+                - id_submission
               type: object
               properties:
-                author:
-                  type: string
-                  minLength: 4
-                  example: 'My name'
-                content:
+                id_submission:
+                  type: integer
+                  example: 1
+                comment:
                   type: string
                   minLength: 4
                   maxLength: 280
-                  example: 'My content'
+                  example: My comment
+                id_comment_father:
+                  type: integer
+                  example: 1
         required: true
       responses:
-        201:
-          description: Comment created
+        '201':
+          description: Comentari creat
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddCommentResult'
-        400:
+        '400':
           description: 'Error: Bad Request'
           content:
             application/json:
@@ -295,29 +297,66 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
-  /comment/{id}:
-    get:
-      tags:
-      - comments
-      summary: Finds a Commnent by its ID
-      description: Returns a single Comment
-      operationId: getCommentById
-      parameters:
-      - name: commentId
-        in: path
-        description: ID of Comment to return
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: successful operation
+                400_insuficient_parameters:
+                  $ref: '#/components/examples/error400_insuficient_parameters'
+                400SubmissionDeleted:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Submission with id: 1 was deleted before."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
-        404:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+  /comment/{commentId}:
+    get:
+      tags:
+        - comments
+      summary: Troba un Comentari pel seu identificador
+      description: Retorna un únic Comentari i tots els seus fills
+      parameters:
+        - name: commentId
+          in: path
+          description: ID del Comentari a retornar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment_with_sons'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+                400_insuficient_parameters:
+                  $ref: '#/components/examples/error400_insuficient_parameters'
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -328,85 +367,22 @@ paths:
                   $ref: '#/components/examples/error404'
     delete:
       tags:
-      - comments
-      summary: Deletes a Comment
-      operationId: deleteComment
+        - comments
+      summary: Esborra un Comentari i tots els seus fills
       parameters:
-      - name: commentId
-        in: path
-        description: Comment id to delete
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: commentId
+          in: path
+          description: ID del commentari a esborrar
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        204:
+        '204':
           description: Comment deleted
           content:
             application/json: {}
-        404:
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-        401:
-          description: 'Error: Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error401'
-        403:
-          description: 'Error: Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error403'
-      security:
-      - ApiKeyAuth: []
-  /comments/{id}/edit:
-    post:
-      tags:
-      - comments
-      summary: Edit a Comment given its ID
-      operationId: editComment
-      requestBody:
-        description: Provide the author & content of the new Comment
-        content:
-          application/json:
-            schema:
-              required:
-              - author
-              - content
-              type: object
-              properties:
-                author:
-                  type: string
-                  minLength: 4
-                  example: 'My name'
-                content:
-                  type: string
-                  minLength: 4
-                  maxLength: 280
-                  example: 'My content'
-        required: true
-      responses:
-        201:
-          description: Comment created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AddCommentResult'
-        400:
+        '400':
           description: 'Error: Bad Request'
           content:
             application/json:
@@ -415,164 +391,568 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
-  
+                400CommentDeleted:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Comment with id: 1 was deleted before."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+      security:
+        - ApiKeyAuth: []
+  /comments/{id}/edit:
+    put:
+      tags:
+        - comments
+      summary: Editeu un comentari donat el seu identificador
+      parameters:
+        - name: id
+          in: path
+          description: ID del commentari a editar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Proporcioneu el contingut del nou comentari
+        content:
+          application/json:
+            schema:
+              required:
+                - comment
+              type: object
+              properties:
+                comment:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: My new comment
+        required: true
+      responses:
+        '203':
+          description: Comment edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCommentResult'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                IncorrectApiKey:
+                  value: |-
+                    {
+                        "status": 403,
+                        "error": "Forbidden",
+                        "message": "Incorrect apiKey"
+                    }
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
   /comments/{id}/upvote:
     put:
       tags:
-      - comments
+        - comments
       summary: Upvote a Comment
-      operationId: upvoteComment
       parameters:
-      - name: commentId
-        in: path
-        description: Comment id to upvote
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: id
+          in: path
+          description: Comment id to upvote
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        200:
+        '200':
           description: Upvoted Comment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                UpvotedComment:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "User with id: 1 has successfully upvoted comment with id: 2",
+                        "comment": {
+                            "UpVotes": 1,
+                            "id": 2,
+                            "author": "Alexandru-D6",
+                            "comment": "dfgsdgfsdfgdsfdfd",
+                            "created_at": "2022-05-09T21:31:04.594Z",
+                            "id_submission": 2,
+                            "id_comment_father": 0,
+                            "comments": []
+                        }
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Bad Request:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 is the author of the comment with id: 1"
+                    }
+                AlreadyUpvotedComment:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 has already upvoted comment with id: 2"
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
   /comments/{id}/unvote:
     put:
       tags:
-      - comments
+        - comments
       summary: Unvote a Comment
-      operationId: unvoteComment
       parameters:
-      - name: commentId
-        in: path
-        description: Comment id to unvote
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: id
+          in: path
+          description: Comment id to unvote
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        200:
+        '200':
           description: Unvoted Comment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                Upvoted Comment:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "User with id: 1 has successfully unvoted comment with id: 2",
+                        "comment": {
+                            "UpVotes": 1,
+                            "id": 2,
+                            "author": "Alexandru-D6",
+                            "comment": "dfgsdgfsdfgdsfdfd",
+                            "created_at": "2022-05-09T21:31:04.594Z",
+                            "id_submission": 2,
+                            "id_comment_father": 0,
+                            "comments": []
+                        }
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Bad Request:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 is the author of the comment with id: 1"
+                    }
+                Already upvoted comment:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 has already unvoted comment with id: 2"
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /user/{id}/votedComments:
+                Not Found:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
+  /user/{name}:
     get:
       tags:
-      - user
-      summary: Retrieves all comments voted by a user
-      description: Returns all the comments voted of a user
-      operationId: getCommentById
+        - user
+      summary: Recupera el perfil de l'usuari
+      description: Retorna les dades del perfil d'un usuari
       parameters:
-      - name: commentId
-        in: path
-        description: ID of Comment to return
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: name
+          in: path
+          description: ID of Comment to return
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                SuccessInfoProfile:
+                  value: |-
+                    {
+                        "status": 200,
+                        "user": {
+                            "id": 1,
+                            "created_at": "2022-05-09T18:01:27.196Z",
+                            "email": "electrike.official@gmail.com",
+                            "name": "ElectrikeOfficial",
+                            "about": null,
+                            "karma": 0,
+                            "LikedSubmissions": [
+                                "{-1}"
+                            ],
+                            "LikedComments": [
+                                "{-1}",
+                                "2"
+                            ]
+                        }
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /user/{id}/comments:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "User with name: Testing doesn't exist in our database"
+                    }
+  /users/edit:
+    put:
+      tags:
+        - user
+      summary: Edita la informació de l'about
+      description: Retorna la informació del perfil editada
+      requestBody:
+        description: Proporcioneu el contingut del nou About
+        content:
+          application/json:
+            schema:
+              required:
+                - about
+              type: object
+              properties:
+                about:
+                  type: string
+                  example: >-
+                    Hola, aquest és el meu exemple de new about. Quim, posa'ns
+                    un 10.
+        required: true
+      responses:
+        '203':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                Edited about info:
+                  value: |-
+                    {
+                        "status": 203,
+                        "message": "User with name: ElectrikeOfficial was successfully edited.",
+                        "user": {
+                            "about": "LOL i didn't expected to work",
+                            "email": "electrike.official@gmail.com",
+                            "id": 1,
+                            "created_at": "2022-05-09T18:01:27.196Z",
+                            "name": "ElectrikeOfficial",
+                            "karma": 0,
+                            "LikedSubmissions": [
+                                "{-1}"
+                            ],
+                            "LikedComments": [
+                                "{-1}",
+                                "2"
+                            ]
+                        }
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                BadRequest:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Insuficient parameters, missing about"
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "User with apiKey: Re659ZU5FV4Yv5qJxH9CbPc doesn't exist in our database"
+                    }
+  /user/votedComments:
     get:
       tags:
-      - user
-      summary: Retrieves all comments done by a user
-      description: Returns all the comments of a user
-      operationId: getCommentById
-      parameters:
-      - name: commentId
-        in: path
-        description: ID of Comment to return
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - user
+      summary: Recupera tots els comentaris votats per un usuari
+      description: Retorna tots els comentaris votats per un usuari
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                VotedComments:
+                  value: |-
+                    {
+                        "status": 200,
+                        "comments": [
+                            {
+                                "id": 2,
+                                "author": "Alexandru-D6",
+                                "comment": "dfgsdgfsdfgdsfdfd",
+                                "UpVotes": 1,
+                                "created_at": "2022-05-09T21:31:04.594Z",
+                                "id_submission": 2,
+                                "id_comment_father": 0,
+                                "comments": []
+                            }
+                        ]
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /user/{id}/edit:
-    post:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "User with apiKey: Re659ZU5FV4Yv5qJxH9CbPc doesn't exist in our database"
+                    }
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+  /user/{name}/comments:
+    get:
       tags:
-      - user
-      summary: Edit about information
-      description: Returns ??
-      operationId: getCommentById ??
+        - user
+      summary: Recupera tots els comentaris fets per un usuari
+      description: Retorna tots els comentaris d'un usuari
       parameters:
-      - name: commentId
-        in: path
-        description: ID of Comment to return
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: name
+          in: path
+          description: nom de l'usuari del que volem obtenir els comentaris fets
+          required: true
+          schema:
+            type: string
       responses:
-        200:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                SuccessUserComments:
+                  value: |-
+                    {
+                        "status": 200,
+                        "comments": [
+                            {
+                                "id": 1,
+                                "author": "ElectrikeOfficial",
+                                "comment": "oh.. hello there...",
+                                "UpVotes": 0,
+                                "created_at": "2022-05-09T18:04:14.655Z",
+                                "updated_at": "2022-05-09T21:20:30.348Z",
+                                "id_submission": 2,
+                                "id_comment_father": 0,
+                                "submission_id": 2,
+                                "comment_id": null,
+                                "id_sons": null
+                            }
+                        ],
+                        "title_submission": [
+                            "aaaaaaaaaaaa"
+                        ]
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "User not found"
+                    }
   /user/submissions/userID:
     get:
       tags:
-      - user
+        - user
       summary: Obté el llistat de submissions de l'usuari amb userID.
       operationId: getUserSubmissions
       parameters:
@@ -583,13 +963,13 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: operació finalitzada amb éxit
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -598,11 +978,10 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-  
   /user/submissions/voted/userID:
     get:
       tags:
-      - user
+        - user
       summary: Obté el llistat de submissions que ha votat l'usuari amb userID.
       operationId: getUserVotedSubmissions
       parameters:
@@ -613,13 +992,13 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: operació finalitzada amb éxit
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -627,8 +1006,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
-                  $ref: '#/components/examples/error404'     
-  
+                  $ref: '#/components/examples/error404'
 components:
   schemas:
     Comment:
@@ -637,47 +1015,104 @@ components:
         id:
           type: integer
           format: int64
-          example: 2
+          example: 3
         author:
           type: string
-          minLength: 4
-          example: 'My name'
-        content:
+          example: Electrike
+        comment:
           type: string
-          minLength: 4
-          maxLength: 280
-          example: 'My content'
-        likes:
+          minLength: 5
+          maxLength: 256
+          example: Ejemplo de comentario.
+        upVotes:
           type: integer
           format: int32
         created_at:
           type: string
           format: date-time
-        _links:
+        id_submission:
+          type: integer
+          format: int64
+          example: 1
+        id_comment_father:
+          type: integer
+          format: int64
+          example: 2
+        comments:
+          type: object
+          
+    Comment_with_sons:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum:
+            - 201
+        comment:
           type: object
           properties:
-            self:
+            id:
+              type: integer
+              format: int64
+              example: 2
+            author:
               type: string
-              format: url
-              example: 'https://asw-api-demo.herokuapp.com/comment/2'
+              example: Electrike
+            comment:
+              type: string
+              minLength: 5
+              maxLength: 256
+              example: Ejemplo de comentario.
+            upVotes:
+              type: integer
+              format: int32
+            created_at:
+              type: string
+              format: date-time
+            id_submission:
+              type: integer
+              format: int64
+              example: 1
+            id_comment_father:
+              type: integer
+              format: int64
+            comments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
     AddCommentResult:
       type: object
       properties:
-        new_comment:
-          $ref: '#/components/schemas/Comment'
-        api_key:
+        status:
+          type: integer
+          enum:
+            - 201
+        message:
           type: string
-          example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
+          enum:
+            - 'Comment with id: [id] was successfully created.'
+        comment:
+          $ref: '#/components/schemas/Comment'
     ErrorResult:
       type: object
       properties:
         status:
           type: integer
-          enum: [400, 401, 403, 404, 409]
-        error: 
+          enum:
+            - 400
+            - 401
+            - 403
+            - 404
+            - 409
+        error:
           type: string
-          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
-        message: 
+          enum:
+            - Bad Request
+            - Unauthorized
+            - Forbidden
+            - Not Found
+            - Conflict
+        message:
           type: string
     Tweet:
       type: object
@@ -689,12 +1124,12 @@ components:
         author:
           type: string
           minLength: 4
-          example: 'My name'
+          example: My name
         content:
           type: string
           minLength: 4
           maxLength: 280
-          example: 'My content'
+          example: My content
         likes:
           type: integer
           format: int32
@@ -707,7 +1142,7 @@ components:
             self:
               type: string
               format: url
-              example: 'https://asw-api-demo.herokuapp.com/tweets/2'
+              example: https://asw-api-demo.herokuapp.com/tweets/2
     AddTweetResult:
       type: object
       properties:
@@ -715,30 +1150,36 @@ components:
           $ref: '#/components/schemas/Tweet'
         api_key:
           type: string
-          example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
+          example: |
+            MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=
   examples:
     error400:
       value:
         status: 400
-        error: "Bad Request"
-        message: "Content is too long (maximum is 280 characters)"
+        error: Bad Request
+        message: Content is too long (maximum is 280 characters)
+    error400_insuficient_parameters:
+      value:
+        status: 400
+        error: Bad Request
+        message: Insuficient parameters, missing id_submission
     error401:
       value:
         status: 401
-        error: "Unauthorized"
-        message: "You provided no api key (X-API-KEY Header)"
+        error: Unauthorized
+        message: You provided no api key (X-API-KEY Header)
     error403:
       value:
         status: 403
-        error: "Forbidden"
-        message: "Your api key (X-API-KEY Header) is not valid"
+        error: Forbidden
+        message: Your api key (X-API-KEY Header) is not valid
     error404:
       value:
         status: 404
-        error: "Not Found"
-        message: "No Comment with that ID"
+        error: Not Found
+        message: Submission with ID:[id] doesn't exist in our data base.
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      name: X-API-KEY #Custom headers in rails apps must have the X- prefix
+      name: X-API-KEY
       in: header
