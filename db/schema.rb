@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_02_154449) do
+ActiveRecord::Schema.define(version: 2022_05_09_144231) do
 
   create_table "comments", force: :cascade do |t|
     t.string "author", default: "", null: false
@@ -18,11 +18,8 @@ ActiveRecord::Schema.define(version: 2022_05_02_154449) do
     t.integer "UpVotes", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.text "id_sons"
     t.integer "id_submission", default: 0, null: false
-    t.text "title_submission", default: "", null: false
     t.integer "id_comment_father", default: 0, null: false
-    t.integer "num_sons", default: 0, null: false
     t.integer "submission_id"
     t.integer "comment_id"
     t.index ["comment_id"], name: "index_comments_on_comment_id"
@@ -50,7 +47,6 @@ ActiveRecord::Schema.define(version: 2022_05_02_154449) do
     t.string "provider"
     t.string "uid"
     t.string "name"
-    t.string "username"
     t.string "about"
     t.integer "karma", default: 0
     t.text "LikedSubmissions"

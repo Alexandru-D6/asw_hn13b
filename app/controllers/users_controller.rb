@@ -73,43 +73,41 @@ class UsersController < ApplicationController
   
   def show_api
     if params[:name].nil?
-      render json: {error: "Insuficient parameters, missing about"}, status: 400
+      render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing about"}, status: 400
       return
     else
       if !User.exists?(name: params[:name])
-        render json: {error: "User with name: " + params[:name] + " doesn't exist in our database"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "User with name: " + params[:name] + " doesn't exist in our database"}, status: 404
         return
       end
       
       @user = User.find_by(name: params[:name])
-      @user.auth_token = nil
-      @user.uid = nil
-      render json: {user: @user},status: 200
+      render json: {status: 200, user: @user.as_json.except("updated_at", "provider", "uid", "auth_token")},status: 200
     end
   end
   
   def edit_api
     if request.headers["x-api-key"].nil?
-      render json: {error: "API key not found"}, status: 401
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
       
       if params[:about].nil?
-        render json: {error: "Insuficient parameters, missing about"}, status: 400
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing about"}, status: 400
         return
       end
       
       if !User.exists?(auth_token: request.headers["x-api-key"])
-        render json: {error: "User with apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "User with apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
         return
       end
       
       user = User.find_by(auth_token: request.headers["x-api-key"])
       
       if user.update(about: params[:about])
-        render json: {correct: "User with name: " + user.name.to_s + " was successfully edited."}, status: 203
+        render json: {status: 200, message: "User with name: " + user.name.to_s + " was successfully edited."}, status: 203
       else
-        render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: user.errors}, status: 410
+        render json: {status: 400, error: "Bad Request", message: user.errors.first.full_message}, status: 400
       end
     end
   end
