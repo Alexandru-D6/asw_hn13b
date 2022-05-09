@@ -476,7 +476,7 @@ class SubmissionsController < ApplicationController
       else
         @submission = Submission.update(title: params[:title])
         if @submission
-          render json: {text: "Successfully updated"}, status: 203
+          render json: {text: "The submission with id " + @submission.id + " has been updated"}, status: 203
         else 
           render json: {error: "Something went wrong"}, status: 410
         end 

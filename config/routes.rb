@@ -62,10 +62,10 @@ Rails.application.routes.draw do
   
   ##API
   
-  get '/API/v1.0/submissions/news', to: 'submissions#index_api'
-  get '/API/v1.0/upvoted', to: 'submissions#upvoted_api'
-  get '/API/v1.0/submission', to: 'submissions#item_api'
-  put '/API/v1.0/submission/ask/edit', to: 'submissions#update_api'
+  get '/API/v1.0/submissions/news' => 'submissions#index_api'
+  get '/API/v1.0/upvoted'=> 'submissions#upvoted_api'
+  get '/API/v1.0/submission/:id' => 'submissions#item_api'
+  put '/API/v1.0/submission/ask/:id/edit' => 'submissions#update_api'
   
   
   root to: 'submissions#index'
