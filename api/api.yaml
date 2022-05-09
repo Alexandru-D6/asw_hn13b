@@ -4,7 +4,7 @@ info:
   title: Hacker news - HBN13
   description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
 servers:
-  - url: 'https://asw-api-demo.herokuapp.com/'
+  - url: 'https://serene-ridge-36448.herokuapp.com/'
 paths:
   /submission/news:
     get:
@@ -257,31 +257,32 @@ paths:
     post:
       tags:
       - comments
-      summary: Adds a new Comment to the Hacker News
-      operationId: addComment
+      summary: Afegeix un nou Comentari a una Submission de Hacker News
       requestBody:
-        description: Provide the author & content of the new Comment
+        description: Proporcioneu el contingut del nou Comentari
         content:
           application/json:
             schema:
               required:
-              - author
-              - content
+              - comment
+              - id_submission
               type: object
               properties:
-                author:
-                  type: string
-                  minLength: 4
-                  example: 'My name'
-                content:
+                id_submission:
+                  type: integer
+                  example: 1
+                comment:
                   type: string
                   minLength: 4
                   maxLength: 280
-                  example: 'My content'
+                  example: 'My comment'
+                id_comment_father:
+                  type: integer
+                  example: 1
         required: true
       responses:
         201:
-          description: Comment created
+          description: Comentari creat
           content:
             application/json:
               schema:
@@ -295,13 +296,33 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
+                400_insuficient_parameters:
+                  $ref: '#/components/examples/error400_insuficient_parameters'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+        
   /comment/{id}:
     get:
       tags:
       - comments
       summary: Troba un Comentari pel seu identificador
-      description: Retorna un únic Comentari
-      operationId: getCommentById
+      description: Retorna un únic Comentari i tots els seus fills
       parameters:
       - name: commentId
         in: path
@@ -312,11 +333,11 @@ paths:
           format: int64
       responses:
         200:
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/Comment_with_sons'
         400:
           description: 'Error: Bad Request'
           content:
@@ -648,7 +669,7 @@ paths:
                   $ref: '#/components/examples/error404'     
   
 components:
-  schemas:
+  schemas:    
     Comment:
       type: object
       properties:
@@ -688,14 +709,70 @@ components:
           type: integer
           format: int64
           example: null
+    Comment_with_sons:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        author:
+          type: string
+          example: 'Electrike'
+        comment:
+          type: string
+          minLength: 5
+          maxLength: 256
+          example: 'Ejemplo de comentario.'
+        upVotes:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        id_sons:
+          type: integer
+          format: int64
+          example: null
+        id_submission:
+          type: integer
+          format: int64
+          example: 1
+        title_submission:
+          type: string
+          example: ''
+        id_comment_father:
+          type: integer
+          format: int64
+          example: 10
+        num_sons:
+          type: integer
+          format: int64
+          example: 0
+        submission_id:
+          type: integer
+          format: int64
+          example: null
+        comment_id:
+          type: integer
+          format: int64
+          example: 10
+        comments: 
+          $ref: '#/components/schemas/Comment'     
     AddCommentResult:
       type: object
       properties:
-        new_comment:
-          $ref: '#/components/schemas/Comment'
-        api_key:
+        status:
+          type: integer
+          enum: [201]
+        message:
           type: string
-          example: "MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=\n"
+          enum: ["Comment with id: [id] was successfully created."]
+        comment:
+          $ref: '#/components/schemas/Comment'
     ErrorResult:
       type: object
       properties:
@@ -750,6 +827,11 @@ components:
         status: 400
         error: "Bad Request"
         message: "Content is too long (maximum is 280 characters)"
+    error400_insuficient_parameters:
+      value:
+        status: 400
+        error: "Bad Request"
+        message: "Insuficient parameters, missing id_submission"
     error401:
       value:
         status: 401
@@ -764,7 +846,7 @@ components:
       value:
         status: 404
         error: "Not Found"
-        message: "No Comment with that ID"
+        message: "Submission with ID:[id] doesn't exist in our data base."
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
