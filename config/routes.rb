@@ -68,12 +68,14 @@ Rails.application.routes.draw do
   get '/API/v1.0/submission/newest', to: 'submissions#newest_api'
   
   #comments
-  get '/API/v1.0/comment', to: 'comments#show_api'
+  get '/API/v1.0/comment/:id', to: 'comments#show_api'
   post '/API/v1.0/comments', to: 'comments#create_api'
-  delete '/API/v1.0/comment', to: 'comments#soft_delete_api'
+  delete '/API/v1.0/comment/:id', to: 'comments#soft_delete_api'
   
-  put '/API/v1.0/comments/upvote', to: 'comments#upvote_api'
-  put '/API/v1.0/comments/unvote', to: 'comments#unvote_api'
+  put '/API/v1.0/comments/:id/upvote', to: 'comments#upvote_api'
+  put '/API/v1.0/comments/:id/unvote', to: 'comments#unvote_api'
+  
+  put '/API/v1.0/comments/:id/edit', to: 'comments#edit_api'
   
   
   

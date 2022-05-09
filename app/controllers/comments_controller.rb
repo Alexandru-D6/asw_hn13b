@@ -561,7 +561,49 @@ class CommentsController < ApplicationController
     end
   end
 
+  def edit_api
+    if request.headers["x-api-key"].nil?
+      render json: {error: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {error: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {error: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {error: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 405
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {error: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(name: comment.author)
+      
+      if (user.auth_token != request.headers["x-api-key"])
+        render json: {error: "Incorrect apiKey"}, status: 403
+        return
+      else
 
+        if comment.update(comment: params[:comment])
+          render json: {correct: "Comment with id: " + comment.id.to_s + " was successfully edited."}, status: 203
+        else
+          render json: {joke: "There was some error ¯\_(ツ)_/¯.", error: comment.errors}, status: 410
+        end
+        
+      end
+    end
+  end
 
 
 
