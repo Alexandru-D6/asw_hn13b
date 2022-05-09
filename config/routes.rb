@@ -81,7 +81,7 @@ Rails.application.routes.draw do
   #User
   get '/API/v1.0/user/:name', to: 'users#show_api'
   get '/API/v1.0/user/:name/comments', to: 'comments#threads_api'
-  get '/API/v1.0/users/voted_comments', to: 'comments#upvoted_api'
+  get '/API/v1.0/users/upvotedComments', to: 'comments#upvoted_api'
   put '/API/v1.0/users/edit', to: 'users#edit_api'
   
   

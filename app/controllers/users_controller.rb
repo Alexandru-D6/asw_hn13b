@@ -105,7 +105,7 @@ class UsersController < ApplicationController
       user = User.find_by(auth_token: request.headers["x-api-key"])
       
       if user.update(about: params[:about])
-        render json: {status: 200, message: "User with name: " + user.name.to_s + " was successfully edited."}, status: 203
+        render json: {status: 203, message: "User with name: " + user.name.to_s + " was successfully edited.", user: user.as_json.except("updated_at", "provider", "uid", "auth_token")}, status: 203
       else
         render json: {status: 400, error: "Bad Request", message: user.errors.first.full_message}, status: 400
       end
