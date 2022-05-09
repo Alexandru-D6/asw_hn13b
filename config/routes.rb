@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :comments
+  resources :users
   devise_for :users, :controllers => { :omniauth_callbacks => "callbacks" }
   
   
@@ -40,7 +41,6 @@ Rails.application.routes.draw do
   end
 
   
-  resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   
   get 'news', to: 'submissions#index'
@@ -68,9 +68,23 @@ Rails.application.routes.draw do
   get '/API/v1.0/submission/newest', to: 'submissions#newest_api'
   
   #comments
-  get '/API/v1.0/comment', to: 'comments#show_api'
+  get '/API/v1.0/comment/:id', to: 'comments#show_api'
   post '/API/v1.0/comments', to: 'comments#create_api'
-  delete '/API/v1.0/comment', to: 'comments#soft_delete_api'
+  delete '/API/v1.0/comment/:id', to: 'comments#soft_delete_api'
+  
+  put '/API/v1.0/comment/:id/upvote', to: 'comments#upvote_api'
+  put '/API/v1.0/comment/:id/unvote', to: 'comments#unvote_api'
+  
+  put '/API/v1.0/comment/:id/edit', to: 'comments#edit_api'
+  
+  
+  #User
+  get '/API/v1.0/user/:name', to: 'users#show_api'
+  get '/API/v1.0/user/:name/comments', to: 'comments#threads_api'
+  get '/API/v1.0/users/upvotedComments', to: 'comments#upvoted_api'
+  put '/API/v1.0/users/edit', to: 'users#edit_api'
+  
+  
   
   root to: 'submissions#index'
   

@@ -157,7 +157,7 @@ class CommentsController < ApplicationController
           @comment = Array.new(0)
           temp.each do |temp|
             if temp.author != ""
-              temp.title_submission = Submission.find(temp.id_submission).title
+              #temp.title_submission = Submission.find(temp.id_submission).title
               @comment.push(temp)  
             end
           end
@@ -259,9 +259,6 @@ class CommentsController < ApplicationController
         comment.id_sons = []
         comment.UpVotes = 0
         
-        comment.title_submission = ""
-        comment.num_sons = 0
-        
         if !comment.comments.nil?
           comment.comments.each do |comment_son| ##<- delete all of them
             SoftDeleteComments.softDC(comment_son.id)
@@ -291,51 +288,65 @@ class CommentsController < ApplicationController
   ##           ##
   ###############
   
+  ##Get comments tree
+  def getCommentsTree(a)
+    temp = [];
+    
+    a.comments.each do |c|
+      temp2 = c
+      if temp2.author != ""
+        temp.push(temp2.as_json.merge(comments: getCommentsTree(c)).except("submission_id", "comment_id", "id_sons", "updated_at"))
+      end
+    end
+    
+    return temp;
+  end
+  
   def show_api
     if params[:id].nil?
-      render json: {error: "param ID not found"}, status: 400
+      render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id"}, status: 400
     else 
       if !Comment.exists?(params[:id])
-        render json: {error: "ID not found"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
       else
         comment = Comment.find(params[:id])
       
-        render json: {comment: comment}, status: 200
+        render json: {status: 200, comment: comment.as_json.merge({comments: getCommentsTree(comment)}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
       end
     end
   end
   
   def soft_delete_api
     if request.headers["x-api-key"].nil?
-      render json: {error: "API key not found"}, status: 401
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
       if params[:id].nil?
-        render json: {error: "Insuficient parameters"}, status: 400
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
         return
       end
       
       if !Comment.exists?(params[:id])
-        render json: {error: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
         return
       end
       
       comment = Comment.find(params[:id])
       
       if comment.author == ""
-        render json: {error: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 405
+        render json: {status: 400, error: "Bad Request", message: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 400
         return
       end
       
       if !User.exists?(name: comment.author)
-        render json: {error: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
         return
       end
       
       user = User.find_by(name: comment.author)
       
       if (user.auth_token != request.headers["x-api-key"])
-        render json: {error: "Incorrect apiKey"}, status: 403
+        render json: {status: 403, error: "Forbidden", message: "Incorrect apiKey"}, status: 403
         return
       else
         
@@ -346,9 +357,6 @@ class CommentsController < ApplicationController
           comment.id_sons = []
           comment.UpVotes = 0
           
-          comment.title_submission = ""
-          comment.num_sons = 0
-          
           if !comment.comments.nil?
             comment.comments.each do |comment_son| ##<- delete all of them
               SoftDeleteComments.softDC(comment_son.id)
@@ -358,14 +366,299 @@ class CommentsController < ApplicationController
           end
           
           if comment.save
-            render json: {correct: "Comment with id: " + id.to_s + " was successfully deleted."}, status: 202
+            render json: {status: 202, message: "Comment with id: " + id.to_s + " was successfully deleted."}, status: 204
           else
-            render json: {error: "There was some error ¯\_(ツ)_/¯."}, status: 410
+            render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
           end
         end
       end
     end
   end
+
+  def create_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    else
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
+      if params[:comment].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment"}, status: 400
+        return
+      end
+      
+      if !params[:id_comment_father].nil? && !Comment.exists?(params[:id_comment_father])
+        render json: {status: 404, error: "Not Found", message: "Comment with father id: " + params[:id_comment_father] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if !Submission.exists?(params[:id_submission])
+        render json: {status: 404, error: "Not Found", message: "Submission with id: " + params[:id_submission] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      submission = Submission.find(params[:id_submission])
+      
+      if submission.author_username == ""
+        render json: {status: 400, error: "Bad Request", message: "Submission with id: " + params[:id_submission] + " was deleted before."}, status: 400
+        return
+      end
+      
+      if !User.exists?(auth_token: request.headers["x-api-key"])
+        render json: {status: 404, error: "Not Found", message: "User with provided apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      @comment = Comment.new(comment: params[:comment], author: user.name, id_submission: params[:id_submission])
+      
+      if params[:id_comment_father].nil?
+        
+        if submission.comments.nil? 
+          submission.comments = Array.new(1)  
+        end
+        
+        submission.comments.push(@comment)
+        ##comprobar que se guarda bien :D
+        submission.save
+      else
+        comment_father = Comment.find(params[:id_comment_father])
+        
+        if comment_father.comments.nil? 
+          comment_father.comments = Array.new(1)  
+        end
+        
+        comment_father.comments.push(@comment)
+        comment_father.save
+        
+        @comment.id_comment_father = params[:id_comment_father]
+      end
+      
+      if @comment.save
+        render json: {status: 201, message: "Comment with id: " + @comment.id.to_s + " was successfully created.", comment: @comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 201
+      else
+        render json: {status: 400, error: "Bad Request", message: @comment.errors.first.full_message}, status: 400
+      end
+      
+    end
+  end
+
+  def upvote_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 404
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      if (user.name == comment.author)
+        render json: {status: 400, error: "Bad Request", message: "User with id: " + user.id.to_s + " is the author of the comment with id: " + comment.id.to_s}, status: 400
+        return
+      else
+        ##logic HERE
+        
+        if user.LikedComments.detect{|e| e == params[:id]}.nil?
+          comment.UpVotes = comment.UpVotes + 1
+          user.LikedComments.push(params[:id])
+          
+          if !user.save
+            render json: {status: 400, error: "Bad Request", message: user.errors}, status: 400
+          end
+          
+          if comment.save
+            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully upvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
+          else
+            render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
+          end
+        else
+          render json: {status: 400, error: "Bad Request", message: "User with id: " + user.id.to_s + " has already upvoted comment with id: " + comment.id.to_s}, status: 400
+        end
+      end
+    end
+  end
+  
+  def unvote_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {status: 400, error: "Bad Request", message: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 400
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      if (user.name == comment.author)
+        render json: {status: 400, error: "Bad Request", message: "User with id: " + user.id.to_s + " is the author of the comment with id: " + comment.id.to_s}, status: 400
+        return
+      else
+        ##logic HERE
+        
+        if !user.LikedComments.detect{|e| e == params[:id]}.nil?
+          comment.UpVotes = comment.UpVotes - 1
+          user.LikedComments.extract!{|e| e == params[:id]}
+          
+          if !user.save
+            render json: {status: 400, error: "Bad Request", message: user.errors.first.full_message}, status: 400
+          end
+          
+          if comment.save
+            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully unvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
+          else
+            render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
+          end
+        else
+          render json: {status: 400, error: "Bad Request", message: "User with id: " + user.id.to_s + " has already unvoted comment with id: " + comment.id.to_s}, status: 400
+        end
+      end
+    end
+  end
+
+  def edit_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    else
+      if params[:id].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
+        return
+      end
+      
+      if !Comment.exists?(params[:id])
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      comment = Comment.find(params[:id])
+      
+      if comment.author == ""
+        render json: {status: 400, error: "Bad Request", message: "Comment with id: " + comment.id.to_s + " was deleted before."}, status: 400
+        return
+      end
+      
+      if !User.exists?(name: comment.author)
+        render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(name: comment.author)
+      
+      if (user.auth_token != request.headers["x-api-key"])
+        render json: {status: 403, error: "Forbidden", message: "Incorrect apiKey"}, status: 403
+        return
+      else
+
+        if comment.update(comment: params[:comment])
+          render json: {status: 203, message: "Comment with id: " + comment.id.to_s + " was successfully edited.", comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 203
+        else
+          render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
+        end
+        
+      end
+    end
+  end
+
+  def upvoted_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    else
+      if !User.exists?(auth_token: request.headers["x-api-key"])
+        render json: {status: 404, error: "Not Found", message: "User with apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      user = User.find_by(auth_token: request.headers["x-api-key"])
+      
+      @comment = Array.new(0)
+      if !user.LikedComments.nil?
+        temp = Comment.where(id: user.LikedComments)
+        temp.order(created_at: :desc, title: :asc)
+        
+        temp.each do |temp|
+          if temp.author != ""
+            #temp.title_submission = Submission.find(temp.id_submission).title
+            @comment.push(temp.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at"))  
+          end
+        end
+      end
+      
+      render json: {status: 200, comments: @comment}, status: 200
+    end
+  end
+  
+  def threads_api
+    if params[:name].nil?
+      render json: {status: 400, error: "Bad Request", message: "param name not found"}, status: 400
+    else 
+      if !User.exists?(name: params[:name])
+        render json: {status: 404, error: "Not Found", message: "User not found"}, status: 404
+      else
+        temp = Comment.where(author: params[:name]).order(created_at: :desc, comment: :asc)
+    
+        @comments = Array.new(0)
+        temp.each do |com|
+          if com.author != ""
+            @comments.push(com)
+          end
+        end
+        
+        @titles_submissions = Array.new(0)
+        @comments.each do |comment|
+            submission = Submission.find(comment.id_submission)
+            @titles_submissions.push(submission.title)
+        end
+        
+        render json: {status: 200, comments: @comments, title_submission: @titles_submissions}, status: 200
+      end
+    end
+  end
+  
+  
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
