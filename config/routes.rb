@@ -72,17 +72,17 @@ Rails.application.routes.draw do
   post '/API/v1.0/comments', to: 'comments#create_api'
   delete '/API/v1.0/comment/:id', to: 'comments#soft_delete_api'
   
-  put '/API/v1.0/comments/:id/upvote', to: 'comments#upvote_api'
-  put '/API/v1.0/comments/:id/unvote', to: 'comments#unvote_api'
+  put '/API/v1.0/comment/:id/upvote', to: 'comments#upvote_api'
+  put '/API/v1.0/comment/:id/unvote', to: 'comments#unvote_api'
   
-  put '/API/v1.0/comments/:id/edit', to: 'comments#edit_api'
+  put '/API/v1.0/comment/:id/edit', to: 'comments#edit_api'
   
   
   #User
-  get '/API/v1.0/users/:name', to: 'users#show_api'
-  get '/API/v1.0/users/:name/comments', to: 'comments#threads_api'
-  get '/API/v1.0/user/voted_comments', to: 'comments#upvoted_api'
-  put '/API/v1.0/user/edit', to: 'users#edit_api'
+  get '/API/v1.0/user/:name', to: 'users#show_api'
+  get '/API/v1.0/user/:name/comments', to: 'comments#threads_api'
+  get '/API/v1.0/users/voted_comments', to: 'comments#upvoted_api'
+  put '/API/v1.0/users/edit', to: 'users#edit_api'
   
   
   

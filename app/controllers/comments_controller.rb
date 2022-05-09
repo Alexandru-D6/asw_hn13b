@@ -305,14 +305,14 @@ class CommentsController < ApplicationController
   
   def show_api
     if params[:id].nil?
-      render json: {error: "param ID not found"}, status: 400
+      render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id"}, status: 400
     else 
       if !Comment.exists?(params[:id])
-        render json: {error: "ID not found"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
       else
         comment = Comment.find(params[:id])
       
-        render json: {comment: comment.as_json.merge({comments: getCommentsTree(comment)})}, status: 200
+        render json: {status: 200, comment: comment.as_json.merge({comments: getCommentsTree(comment)})}, status: 200
       end
     end
   end
