@@ -67,6 +67,16 @@ Rails.application.routes.draw do
   get '/API/v1.0/submission/:id' => 'submissions#item_api'
   put '/API/v1.0/submission/url/:id/edit' => 'submissions#update_api'
   
+  get '/API/v1.0/index', to: 'submissions#index_api'
+  get '/API/v1.0/submissions/ask', to: 'submissions#ask_api'
+  post '/API/v1.0/submissions/create_submission', to: 'submissions#post_submission_api'
+  put '/API/v1.0/submissions/:id/edit', to: 'submissions#update_api'
+  delete '/API/v1.0/submissions/:id/delete', to: 'submissions#delete_api'
+  put '/API/v1.0/submissions/upvote/:id', to: 'submissions#upvote_api'
+  put '/API/v1.0/submissions/unvote/:id', to: 'submissions#unvote_api'
+ 
+  get '/API/v1.0/user/:id/submissions', to: 'submissions#submitted_api'
+  get '/API/v1.0/user/upvoted_submissions', to: 'submissions#upvoted_api'
   
   root to: 'submissions#index'
   

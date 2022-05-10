@@ -385,19 +385,110 @@ class SubmissionsController < ApplicationController
         @shorturl.push("")
       end
     end
-    
-    ##delete temp, it's to show that you can send even private variables
-    render json: {submissions: @submissions, shorturl: @shorturl, temp: temp}, status: 200
-    
+    render json: {status: 200, submissions: @submissions.except("updated_at")}, status: 200
+  end
+
+  def ask_api
+    subm = Submission.all.order(created_at: :desc, title: :asc)
+    @submissions = Array.new(0)
+    subm.each do |submission|
+      if submission.url == "" && submission.author_username != ""
+        @submissions.push(submission)
+      end
+    end
+    @shorturl = Array.new(0);
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+    render json: {status: 200, submissions: @submissions.except("updated_at"), shorturl: @shorturl}, status: 200
+  end
+  
+  def post_submission_api
+    if request.headers["x-api-key"].nil?
+      render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
+      return
+    end
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    if user.nil?
+      render json: {status: 403, error: "Forbidden", message: "User not found"}, status: 403
+      return
+    end
+    if params[:url].nil? and params[:text].nil?
+      render json: {status: 400, error: "Bad Request", message: "Field url and text not found"}, status: 400
+      return
+    end
+    if Submission.find_by(url: params[:url]).present? && params[:url] != ""
+      render json: {status: 400, error: "Bad Request", message: "There is a submission with the entered url"}, status: 400
+      return
+    end
+    comment = Comment.new()
+    if params[:url] != "" && params[:text] != ""
+      comment.comment = params[:text]
+      comment.author = User.find_by(auth_token: request.headers["x-api-key"]).name
+      params[:text] = nil
+    end
+    if (params[:url].nil?)
+      @submission = Submission.new(title: params["title"], url: "", text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+    else
+      @submission = Submission.new(title: params["title"], url: params["url"], text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+    end
+    if @submission.save
+      if comment.author.present? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
+        comment.id_submission = @submission.id
+        comment.save
+        
+        @submission.comments.push(comment)
+        @submission.text = ""
+        @submission.save
+      end
+       render json: {status: 201, message: "Submission with id: " + @submission.id.to_s + " was successfully created.", submission: @submission.except("updated_at")}, status: 201
+    else
+      render json: {status: 400, error: "Bad Request", message: @submission.errorsf.irst.full_message}, status: 400
+    end
+  end
+  
+  def submitted_api
+    if params[:id].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, you need to add the name of the user"}, status: 400
+    else
+      if User.find_by(name: params[:id]).nil?
+        render json:{status: 404, error: "Not Found", message: "The user with the id:"+ params[:id]+" not found"}, status: 404
+      else
+        @user_name = params[:id].to_s
+        @submission = Submission.where(author_username: @user_name)
+        @submission.order(created_at: :desc, title: :asc)
+        
+        if !@submission.nil?
+          @shorturl = Array.new(0);
+          @submission.each do |submission|
+            if submission.url != ""
+              url =submission.url.split('//')
+              shortu = url[1].split('/')
+              @shorturl.push(shortu[0])
+            else 
+              @shorturl.push("")
+            end
+          end
+        end
+        render json:{status: 200,submissions: @submission, short_url: @shorturl}, status: 200
+      end
+    end
   end
   
   def upvoted_api
-    if !user_signed_in?
-      render json: {error: "You're not logged in!!!"}, status: 400
+    if request.headers["x-api-key"].nil?
+      render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
     else
-      if !params[:id].nil?
-        @user_name = params[:id].to_s
-        user = User.find_by(name: params[:id])
+      if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+         render json:{status: 403, error: "Forbidden", message: "The user with the api key:" + request.headers["x-api-key"] + " not found"}, status: 403
+      else
+        user = User.find_by(auth_token: request.headers["x-api-key"])
         
         if !user.nil? && !user.LikedSubmissions.nil?
           temp = Submission.where(id: user.LikedSubmissions)
@@ -423,10 +514,7 @@ class SubmissionsController < ApplicationController
             end
           end
         end
-        
-        render json: {submissions: @submissions, shorturl: @shorturl}, status: 200
-        ##para evitar llamar mas de un render json a la vez
-        return;
+        render json: {status: 200, submissions: @submission, short_url: @short_url}, status: 200
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
@@ -498,7 +586,180 @@ class SubmissionsController < ApplicationController
     end
   end
   
-
+  def update_api
+    if request.headers["x-api-key"].nil?
+      render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
+      return
+    end
+    if params[:id].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{status: 403, error: "Forbidden", message: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 403
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{status: 404, error: "Not Found", message: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username != User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{status: 400, error: "Bad Request", message: "You are not the author of the submission " + params[:id]}, status: 400
+      return
+    end
+    if Submission.find_by(id: params[:id]).url == "" && params[:title].nil? && params[:text].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter title and text not found"},status: 400
+      return
+    end
+    if Submission.find_by(id: params[:id]).url != "" && params[:title].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter title not found"}, status: 400
+      return
+    end
+    if Submission.find_by(id: params[:id]).url != "" && !params[:text].nil?
+      render json:{status: 400, error: "Bad Request", message: "Parameter text found, tryning to edit a submission of type url"}, status: 400
+      return
+    end
+    @submission = Submission.find_by(id: params[:id])
+    titol = @submission.title
+    updatetext = @submission.text
+    if !params[:title].nil?
+      titol = params[:title]
+    end
+    if !params[:text].nil?
+      updatetext = params[:text]
+    end
+    if @submission.update(title: titol, text: updatetext)
+      render json:{status:203, message: "Submission edited", submission: @submission}, status: 203
+    else
+      render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
+    end
+  end
+  
+  def delete_api
+    if request.headers["x-api-key"].nil?
+      render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
+      return
+    end
+    if params[:id].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{status: 403, error: "Forbidden", message: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 403
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{status: 404, error: "Not found", message: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username != User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{status: 403, error: "Forbidden", message: "You are not the author of the submission " + params[:id]}, status: 403
+      return
+    end
+    @submission = Submission.find(params[:id])
+    @submission.title = "[deleted]"
+    @submission.url = ""
+    @submission.text = ""
+    @submission.UpVotes = 0
+    @submission.author_username = ""
+    
+    if !@submission.comments.nil?
+      @submission.comments.each do |comment| ##<- delete all of them
+        SoftDeleteComments.softDC(comment.id)
+        ##comment.soft_delete ##this is a method inside comments_controller that does exactly the same as Submission.soft_delete
+        ##@submission.comments.delete(comment) ##this removes the comment from has_many list of submisssion
+      end
+    end
+    if @submission.save
+        render json:{status: 202, message: "Submission wiht the id:"+ params[:id]+" was successfully deleted"}, staus: 202
+    else
+      render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
+    end
+  end
+  
+  def upvote_api
+    if request.headers["x-api-key"].nil?
+      render json:{status: 401, error: "Unauthorized", message: "Insuficient parameters, header api key not found" }, status: 401
+      return
+    end
+    if params[:id].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{status: 403, error: "Forbidden", message: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 403
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{status: 404, error: "Not found", message: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{status: 403, error: "Forbidden", message: "You are the author of the submission " + params[:id]+ ", then you can't upvote it"}, status: 403
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == ""
+      render json:{status: 400, error: "Bad Request", message: "You can't vote a submission that is deleted"}, status: 400
+      return
+    end
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    @submission = Submission.find(params[:id])
+    if user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+      @submission.UpVotes = @submission.UpVotes + 1
+      user.LikedSubmissions.push(params[:id].to_s)
+      user.save
+      if @submission.save
+        render json:{status: 203, message: "Submission upvoted", submission: @submission.except("updated_at")}, staus: 203
+      else 
+        render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 410
+      end
+    else 
+      render json:{status: 400, error: "Bad Request", message: "You have already vote this submission"}, staus: 400
+    end
+  end
+  
+  def unvote_api
+    if request.headers["x-api-key"].nil?
+      render json:{status: 401, error: "Unauthorized", message: "Insuficient parameters, header api key not found" }, status: 401
+      return
+    end
+    if params[:id].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
+      return
+    end
+    if User.find_by(auth_token: request.headers["x-api-key"]).nil?
+      render json:{status:403, error: "Forbidden", message: "User with the api key "+ request.headers["x-api-key"] + " not found"}, status: 403
+      return
+    end
+    if Submission.find_by(id: params[:id]).nil?
+      render json:{status: 404, error: "Not found", message: "Submission with the id: "+params[:id]+" not found"}, status: 404
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == User.find_by(auth_token: request.headers["x-api-key"]).name
+      render json:{status: 403, error: "Forbidden" ,message: "You are the author of the submission " + params[:id] + ", then you can't unvote it"}, status: 403
+      return
+    end
+    if  Submission.find_by(id: params[:id]).author_username == ""
+      render json:{status: 400, error: "Submission Deleted", message: "You can't unvote a submission that is deleted"}, status: 400
+      return
+    end
+    @submission = Submission.find(params[:id])
+    user = User.find_by(auth_token: request.headers["x-api-key"])
+    if !user.LikedSubmissions.detect{|e| e == params[:id]}.nil?
+      @submission.UpVotes = @submission.UpVotes - 1
+      user.LikedSubmissions.extract!{|e| e == params[:id]}
+      user.save
+      if @submission.save
+        render json:{status: 203, message: "Submission unvoted", submission: @submission.except("updated_at")}, staus: 203
+      else
+        render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
+      end
+    else
+      render json:{staus: 400, error: "Bad Request" , message: "You don't have vote this submission"}, staus: 400
+    end
+  
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_submission
