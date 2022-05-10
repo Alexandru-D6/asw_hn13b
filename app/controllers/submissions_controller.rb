@@ -436,13 +436,13 @@ class SubmissionsController < ApplicationController
   
   def item_api 
     if params[:id].nil?
-      render json: {error: "Insuficient parameters: missing ID"}, status: 400
+      render json: {status: 400, error: "Bad request", message: "Insuficient parameters, missing submission ID"}, status: 400
       return
     else 
       submissionID = params[:id]
       @submission = Submission.find_by(id: submissionID)
       if @submission.nil?
-        render json: {error: "Not found"}, status: 404
+        render json: {status: 404, error: "Not found", message: "The submission doesn't exist in the data base"}, status: 404
         return
       
       else 
@@ -454,34 +454,34 @@ class SubmissionsController < ApplicationController
         else 
           @shorturl.push("")
         end
-        render json: {submission: @submission, comments: @submission.comments}
+        render json: {staus: 200, submission: @submission, comments: @submission.comments}, status: 200
       end 
     end
   end
   
   def update_api
     if request.headers["x-api-key"].nil? or params[:id].nil? or params[:title].nil?
-      render json: {error: "Insuficient parameters: your apiKey is missing"}, status: 400
+      render json: {status: 400, error: "Bad request", message:"Insuficient parameters, the apiKey is missing"}, status: 400
       return
     end
     if params[:id].nil?
-      render json: {error: "Insuficient parameters: the ID is missing"}, status: 400
+      render json: {status: 400, error: "Bad request", message: "Insuficient parameters, the submission ID is missing"}, status: 400
       return
     end
     if params[:title].nil?
-      render json: {error: "Insuficient parameters: the title is missing"}, status: 400
+      render json: {status: 400, error: "Bad request" ,message: "Insuficient parameters: the title is missing"}, status: 400
       return
     
     else 
       if User.find_by(auth_token: request.headers["x-api-key"]).nil?
-        render json: {error: "User not found"}, status: 404
+        render json: {status: 404, error: "Not found", message: "The apiKey doesn't exist"}, status: 404
         return
       end
       
       submissionID = params[:id]
       @submission = Submission.find_by(id: submissionID)
       if @submission.nil?
-        render json: {error: "Not found"}, status: 404
+        render json: {status: 404, error: "Not found", message: "The submission with this ID doesn't exist"}, status: 404
         return 
       else
         if @submission.url.nil?
@@ -492,7 +492,7 @@ class SubmissionsController < ApplicationController
         if @submission.nil?
           render json: {error: "Something went wrong"}, status: 410
         else 
-          render json: {text: "The submission with id " +params[:id].to_s + " has been updated"}, status: 203
+          render json: {status: 203, text: "The submission with id " + params[:id].to_s + " has been updated"}, status: 203
         end
       end
     end
