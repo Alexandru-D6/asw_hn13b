@@ -548,45 +548,6 @@ class SubmissionsController < ApplicationController
   end
   
   def update_api
-    if request.headers["x-api-key"].nil? or params[:id].nil? or params[:title].nil?
-      render json: {status: 400, error: "Bad request", message:"Insuficient parameters, the apiKey is missing"}, status: 400
-      return
-    end
-    if params[:id].nil?
-      render json: {status: 400, error: "Bad request", message: "Insuficient parameters, the submission ID is missing"}, status: 400
-      return
-    end
-    if params[:title].nil?
-      render json: {status: 400, error: "Bad request" ,message: "Insuficient parameters: the title is missing"}, status: 400
-      return
-    
-    else 
-      if User.find_by(auth_token: request.headers["x-api-key"]).nil?
-        render json: {status: 404, error: "Not found", message: "The apiKey doesn't exist"}, status: 404
-        return
-      end
-      
-      submissionID = params[:id]
-      @submission = Submission.find_by(id: submissionID)
-      if @submission.nil?
-        render json: {status: 404, error: "Not found", message: "The submission with this ID doesn't exist"}, status: 404
-        return 
-      else
-        if @submission.url.nil?
-          @submission = Submission.update(title: params[:title], text: params[:text])
-        else 
-          @submission = Submission.update(title: params[:title])
-        end
-        if @submission.nil?
-          render json: {error: "Something went wrong"}, status: 410
-        else 
-          render json: {status: 203, text: "The submission with id " + params[:id].to_s + " has been updated"}, status: 203
-        end
-      end
-    end
-  end
-  
-  def update_api
     if request.headers["x-api-key"].nil?
       render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
       return
