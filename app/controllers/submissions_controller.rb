@@ -520,17 +520,13 @@ class SubmissionsController < ApplicationController
     end
   end
   
-  def update_ask_api
+  def update_api
     if request.headers["x-api-key"].nil?
       render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
       return
     end
     if params[:id].nil?
-      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, Parameter id not found"}, status: 400
-      return
-    end
-    if params[:title].nil? && params[:text].nil?
-      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, Parameter title and text not found"}, status: 400
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
       return
     end
     if User.find_by(auth_token: request.headers["x-api-key"]).nil?
@@ -545,8 +541,16 @@ class SubmissionsController < ApplicationController
       render json:{status: 400, error: "Bad Request", message: "You are not the author of the submission " + params[:id]}, status: 400
       return
     end
-    if Submission.find_by(id: params[:id]).url != ""
-      render json:{status: 400, error: "Bad Request", message: "You are trying to edit a submission of type url"},status: 400
+    if Submission.find_by(id: params[:id]).url == "" && params[:title].nil? && params[:text].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter title and text not found"},status: 400
+      return
+    end
+    if Submission.find_by(id: params[:id]).url != "" && params[:title].nil?
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter title not found"}, status: 400
+      return
+    end
+    if Submission.find_by(id: params[:id]).url != "" && !params[:text].nil?
+      render json:{status: 400, error: "Bad Request", message: "Parameter text found, tryning to edit a submission of type url"}, status: 400
       return
     end
     @submission = Submission.find_by(id: params[:id])
@@ -559,7 +563,7 @@ class SubmissionsController < ApplicationController
       updatetext = params[:text]
     end
     if @submission.update(title: titol, text: updatetext)
-      render json:{status:203, message: "Submission edited", submission: @submission.except("updated_at")}, status: 203
+      render json:{status:203, message: "Submission edited", submission: @submission}, status: 203
     else
       render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
     end
@@ -571,7 +575,7 @@ class SubmissionsController < ApplicationController
       return
     end
     if params[:id].nil?
-      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, Parameter id not found"}, status: 400
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
       return
     end
     if User.find_by(auth_token: request.headers["x-api-key"]).nil?
@@ -613,7 +617,7 @@ class SubmissionsController < ApplicationController
       return
     end
     if params[:id].nil?
-      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, Parameter id not found"}, status: 400
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
       return
     end
     if User.find_by(auth_token: request.headers["x-api-key"]).nil?
@@ -654,7 +658,7 @@ class SubmissionsController < ApplicationController
       return
     end
     if params[:id].nil?
-      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, Parameter id not found"}, status: 400
+      render json:{status: 400, error: "Bad Request", message: "Insuficient parameters, parameter id not found"}, status: 400
       return
     end
     if User.find_by(auth_token: request.headers["x-api-key"]).nil?
