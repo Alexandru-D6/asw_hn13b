@@ -256,7 +256,6 @@ class CommentsController < ApplicationController
       if comment.author != ""
         comment.comment = "[deleted]"
         comment.author = ""
-        comment.id_sons = []
         comment.UpVotes = 0
         
         if !comment.comments.nil?
@@ -295,7 +294,7 @@ class CommentsController < ApplicationController
     a.comments.each do |c|
       temp2 = c
       if temp2.author != ""
-        temp.push(temp2.as_json.merge(comments: getCommentsTree(c)).except("submission_id", "comment_id", "id_sons", "updated_at"))
+        temp.push(temp2.as_json.merge(comments: getCommentsTree(c)).except("submission_id", "comment_id", "updated_at"))
       end
     end
     
@@ -311,7 +310,7 @@ class CommentsController < ApplicationController
       else
         comment = Comment.find(params[:id])
       
-        render json: {status: 200, comment: comment.as_json.merge({comments: getCommentsTree(comment)}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
+        render json: {status: 200, comment: comment.as_json.merge({comments: getCommentsTree(comment)}).except("submission_id", "comment_id", "updated_at")}, status: 200
       end
     end
   end
@@ -354,7 +353,6 @@ class CommentsController < ApplicationController
         if comment.author != ""
           comment.comment = "[deleted]"
           comment.author = ""
-          comment.id_sons = []
           comment.UpVotes = 0
           
           if !comment.comments.nil?
@@ -439,7 +437,7 @@ class CommentsController < ApplicationController
       end
       
       if @comment.save
-        render json: {status: 201, message: "Comment with id: " + @comment.id.to_s + " was successfully created.", comment: @comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 201
+        render json: {status: 201, message: "Comment with id: " + @comment.id.to_s + " was successfully created.", comment: @comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "updated_at")}, status: 201
       else
         render json: {status: 400, error: "Bad Request", message: @comment.errors.first.full_message}, status: 400
       end
@@ -491,7 +489,7 @@ class CommentsController < ApplicationController
           end
           
           if comment.save
-            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully upvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
+            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully upvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "updated_at")}, status: 200
           else
             render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
           end
@@ -546,7 +544,7 @@ class CommentsController < ApplicationController
           end
           
           if comment.save
-            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully unvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 200
+            render json: {status: 200, message: "User with id: " + user.id.to_s + " has successfully unvoted comment with id: " + comment.id.to_s, comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "updated_at")}, status: 200
           else
             render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
           end
@@ -592,7 +590,7 @@ class CommentsController < ApplicationController
       else
 
         if comment.update(comment: params[:comment])
-          render json: {status: 203, message: "Comment with id: " + comment.id.to_s + " was successfully edited.", comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at")}, status: 203
+          render json: {status: 203, message: "Comment with id: " + comment.id.to_s + " was successfully edited.", comment: comment.as_json.merge({comments: []}).except("submission_id", "comment_id", "updated_at")}, status: 203
         else
           render json: {status: 400, error: "Bad Request", message: comment.errors.first.full_message}, status: 400
         end
@@ -621,7 +619,7 @@ class CommentsController < ApplicationController
         temp.each do |temp|
           if temp.author != ""
             #temp.title_submission = Submission.find(temp.id_submission).title
-            @comment.push(temp.as_json.merge({comments: []}).except("submission_id", "comment_id", "id_sons", "updated_at"))  
+            @comment.push(temp.as_json.merge({comments: []}).except("submission_id", "comment_id", "updated_at"))  
           end
         end
       end
