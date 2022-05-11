@@ -181,7 +181,7 @@ paths:
       summary: Crea una submission
       description: Crea una nova publicació de l'usuari que l'esta creant. 
       requestBody:
-        description: 
+        description: Es requereix el titol, el text o la url
         content: 
           application/json:
             schema:
