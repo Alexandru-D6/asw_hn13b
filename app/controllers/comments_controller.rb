@@ -388,7 +388,7 @@ class CommentsController < ApplicationController
         return
       end
       
-      if !params[:id_comment_father].nil? && !Comment.exists?(params[:id_comment_father])
+      if !params[:id_comment_father].nil? && params[:id_comment_father].to_s != "0" && !Comment.exists?(params[:id_comment_father])
         render json: {status: 404, error: "Not Found", message: "Comment with father id: " + params[:id_comment_father] + " doesn't exist in our database"}, status: 404
         return
       end

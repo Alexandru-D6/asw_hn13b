@@ -387,7 +387,7 @@ class SubmissionsController < ApplicationController
         @shorturl.push("")
       end
     end
-    render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
+    render json: {status: 200, submissions: temp, short_url: @shorturl}, status: 200
   end
 
 
@@ -463,7 +463,7 @@ class SubmissionsController < ApplicationController
       return
     end
     comment = Comment.new()
-    if !params[:url].nil?  params[:url] != "" && params[:text] != ""
+    if !params[:url].nil? && params[:url] != "" && params[:text] != ""
       comment.comment = params[:text]
       comment.author = User.find_by(auth_token: request.headers["x-api-key"]).name
       params[:text] = nil
@@ -539,7 +539,6 @@ class SubmissionsController < ApplicationController
             end
           end
         end
-        temp = Array.new(0)
         if !@submission.nil?
           @shorturl = Array.new(0);
           @submission.each do |submission|
@@ -550,10 +549,9 @@ class SubmissionsController < ApplicationController
             else 
               @shorturl.push("")
             end
-            temp.push(submission.as_json.except("upvoted_at"))
           end
         end
-        render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
+        render json: {status: 200, submissions: @submission, short_url: @short_url}, status: 200
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
