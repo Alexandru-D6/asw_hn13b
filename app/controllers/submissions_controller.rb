@@ -328,32 +328,32 @@ class SubmissionsController < ApplicationController
     
     @shorturl = Array.new(0);
     @submissions = Array.new(0)
-      subm = Submission.all.order(created_at: :desc, title: :asc)
-      subm.each do |submission|
-        
-        if data>=submission.created_at && submission.author_username != ""
-          @submissions.push(submission)
-          if submission.url != "" 
-            url =submission.url.split('//')
-            shortu = url[1].split('/')
-            @shorturl.push(shortu[0])
-          else 
-            @shorturl.push("")
-          end
+    subm = Submission.all.order(created_at: :desc, title: :asc)
+    subm.each do |submission|
+      
+      if data>=submission.created_at && submission.author_username != ""
+        @submissions.push(submission)
+        if submission.url != "" 
+          url =submission.url.split('//')
+          shortu = url[1].split('/')
+          @shorturl.push(shortu[0])
+        else 
+          @shorturl.push("")
         end
       end
-      url = "past?day="
-      dataD = data - (3600*24)
-      dataM = data - (3600*24*30)
-      dataY = data - (3600*24*365)
-      dataF = data + (3600*24)
-      @date = data.strftime("%F")
-      @dataToday = url+data.strftime("%F")
-      @dataN = data.strftime("%B %d, %Y (%Z)")
-      @dataD = url+dataD.strftime("%F")
-      @dataM = url+dataM.strftime("%F")
-      @dataY = url+dataY.strftime("%F")
-      @dataF = url+dataF.strftime("%F")
+    end
+    url = "past?day="
+    dataD = data - (3600*24)
+    dataM = data - (3600*24*30)
+    dataY = data - (3600*24*365)
+    dataF = data + (3600*24)
+    @date = data.strftime("%F")
+    @dataToday = url+data.strftime("%F")
+    @dataN = data.strftime("%B %d, %Y (%Z)")
+    @dataD = url+dataD.strftime("%F")
+    @dataM = url+dataM.strftime("%F")
+    @dataY = url+dataY.strftime("%F")
+    @dataF = url+dataF.strftime("%F")
       
   end
   
@@ -414,8 +414,8 @@ class SubmissionsController < ApplicationController
     
     render json: {submissions: temp, shorturl: @shorturl}, status: 200
   end
-    
-    
+  
+  
   def ask_api
     subm = Submission.all.order(created_at: :desc, title: :asc)
     @submissions = Array.new(0)
@@ -755,7 +755,6 @@ class SubmissionsController < ApplicationController
     else
       render json:{staus: 400, error: "Bad Request" , message: "You don't have vote this submission"}, staus: 400
     end
-  
   end
   
   private
@@ -768,5 +767,4 @@ class SubmissionsController < ApplicationController
     def submission_params
       params.require(:submission).permit(:title, :url, :text, :UpVotes, :author_username)
     end
-  end
 end
