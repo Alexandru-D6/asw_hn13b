@@ -78,8 +78,7 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
-                400_insuficient_parameters:
-                  $ref: '#/components/examples/error400_insuficient_parameters'
+
         '404':
           description: 'Error: Not Found'
           content:
@@ -88,7 +87,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
-                  $ref: '#/components/examples/error404
+                  $ref: '#/components/examples/error404'
                   
   /submission/{id}/edit:
     put:
@@ -125,7 +124,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddCommentResult'
-        '408':
+        '400':
           description: 'Error: Bad Request'
               
         '401':
@@ -156,7 +155,7 @@ paths:
                         "error": "Forbidden",
                         "message": "Incorrect apiKey"
                     }
-        '409':
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -221,12 +220,12 @@ paths:
         '401':
           description: 'Error: Unauthorized'
           content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ErrorResult'
-            examples:
-              errorExample:
-                $ref: '#/components/examples/error401'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
         '403':
           description: 'Error: Forbidden'
           content:
