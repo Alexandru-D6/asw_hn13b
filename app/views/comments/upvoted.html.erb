@@ -15,11 +15,12 @@
               <td>
                 <table class="fatitem" border="0">
                   <tbody>
-                    <% if !@comment.nil? %>
+                    <% if !@comment.nil? && !@title_submission_comment.nil?%>
+                      <% cont = 0 %>
                       <% @comment.each do |comment| %>
                         
-                        <%= render 'comment', comment: comment, title_submission: comment.title_submission , url: '/upvoted_comments?id='+@user_name %>
-                        
+                        <%= render 'comment', comment: comment, title_submission: @title_submission_comment[cont] , url: '/upvoted_comments?id='+@user_name %>
+                        <%cont = cont + 1%> 
                       <% end %>
                     <% end %>
                     

@@ -155,9 +155,10 @@ class CommentsController < ApplicationController
           temp.order(created_at: :desc, title: :asc)
           
           @comment = Array.new(0)
+          @title_submission_comment = Array.new(0) 
           temp.each do |temp|
             if temp.author != ""
-              #temp.title_submission = Submission.find(temp.id_submission).title
+              @title_submission_comment.push(Submission.find(temp.id_submission).title)
               @comment.push(temp)  
             end
           end
