@@ -55,7 +55,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ObtainNews'
   
-  /submission/{submissionId}:
+  /submission/{id}:
     get:
       tags:
       - Submissions
@@ -304,7 +304,7 @@ paths:
       - ApiKeyAuth: []
           
           
-  /submissions/{id}/upvote:
+  /submission/{id}/upvote:
     put:
       tags:
       - Submissions
@@ -522,7 +522,7 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
-  /comment/{commentId}:
+  /comment/{id}:
     get:
       tags:
         - comments
@@ -1039,7 +1039,7 @@ paths:
                     }
       security:
         - ApiKeyAuth: []
-  /user/votedComments:
+  /users/upvotedComments:
     get:
       tags:
         - user
@@ -1157,7 +1157,7 @@ paths:
                         "error": "Not Found",
                         "message": "User not found"
                     }
-  /user/submissions/userID:
+  /user/{name}/submissions:
     get:
       tags:
         - user
@@ -1199,7 +1199,7 @@ paths:
                 errorExample:
                   $ref: '#/components/examples/error404'
   
-  /user/{userID}/submissions/voted:
+  /users/upvotedSubmissions:
     get:
       tags:
         - user
