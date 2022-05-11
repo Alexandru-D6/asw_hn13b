@@ -84,8 +84,7 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error400'
-
-        404:
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -94,7 +93,68 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-                  
+    delete:
+      tags:
+        - submissions
+      summary: Esborra una submissions i tots els seus comentaris
+      parameters:
+        - name: submissionId
+          in: path
+          description: ID de la submission a esborrar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Submission deleted
+          content:
+            application/json: {}
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+                400CommentDeleted:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Submission with id: 1 was deleted before."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+      security:
+        - ApiKeyAuth: []
   /submission/{id}/edit:
     put:
       tags:

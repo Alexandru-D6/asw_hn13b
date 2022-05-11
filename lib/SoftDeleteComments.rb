@@ -4,7 +4,6 @@ module SoftDeleteComments
     if comment.author != ""
       comment.comment = "[deleted]"
       comment.author = ""
-      comment.id_sons = []
       comment.UpVotes = 0
       
       if !comment.comments.nil?

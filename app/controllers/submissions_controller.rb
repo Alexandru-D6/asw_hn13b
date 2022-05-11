@@ -376,7 +376,9 @@ class SubmissionsController < ApplicationController
     end
     
     @shorturl = Array.new(0)
+    temp = Array.new(0)
     @submissions.each do |submission|
+      temp.push(submission.as_json.except("updated_at"))
       if submission.url != ""
         url =submission.url.split('//')
         shortu = url[1].split('/')
@@ -385,7 +387,7 @@ class SubmissionsController < ApplicationController
         @shorturl.push("")
       end
     end
-    render json: {status: 200, submissions: @submissions}, status: 200
+    render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
   end
 
 
@@ -461,15 +463,15 @@ class SubmissionsController < ApplicationController
       return
     end
     comment = Comment.new()
-    if params[:url] != "" && params[:text] != ""
+    if !params[:url].nil?  params[:url] != "" && params[:text] != ""
       comment.comment = params[:text]
       comment.author = User.find_by(auth_token: request.headers["x-api-key"]).name
       params[:text] = nil
     end
-    if (params[:url].nil?)
+    if (!params[:text].nil? && params[:url].nil?)
       @submission = Submission.new(title: params["title"], url: "", text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
     else
-      @submission = Submission.new(title: params["title"], url: params["url"], text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+      @submission = Submission.new(title: params["title"], url: params["url"], text: "", author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
     end
     if @submission.save
       if comment.author.present? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
@@ -483,7 +485,7 @@ class SubmissionsController < ApplicationController
       temp = @submission.as_json.except("updated_at")
        render json: {status: 201, message: "Submission with id: " + @submission.id.to_s + " was successfully created.", submission: temp}, status: 201
     else
-      render json: {status: 400, error: "Bad Request", message: @submission.errorsf.irst.full_message}, status: 400
+      render json: {status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, status: 400
     end
   end
   
@@ -559,6 +561,19 @@ class SubmissionsController < ApplicationController
     end
   end
   
+  def getCommentsTree(a)
+    temp = [];
+    
+    a.comments.each do |c|
+      temp2 = c
+      if temp2.author != ""
+        temp.push(temp2.as_json.merge(comments: getCommentsTree(c)).except("submission_id", "comment_id", "updated_at"))
+      end
+    end
+    
+    return temp;
+  end
+  
   def find_submission_api 
     if params[:id].nil?
       render json: {status: 400, error: "Bad request", message: "Insuficient parameters, missing submission ID"}, status: 400
@@ -579,7 +594,16 @@ class SubmissionsController < ApplicationController
         else 
           @shorturl.push("")
         end
-        render json: {staus: 200, submission: @submission, comments: @submission.comments}, status: 200
+        
+        temp = Array.new(0)
+        
+        @submission.comments.each do |comm|
+          if (comm.author != "")
+            temp.push(comm.as_json.merge({comments: getCommentsTree(comm)}).except("submission_id", "comment_id", "updated_at"))
+          end
+        end
+        
+        render json: {staus: 200, submission: @submission.as_json.except("updated_api"), comments: temp}, status: 200
       end 
     end
   end

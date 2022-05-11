@@ -566,7 +566,7 @@ class CommentsController < ApplicationController
       end
       
       if !Comment.exists?(params[:id])
-        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
+        render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id].to_s + " doesn't exist in our database"}, status: 404
         return
       end
       
