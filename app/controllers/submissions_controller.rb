@@ -365,7 +365,7 @@ class SubmissionsController < ApplicationController
   ##           ##
   ###############
   
-  def index_api
+  def news_api
     temp = Submission.all.order(UpVotes: :desc, title: :asc)
     
     @submissions = Array.new(0)
@@ -385,9 +385,34 @@ class SubmissionsController < ApplicationController
         @shorturl.push("")
       end
     end
-    render json: {status: 200, submissions: @submissions.except("updated_at")}, status: 200
+    render json: {status: 200, submissions: @submissions}, status: 200
   end
 
+
+def newest_api
+    temp = Submission.all.order(created_at: :desc, title: :asc)
+    
+    @submissions = Array.new(0)
+    temp.each do |temp|
+      if temp.author_username != ""
+        @submissions.push(temp)  
+      end
+    end
+    
+    @shorturl = Array.new(0);
+    @submissions.each do |submission|
+      if submission.url != ""
+        url =submission.url.split('//')
+        shortu = url[1].split('/')
+        @shorturl.push(shortu[0])
+      else 
+        @shorturl.push("")
+      end
+    end
+    
+    render json: {submissions: @submissions, shorturl: @shorturl}, status: 200
+    
+    
   def ask_api
     subm = Submission.all.order(created_at: :desc, title: :asc)
     @submissions = Array.new(0)
@@ -409,7 +434,8 @@ class SubmissionsController < ApplicationController
     render json: {status: 200, submissions: @submissions.except("updated_at"), shorturl: @shorturl}, status: 200
   end
   
-  def post_submission_api
+  
+  def create_api
     if request.headers["x-api-key"].nil?
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
@@ -481,6 +507,7 @@ class SubmissionsController < ApplicationController
     end
   end
   
+  
   def upvoted_api
     if request.headers["x-api-key"].nil?
       render json:{status: 401, error: "Unauthorized", message: "Header api key not found" }, status: 401
@@ -522,7 +549,7 @@ class SubmissionsController < ApplicationController
     end
   end
   
-  def item_api 
+  def find_submission_api 
     if params[:id].nil?
       render json: {status: 400, error: "Bad request", message: "Insuficient parameters, missing submission ID"}, status: 400
       return
@@ -731,4 +758,5 @@ class SubmissionsController < ApplicationController
     def submission_params
       params.require(:submission).permit(:title, :url, :text, :UpVotes, :author_username)
     end
+  end
 end
