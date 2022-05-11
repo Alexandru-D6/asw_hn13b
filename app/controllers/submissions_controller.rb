@@ -431,7 +431,11 @@ def newest_api
         @shorturl.push("")
       end
     end
-    render json: {status: 200, submissions: @submissions.except("updated_at"), shorturl: @shorturl}, status: 200
+    temp = Array.new(0)
+    @submissions.each do |submission|
+      temp.push(submission.as_json.except("updated_at"))
+    end
+    render json: {status: 200, submissions: temp, shorturl: @shorturl}, status: 200
   end
   
   
@@ -473,7 +477,8 @@ def newest_api
         @submission.text = ""
         @submission.save
       end
-       render json: {status: 201, message: "Submission with id: " + @submission.id.to_s + " was successfully created.", submission: @submission.except("updated_at")}, status: 201
+      temp = @submission.as_json.except("updated_at")
+       render json: {status: 201, message: "Submission with id: " + @submission.id.to_s + " was successfully created.", submission: temp}, status: 201
     else
       render json: {status: 400, error: "Bad Request", message: @submission.errorsf.irst.full_message}, status: 400
     end
@@ -489,10 +494,11 @@ def newest_api
         @user_name = params[:id].to_s
         @submission = Submission.where(author_username: @user_name)
         @submission.order(created_at: :desc, title: :asc)
-        
+        temp = Array.new(0)
         if !@submission.nil?
           @shorturl = Array.new(0);
           @submission.each do |submission|
+            temp.push(submission.as_json.except("updated_at"))
             if submission.url != ""
               url =submission.url.split('//')
               shortu = url[1].split('/')
@@ -502,7 +508,7 @@ def newest_api
             end
           end
         end
-        render json:{status: 200,submissions: @submission, short_url: @shorturl}, status: 200
+        render json:{status: 200, submissions: temp, short_url: @shorturl}, status: 200
       end
     end
   end
@@ -524,11 +530,11 @@ def newest_api
           @submission = Array.new(0)
           temp.each do |temp|
             if temp.author_username != ""
-              @submission.push(temp)  
+              @submission.push(temp.as_json.except("updated_at"))  
             end
           end
         end
-        
+        temp = Array.new(0)
         if !@submission.nil?
           @shorturl = Array.new(0);
           @submission.each do |submission|
@@ -539,9 +545,10 @@ def newest_api
             else 
               @shorturl.push("")
             end
+            temp.push(submission.as_json.except("upvoted_at"))
           end
         end
-        render json: {status: 200, submissions: @submission, short_url: @short_url}, status: 200
+        render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
@@ -617,7 +624,7 @@ def newest_api
       updatetext = params[:text]
     end
     if @submission.update(title: titol, text: updatetext)
-      render json:{status:203, message: "Submission edited", submission: @submission}, status: 203
+      render json:{status:203, message: "Submission edited", submission: @submission.as_json.except("updated_at")}, status: 203
     else
       render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
     end
@@ -697,7 +704,7 @@ def newest_api
       user.LikedSubmissions.push(params[:id].to_s)
       user.save
       if @submission.save
-        render json:{status: 203, message: "Submission upvoted", submission: @submission.except("updated_at")}, staus: 203
+        render json:{status: 203, message: "Submission upvoted", submission: @submission.as_json.except("updated_at")}, staus: 203
       else 
         render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 410
       end
@@ -738,7 +745,7 @@ def newest_api
       user.LikedSubmissions.extract!{|e| e == params[:id]}
       user.save
       if @submission.save
-        render json:{status: 203, message: "Submission unvoted", submission: @submission.except("updated_at")}, staus: 203
+        render json:{status: 203, message: "Submission unvoted", submission: @submission.as_json.except("updated_at")}, staus: 203
       else
         render json:{status: 400, error: "Bad Request", message: @submission.errors.first.full_message}, staus: 400
       end
