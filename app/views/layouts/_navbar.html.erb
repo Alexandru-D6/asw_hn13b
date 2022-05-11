@@ -28,7 +28,7 @@
             <span style="display:table-cell; float: right; vertical-align:middle;">
               <% if user_signed_in? %>
                 <li class="div_bar"><%= link_to current_user.name, "/user?id="+current_user.name%> (<%= current_user.karma %>) |</li>
-                <li class="div_bar"><%= link_to "logout", destroy_user_session_path, method: :delete %></li>
+                <li class="div_bar"><%= link_to "logout", destroy_user_session_path(user: current_user.id), method: :delete %></li>
               <% else %>
                 <li class="div_bar"><%= link_to "login", omniauth_authorize_path(User, :github), method: :post, data: { disable_with: "Connecting..." } %></li>
               <% end %>

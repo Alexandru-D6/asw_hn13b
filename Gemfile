@@ -28,7 +28,7 @@ gem 'omniauth-rails_csrf_protection'
 gem 'rack-cors'
 
 
-gem 'has_secure_token', '~> 1.0'
+#gem 'has_secure_token', '~> 1.0'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
