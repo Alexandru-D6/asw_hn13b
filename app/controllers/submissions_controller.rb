@@ -558,6 +558,7 @@ class SubmissionsController < ApplicationController
           temp.push(aaaa.as_json.except("updated_at"))
         end
         render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
+        return
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
