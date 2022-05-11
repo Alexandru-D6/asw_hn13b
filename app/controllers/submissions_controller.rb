@@ -535,7 +535,7 @@ class SubmissionsController < ApplicationController
           @submission = Array.new(0)
           temp.each do |temp|
             if temp.author_username != ""
-              @submission.push(temp.as_json.except("updated_at"))  
+              @submission.push(temp)
             end
           end
         end
@@ -551,7 +551,13 @@ class SubmissionsController < ApplicationController
             end
           end
         end
-        render json: {status: 200, submissions: @submission, short_url: @short_url}, status: 200
+        
+        temp = Array.new(0)
+        
+        @submission.each do |aaaa|
+          temp.push(aaaa.as_json.except("updated_at"))
+        end
+        render json: {status: 200, submissions: temp, short_url: @short_url}, status: 200
       end
       
       render json: {error: "There isn't any id as paramater"}, status: 401
