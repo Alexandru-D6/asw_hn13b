@@ -12,52 +12,55 @@ info:
 servers:
   - url: https://serene-ridge-36448.herokuapp.com/API/v1.0/
 paths:
-  /submission/news:
+  /submissions/news:
     get:
       tags:
-        - Submissions
-      summary: Obté el llistat de submissions de tipus news.
-      operationId: getNewsSubmissions
+      - Submissions
+      summary: Llistat de submissions de tipus news.
+      description: Retorna el llistat de submissions ordenat segons el número de likes.
+      
       responses:
         '200':
-          description: operació finalitzada amb éxit
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
-  /submission/newest:
+                $ref: '#/components/schemas/ObtainNews'
+                
+  /submissions/newest:
     get:
       tags:
-        - Submissions
-      summary: Obté el llistat de submissions de tipus newest.
-      operationId: getNewestSubmissions
+      - Submissions
+      summary: Llistat de submissions de tipus newest.
+      description: Retorna el llistat de submissions ordenat de més recents a menys. 
       responses:
         '200':
-          description: operació finalitzada amb éxit
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
-  /submission/ask:
+                $ref: '#/components/schemas/ObtainNewest'
+                
+  /submissions/ask:
     get:
       tags:
-        - Submissions
-      summary: Obté el llistat de submissions de tipus ask.
-      operationId: getAskSubmissions
+      - Submissions
+      summary: Llistat de submissions de tipus ask.
+      description: Retorna el llistat de publicacions de tipus ask de l'aplicació.
       responses:
         '200':
-          description: operació finalitzada amb éxit
+          description: Seccessful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
+                $ref: '#/components/schemas/ObtainNews'
+  
   /submission/{submissionId}:
     get:
       tags:
-        - Submissions
-      summary: Troba una submission segons el seu ID.
-      description: Retorna tant el contingut de a submission com tots els seus comentaris.
-      operationId: getTSubmissionById
+      - Submissions
+      summary: Troba una submission segons el seu id.
+      description: Retorna el contingut de la publicacio i tots els seus comentaris. 
       parameters:
         - name: submissionId
           in: path
@@ -67,12 +70,22 @@ paths:
             type: integer
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tweet'
-        '404':
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+
+        404:
           description: 'Error: Not Found'
           content:
             application/json:
@@ -81,23 +94,241 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-    delete:
+                  
+  /submission/{id}/edit:
+    put:
       tags:
         - Submissions
-      summary: Esborra la submission amb submissionId
-      operationId: deleteSubmission
+      summary: Editeu un comentari donat el seu identificador
       parameters:
-        - name: submissionId
+        - name: id
           in: path
-          description: Submission ID a esborrar
+          description: ID del commentari a editar
           required: true
           schema:
-            type: integer
+            type: string
+      requestBody:
+        description: Proporcioneu el contingut dels camps a editar
+        content:
+          application/json:
+            schema:
+              required:
+                - title
+                - text
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 240
+                  example: Change 1
+                text:
+                  type: string
+                  example: Bon dia
+        required: true
       responses:
-        '204':
-          description: Submission esborrat
+        '203':
+          description: Submission edited
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/examples/error400'
+              examples:
+                MissingID:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "A valid submission id is required"
+                    }
+                MissingAskContent:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "At least one of both title or text is required in order to update the ask submission."
+                    }
+                MissingURLContent:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "In order to update the url submission, a new title is needed"
+                    }
+                NoTxtForURL:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "A text field is found but the id corresponds to an URL submission."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "This action requires an apiKEY"
+                    }
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                IncorrectApiKey:
+                  value: |-
+                    {
+                        "status": 403,
+                        "error": "Forbidden",
+                        "message": "This apiKey doesn't have the permission to edit this submission"
+                    }
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
+      security:
+      - ApiKeyAuth: []
+    
+  
+  /submissions/create:
+    post:
+      tags:
+      - Submissions
+      summary: Crea una submission
+      description: Crea una nova publicació de l'usuari que l'esta creant. 
+      requestBody:
+        description: Es requereix el titol, el text o la url
+        content: 
+          application/json:
+            schema:
+              required:
+              - title
+              - text
+              - url
+              type: object
+              properties:
+                title: 
+                  type: string
+                  minLength: 4
+                  example: Hello world!
+                text: 
+                  type: string
+                  minLength: 4
+                  example: Today is the second delivery
+                url:
+                  type: string
+                  example: https://www.eunoia.es/
+      responses:
+        '200':
+          description: Created submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+              examples:
+                URLcreated:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "A new URL submission has been created"
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                MissingContent:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Not text or url has been introduced."
+                    }
+                existingURL:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "The introduced url already exists in other submission."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "This apiKey doesn't exist."
+                    }
+      security:
+      - ApiKeyAuth: []
+          
+          
+  /submissions/{id}/upvote:
+    put:
+      tags:
+      - Submissions
+      summary: Vota una publicació
+      description: Vota una publicació que d'un altre usuari
+      parameters:
+      - name: id
+        in: path
+        description: ID de la submission a votar. 
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Submission voted
+          content:
+            application/json:
+              examples:
+                Correct:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "The submission has been upvoted correctly."
+                    }
         '401':
           description: 'Error: Unauthorized'
           content:
@@ -127,25 +358,86 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
+              
+              
+  /submission/{id}/unvote:
     put:
       tags:
-        - Submissions
-      summary: Edita una submission
-      operationId: editSubmission
+      - Submissions
+      summary: Desfà la votació d'una publicació
+      description: Borra la votació d'una publicació que ha votat anteriorment.
       parameters:
-        - name: submissionId
-          in: path
-          description: ID de la submission a editar
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID de la submission a desvotar. 
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
-          description: Edited submission
+          description: Submission unvoted
+          content:
+            application/json:
+              examples:
+                Unvoted:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "The submission has been unvoted correctly."
+                    }
+        '400':
+          description: 'Error: Bad Request'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tweet'
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                MissingID:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "A valid submission id is required."
+                    }
+                DeletedSubmission:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "The id corresponds to a deleted submission."
+                    }
+                NotUpvoted:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "The submission is not upvoted."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorResult:
+                  $ref: '#/components/examples/error401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorResult:
+                  $ref: '#/components/examples/error403'
+                notAuthor:
+                  value: |-
+                    {
+                        "status": 403,
+                        "error": "Bad Request",
+                        "message": "You are the author of the submission."
+                    }
         '404':
           description: 'Error: Not Found'
           content:
@@ -153,107 +445,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
+                errorResult:
                   $ref: '#/components/examples/error404'
-  /submission/post/:apiKey/:title/:text/{url}:
-    post:
-      tags:
-        - Submissions
-      summary: Crea una submission
-      operationId: createSubmission
-      parameters:
-        - name: apiKey
-          in: path
-          description: apiKey de l'usuari que vol crear la submission
-          required: true
-          schema:
-            type: string
-        - name: title
-          in: path
-          description: titol de la submission a crear
-          required: true
-          schema:
-            type: string
-        - name: url
-          in: query
-          description: url de la submission a crear
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Created submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        '404':
-          description: 'Error: Already created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /submission/vote/submissionID:
-    put:
-      tags:
-        - Submissions
-      summary: Vota una submission
-      operationId: voteSubmission
-      parameters:
-        - name: submissionId
-          in: path
-          description: ID de la submission a votar.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Voted submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        '404':
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /submission/unvote/submissionID:
-    put:
-      tags:
-        - Submissions
-      summary: Desfà la votació d'una submission
-      operationId: unvoteSubmission
-      parameters:
-        - name: submissionId
-          in: path
-          description: ID de la submission a desvotar.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Unvoted submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        '404':
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
+      security:
+        - ApiKeyAuth: []
+  
   /comments:
     post:
       tags:
@@ -966,7 +1162,6 @@ paths:
       tags:
         - user
       summary: Obté el llistat de submissions de l'usuari amb userID.
-      operationId: getUserSubmissions
       parameters:
         - name: userID
           in: path
@@ -976,11 +1171,24 @@ paths:
             type: integer
       responses:
         '200':
-          description: operació finalitzada amb éxit
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
+                $ref: '#/components/schemas/ObtainNews'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              examples:
+                MissingID:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "A user id is required for this operation"
+                    }
+        
         '404':
           description: 'Error: Not Found'
           content:
@@ -990,7 +1198,8 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-  /user/submissions/voted/userID:
+  
+  /user/{userID}/submissions/voted:
     get:
       tags:
         - user
@@ -1005,11 +1214,24 @@ paths:
             type: integer
       responses:
         '200':
-          description: operació finalitzada amb éxit
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddTweetResult'
+                $ref: '#/components/schemas/ObtainNews'
+                
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              examples:
+                MissingID:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "A user id is required for this operation"
+                    }
         '404':
           description: 'Error: Not Found'
           content:
@@ -1126,50 +1348,77 @@ components:
             - Conflict
         message:
           type: string
-    Tweet:
+    Submission:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: 'Change 1'
+        url:
+          type: string
+          example: ''
+        text:
+          type: string
+          example: 'Bon dia'
+        created_at:
+          type: string
+          example: '2022-05-08T19:44:15.493Z'
+        UpVote:
+          type: integer
+          example: 78
+        author_username:
+          type: string
+          minLength: 4
+          example: 'peilinni16'
+    Submission2:
       type: object
       properties:
         id:
           type: integer
           format: int64
           example: 2
-        author:
+        title:
           type: string
-          minLength: 4
-          example: My name
-        content:
+          example: 'Google page'
+        url:
           type: string
-          minLength: 4
-          maxLength: 280
-          example: My content
-        likes:
-          type: integer
-          format: int32
+          example: 'google.com'
+        text:
+          type: string
+          example: ''
         created_at:
           type: string
-          format: date-time
-        _links:
-          type: object
-          properties:
-            self:
-              type: string
-              format: url
-              example: https://asw-api-demo.herokuapp.com/tweets/2
-    AddTweetResult:
+          example: '2022-05-11T19:44:15.493Z'
+        UpVote:
+          type: integer
+          example: 50
+        author_username:
+          type: string
+          minLength: 4
+          example: 'peilinni16'
+        
+    ObtainNews:
       type: object
       properties:
-        new_tweet:
-          $ref: '#/components/schemas/Tweet'
-        api_key:
-          type: string
-          example: |
-            MjAyMC0wNC0xOCAxMjoyODo0MSBVVEM=
+        get_submissions_news:
+          $ref: '#/components/schemas/Submission'
+          
+    ObtainNewest:
+      type: object
+      properties:
+        get_submissions_newest:
+          $ref: '#/components/schemas/Submission2'
+
   examples:
     error400:
       value:
         status: 400
-        error: Bad Request
-        message: Content is too long (maximum is 280 characters)
+        error: "Bad Request"
+        message: "Content is too long"
     error400_insuficient_parameters:
       value:
         status: 400
@@ -1178,8 +1427,8 @@ components:
     error401:
       value:
         status: 401
-        error: Unauthorized
-        message: You provided no api key (X-API-KEY Header)
+        error: "Unauthorized"
+        message: "You didn't provide an api key (X-API-KEY Header)"
     error403:
       value:
         status: 403
@@ -1188,8 +1437,8 @@ components:
     error404:
       value:
         status: 404
-        error: Not Found
-        message: Submission with ID:[id] doesn't exist in our data base.
+        error: "Not Found"
+        message: "No the ID doesn't exist"
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
