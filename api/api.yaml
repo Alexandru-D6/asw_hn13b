@@ -4,43 +4,46 @@ info:
   title: Hacker news - HBN13
   description: "This is the Open API documentation for the REST API of our beloved application **Hacker news** deployed at <https://asw-api-demo.herokuapp.com/>. <br>All operations are executable. Only one operation requires authentication: `deleteComment`. In this case, you must **Authorize** your request by providing the api_key vaule you got when you created the comment."
 servers:
-  - url: 'https://asw-api-demo.herokuapp.com/'
+  - url: 'https://http://54.198.177.164:8080/API/v1.0'
 paths:
-  /submission/news:
+  /submissions/news:
     get:
       tags:
       - Submissions
-      summary: Obté el llistat de submissions de tipus news.
-      operationId: getNewsSubmissions
+      summary: Llistat de submissions de tipus news.
+      description: Retorna el llistat de submissions ordenat segons el número de likes.
+      
       responses:
-        200:
-          description: operació finalitzada amb éxit
+        '200':
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-  /submission/newest:
+                
+  /submissions/newest:
     get:
       tags:
       - Submissions
-      summary: Obté el llistat de submissions de tipus newest.
-      operationId: getNewestSubmissions
+      summary: Llistat de submissions de tipus newest.
+      description: Retorna el llistat de submissions ordenat de més recents a menys. 
       responses:
-        200:
-          description: operació finalitzada amb éxit
+        '200':
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddTweetResult'
-  /submission/ask:
+                
+  /submissions/ask:
     get:
       tags:
       - Submissions
-      summary: Obté el llistat de submissions de tipus ask.
-      operationId: getAskSubmissions
+      summary: Llistat de submissions de tipus ask.
+      description: Retorna el llistat de publicacions de tipus ask de l'aplicació.
       responses:
-        200:
-          description: operació finalitzada amb éxit
+        '200':
+          description: Seccessful operation
           content:
             application/json:
               schema:
@@ -50,9 +53,8 @@ paths:
     get:
       tags:
       - Submissions
-      summary: Troba una submission segons el seu ID.
-      description: Retorna tant el contingut de a submission com tots els seus comentaris. 
-      operationId: getTSubmissionById
+      summary: Troba una submission segons el seu id.
+      description: Retorna el contingut de la publicacio i tots els seus comentaris. 
       parameters:
       - name: submissionId
         in: path
@@ -61,13 +63,24 @@ paths:
         schema:
           type: integer
       responses:
-        200:
-          description: successful operation
+        '200':
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+                400_insuficient_parameters:
+                  $ref: '#/components/examples/error400_insuficient_parameters'
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
@@ -75,43 +88,146 @@ paths:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
-                  $ref: '#/components/examples/error404'
-    delete:
+                  $ref: '#/components/examples/error404
+                  
+  /submission/{id}/edit:
+    put:
       tags:
-      - Submissions
-      summary: Esborra la submission amb submissionId
-      operationId: deleteSubmission
+        - comments
+      summary: Editeu un comentari donat el seu identificador
       parameters:
-      - name: submissionId
-        in: path
-        description: Submission ID a esborrar
+        - name: id
+          in: path
+          description: ID del commentari a editar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Proporcioneu el contingut del nou comentari
+        content:
+          application/json:
+            schema:
+              required:
+                - comment
+              type: object
+              properties:
+                comment:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: My new comment
         required: true
-        schema:
-          type: integer
       responses:
-        204:
-          description: Submission esborrat
-          content:
-            application/json: {}
-        404:
-          description: 'Error: Not Found'
+        '203':
+          description: Comment edited
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-        401:
+                $ref: '#/components/schemas/AddCommentResult'
+        '408':
+          description: 'Error: Bad Request'
+              
+        '401':
           description: 'Error: Unauthorized'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                IncorrectApiKey:
+                  value: |-
+                    {
+                        "status": 403,
+                        "error": "Forbidden",
+                        "message": "Incorrect apiKey"
+                    }
+        '409':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
+      security:
+      - ApiKeyAuth: []
+    
+  
+  /submissions/create:
+    post:
+      tags:
+      - Submissions
+      summary: Crea una submission
+      description: Crea una nova publicació de l'usuari que l'esta creant. 
+      requestBody:
+        description: 
+        content: 
+          application/json:
+            schema:
+              required:
+              - title
+              - text
+              - url
+              type: object
+              properties:
+                title: 
+                  type: string
+                  minLength: 4
+                  example: Hello world!
+                text: 
+                  type: string
+                  minLength: 4
+                  example: Today is the second delivery
+                url:
+                  type: string
+                  example: https://www.eunoia.es/
+      responses:
+        '200':
+          description: Created submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
                 errorExample:
-                  $ref: '#/components/examples/error401'
-        403:
+                  $ref: '#/components/examples/error400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResult'
+            examples:
+              errorExample:
+                $ref: '#/components/examples/error401'
+        '403':
           description: 'Error: Forbidden'
           content:
             application/json:
@@ -122,136 +238,96 @@ paths:
                   $ref: '#/components/examples/error403'
       security:
       - ApiKeyAuth: []
-    
+          
+          
+  /submissions/{id}/upvote:
     put:
       tags:
       - Submissions
-      summary: Edita una submission
-      operationId: editSubmission
+      summary: Vota una publicació
+      description: Vota una publicació que d'un altre usuari
       parameters:
-      - name: submissionId
-        in: path
-        description: ID de la submission a editar
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Edited submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        404:
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  
-  /submission/post/:apiKey/:title/:text/{url}:
-    post:
-      tags:
-      - Submissions
-      summary: Crea una submission
-      operationId: createSubmission
-      parameters:
-      - name: apiKey
-        in: path
-        description: apiKey de l'usuari que vol crear la submission
-        required: true
-        schema:
-          type: string
-      - name: title
-        in: path
-        description: titol de la submission a crear
-        required: true
-        schema:
-          type: string
-      - name: url
-        in: query
-        description: url de la submission a crear
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          description: Created submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tweet'
-        404:
-          description: 'Error: Already created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  
-  /submission/vote/submissionID:
-    put:
-      tags:
-      - Submissions
-      summary: Vota una submission
-      operationId: voteSubmission
-      parameters:
-      - name: submissionId
+      - name: id
         in: path
         description: ID de la submission a votar. 
         required: true
         schema:
           type: integer
       responses:
-        200:
-          description: Voted submission
+        '200':
+          description: Submission voted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
-          description: 'Error: Not Found'
+        '401':
+          description: 'Error: Unauthorized'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
-                  $ref: '#/components/examples/error404'
-  /submission/unvote/submissionID:
+                  $ref: '#/components/examples/error401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+      security:
+      - ApiKeyAuth: []
+              
+              
+  /submission/{id}/unvote:
     put:
       tags:
       - Submissions
-      summary: Desfà la votació d'una submission
-      operationId: unvoteSubmission
+      summary: Desfà la votació d'una publicació
+      description: Borra la votació d'una publicació que ha votat anteriorment.
       parameters:
-      - name: submissionId
+      - name: id
         in: path
         description: ID de la submission a desvotar. 
         required: true
         schema:
           type: integer
       responses:
-        200:
-          description: Unvoted submission
+        '200':
+          description: Submission unvoted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tweet'
-        404:
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
+      security:
+      - ApiKeyAuth: []
   
   /comments:
     post:
@@ -373,6 +449,7 @@ paths:
                   $ref: '#/components/examples/error403'
       security:
       - ApiKeyAuth: []
+  
   /comments/{id}/edit:
     post:
       tags:
@@ -421,9 +498,8 @@ paths:
       tags:
       - comments
       summary: Upvote a Comment
-      operationId: upvoteComment
       parameters:
-      - name: commentId
+      - name: id
         in: path
         description: Comment id to upvote
         required: true
@@ -431,29 +507,87 @@ paths:
           type: integer
           format: int64
       responses:
-        200:
+        '200':
           description: Upvoted Comment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                UpvotedComment:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "User with id: 1 has successfully upvoted comment with id: 2",
+                        "comment": {
+                            "UpVotes": 1,
+                            "id": 2,
+                            "author": "Alexandru-D6",
+                            "comment": "dfgsdgfsdfgdsfdfd",
+                            "created_at": "2022-05-09T21:31:04.594Z",
+                            "id_submission": 2,
+                            "id_comment_father": 0,
+                            "comments": []
+                        }
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Bad Request:
+                  value: |-
+                      {
+                          "status": 400,
+                          "error": "Bad Request",
+                          "message": "User with id: 1 is the author of the comment with id: 1"
+                      }
+                      
+                AlreadyUpvotedComment:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 has already upvoted comment with id: 2"
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
+                  
   /comments/{id}/unvote:
     put:
       tags:
       - comments
       summary: Unvote a Comment
-      operationId: unvoteComment
       parameters:
-      - name: commentId
+      - name: id
         in: path
         description: Comment id to unvote
         required: true
@@ -461,30 +595,86 @@ paths:
           type: integer
           format: int64
       responses:
-        200:
+        '200':
           description: Unvoted Comment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
-        404:
+              examples:
+                Upvoted Comment:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "User with id: 1 has successfully unvoted comment with id: 2",
+                        "comment": {
+                            "UpVotes": 1,
+                            "id": 2,
+                            "author": "Alexandru-D6",
+                            "comment": "dfgsdgfsdfgdsfdfd",
+                            "created_at": "2022-05-09T21:31:04.594Z",
+                            "id_submission": 2,
+                            "id_comment_father": 0,
+                            "comments": []
+                        }
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Bad Request:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 is the author of the comment with id: 1"
+                    }
+                Already upvoted comment:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "User with id: 1 has already unvoted comment with id: 2"
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+        '404':
           description: 'Error: Not Found'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
               examples:
-                errorExample:
-                  $ref: '#/components/examples/error404'
-  /user/{id}/votedComments:
+                Not Found:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Comment with id: 123 doesn't exist in our database"
+                    }
+  /user/{name}:
     get:
       tags:
       - user
       summary: Retrieves all comments voted by a user
       description: Returns all the comments voted of a user
-      operationId: getCommentById
       parameters:
-      - name: commentId
+      - name: name
         in: path
         description: ID of Comment to return
         required: true
