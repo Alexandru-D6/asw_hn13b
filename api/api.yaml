@@ -10,7 +10,7 @@ info:
     you must **Authorize** your request by providing the api_key vaule you got
     when you created the comment.
 servers:
-  - url: http://54.160.71.228:8080/API/v1.0/
+  - url: https://serene-ridge-36448.herokuapp.com/API/v1.0/
 paths:
   /submission/news:
     get:
@@ -324,6 +324,8 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
+      security:
+        - ApiKeyAuth: []
   /comment/{commentId}:
     get:
       tags:
@@ -427,7 +429,7 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
-  /comments/{id}/edit:
+  /comment/{id}/edit:
     put:
       tags:
         - comments
@@ -513,7 +515,9 @@ paths:
                         "error": "Not Found",
                         "message": "Comment with id: 123 doesn't exist in our database"
                     }
-  /comments/{id}/upvote:
+      security:
+        - ApiKeyAuth: []
+  /comment/{id}/upvote:
     put:
       tags:
         - comments
@@ -599,7 +603,9 @@ paths:
                         "error": "Not Found",
                         "message": "Comment with id: 123 doesn't exist in our database"
                     }
-  /comments/{id}/unvote:
+      security:
+        - ApiKeyAuth: []
+  /comment/{id}/unvote:
     put:
       tags:
         - comments
@@ -685,6 +691,8 @@ paths:
                         "error": "Not Found",
                         "message": "Comment with id: 123 doesn't exist in our database"
                     }
+      security:
+        - ApiKeyAuth: []
   /user/{name}:
     get:
       tags:
@@ -833,6 +841,8 @@ paths:
                         "error": "Not Found",
                         "message": "User with apiKey: Re659ZU5FV4Yv5qJxH9CbPc doesn't exist in our database"
                     }
+      security:
+        - ApiKeyAuth: []
   /user/votedComments:
     get:
       tags:
@@ -891,6 +901,8 @@ paths:
                         "error": "Unauthorized",
                         "message": "API key not found"
                     }
+      security:
+        - ApiKeyAuth: []
   /user/{name}/comments:
     get:
       tags:
