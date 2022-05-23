@@ -62,39 +62,33 @@ Rails.application.routes.draw do
   
   ##API
   
-  #comments
-  get '/API/v1.0/comment/:id', to: 'comments#show_api'
-  post '/API/v1.0/comments', to: 'comments#create_api'
-  delete '/API/v1.0/comment/:id', to: 'comments#soft_delete_api'
-  
-  put '/API/v1.0/comment/:id/upvote', to: 'comments#upvote_api'
-  put '/API/v1.0/comment/:id/unvote', to: 'comments#unvote_api'
-  
-  put '/API/v1.0/comment/:id/edit', to: 'comments#edit_api'
-  
-  
   #User
-  get '/API/v1.0/user/:name', to: 'users#show_api'
-  put '/API/v1.0/users/edit', to: 'users#edit_api'
-  get '/API/v1.0/user/:name/comments', to: 'comments#threads_api'
-  get '/API/v1.0/user/:name/submissions', to: 'submissions#submitted_api'
+  put '/API/v1.0/users', to: 'users#edit_api'
   get '/API/v1.0/users/upvotedComments', to: 'comments#upvoted_api'
   get '/API/v1.0/users/upvotedSubmissions', to: 'submissions#upvoted_api'
+  get '/API/v1.0/users/:name', to: 'users#show_api'
+  get '/API/v1.0/users/:name/comments', to: 'comments#threads_api'
+  get '/API/v1.0/users/:name/submissions', to: 'submissions#submitted_api'
   
   
   #submission
   get '/API/v1.0/submissions/news' => 'submissions#news_api'
   get '/API/v1.0/submissions/newest', to: 'submissions#newest_api'
   get '/API/v1.0/submissions/ask', to: 'submissions#ask_api'
+  post '/API/v1.0/submissions', to: 'submissions#create_api'
+  get '/API/v1.0/submissions/:id' => 'submissions#find_submission_api'
+  put '/API/v1.0/submissions/:id' => 'submissions#update_api'
+  delete '/API/v1.0/submissions/:id/delete', to: 'submissions#delete_api'
+  put '/API/v1.0/submissions/:id/upvote', to: 'submissions#upvote_api'
+  put '/API/v1.0/submissions/:id/unvote', to: 'submissions#unvote_api'
   
-  get '/API/v1.0/submission/:id' => 'submissions#find_submission_api'
-  put '/API/v1.0/submission/:id/edit' => 'submissions#update_api'
-  
-  
-  post '/API/v1.0/submissions/create', to: 'submissions#create_api'
-  delete '/API/v1.0/submission/:id/delete', to: 'submissions#delete_api'
-  put '/API/v1.0/submission/:id/upvote', to: 'submissions#upvote_api'
-  put '/API/v1.0/submission/:id/unvote', to: 'submissions#unvote_api'
+  #comments
+  post '/API/v1.0/submissions/:id_submission/comments', to: 'comments#create_api'
+  get '/API/v1.0/submissions/:id_submission/comments/:id', to: 'comments#show_api'
+  delete '/API/v1.0/submissions/:id_submission/comments/:id', to: 'comments#soft_delete_api'
+  put '/API/v1.0/submissions/:id_submission/comments/:id/upvote', to: 'comments#upvote_api'
+  put '/API/v1.0/submissions/:id_submission/comments/:id/unvote', to: 'comments#unvote_api'
+  put '/API/v1.0/submissions/:id_submission/comments/:id/edit', to: 'comments#edit_api'
   
   root to: 'submissions#index'
   

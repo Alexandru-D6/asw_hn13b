@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  #serialize :LikedSubmissions
-  #serialize :LikedComments
+  serialize :LikedSubmissions
+  serialize :LikedComments
   ##has_secure_token
   ##has_secure_token :auth_token
   

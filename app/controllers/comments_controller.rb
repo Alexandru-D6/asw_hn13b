@@ -306,10 +306,20 @@ class CommentsController < ApplicationController
     if params[:id].nil?
       render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id"}, status: 400
     else 
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
       if !Comment.exists?(params[:id])
         render json: {status: 404, error: "Not Found", message: "Comment with id: " + params[:id] + " doesn't exist in our database"}, status: 404
       else
         comment = Comment.find(params[:id])
+        
+        if params[:id_submission] != comment.id_submission
+          render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
+          return
+        end
       
         render json: {status: 200, comment: comment.as_json.merge({comments: getCommentsTree(comment)}).except("submission_id", "comment_id", "updated_at")}, status: 200
       end
@@ -321,6 +331,11 @@ class CommentsController < ApplicationController
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
       if params[:id].nil?
         render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
         return
@@ -340,6 +355,11 @@ class CommentsController < ApplicationController
       
       if !User.exists?(name: comment.author)
         render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if params[:id_submission] != comment.id_submission
+        render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
       
@@ -451,6 +471,11 @@ class CommentsController < ApplicationController
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
       if params[:id].nil?
         render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
         return
@@ -470,6 +495,11 @@ class CommentsController < ApplicationController
       
       if !User.exists?(name: comment.author)
         render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if params[:id_submission] != comment.id_submission
+        render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
       
@@ -506,6 +536,11 @@ class CommentsController < ApplicationController
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
       if params[:id].nil?
         render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
         return
@@ -525,6 +560,11 @@ class CommentsController < ApplicationController
       
       if !User.exists?(name: comment.author)
         render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if params[:id_submission] != comment.id_submission
+        render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
       
@@ -561,6 +601,11 @@ class CommentsController < ApplicationController
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
+      if params[:id_submission].nil?
+        render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing id_submission"}, status: 400
+        return
+      end
+      
       if params[:id].nil?
         render json: {status: 400, error: "Bad Request", message: "Insuficient parameters, missing comment_id"}, status: 400
         return
@@ -580,6 +625,11 @@ class CommentsController < ApplicationController
       
       if !User.exists?(name: comment.author)
         render json: {status: 404, error: "Not Found", message: "User named by name: " + comment.author + " doesn't exist in our database"}, status: 404
+        return
+      end
+      
+      if params[:id_submission] != comment.id_submission
+        render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
       
@@ -605,6 +655,7 @@ class CommentsController < ApplicationController
       render json: {status: 401, error: "Unauthorized", message: "API key not found"}, status: 401
       return
     else
+      
       if !User.exists?(auth_token: request.headers["x-api-key"])
         render json: {status: 404, error: "Not Found", message: "User with apiKey: " + request.headers["x-api-key"] + " doesn't exist in our database"}, status: 404
         return
