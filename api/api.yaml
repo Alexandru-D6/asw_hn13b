@@ -10,7 +10,7 @@ info:
 servers:
   - url: https://serene-ridge-36448.herokuapp.com/API/v1.0/
 paths:
-  /submission/news:
+  /submissions/news:
     get:
       tags:
       - Submissions
@@ -25,7 +25,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ObtainNews'
 
-  /submission/newest:
+  /submissions/newest:
     get:
       tags:
       - Submissions
@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ObtainNewest'
 
-  /submission/ask:
+  /submissions/ask:
     get:
       tags:
       - Submissions
