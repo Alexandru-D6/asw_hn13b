@@ -24,7 +24,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObtainNews'
-                
+
   /submissions/newest:
     get:
       tags:
@@ -38,7 +38,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ObtainNewest'
-                
+
   /submissions/ask:
     get:
       tags:
@@ -53,7 +53,96 @@ paths:
               schema:
                 $ref: '#/components/schemas/ObtainNews'
   
-  /submission/{id}:
+  /submissions:
+    post:
+      tags:
+      - Submissions
+      summary: Crea una submission
+      description: Crea una nova publicació de l'usuari que l'esta creant. 
+      requestBody:
+        description: Es requereix el titol, el text o la url
+        content: 
+          application/json:
+            schema:
+              required:
+              - title
+              - text
+              - url
+              type: object
+              properties:
+                title: 
+                  type: string
+                  minLength: 4
+                  example: Hello world!
+                text: 
+                  type: string
+                  minLength: 4
+                  example: Today is the second delivery
+                url:
+                  type: string
+                  example: https://www.eunoia.es/
+      responses:
+        '200':
+          description: Created submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+              examples:
+                URLcreated:
+                  value: |-
+                    {
+                        "status": 200,
+                        "message": "A new URL submission has been created"
+                    }
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                MissingContent:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "Not text or url has been introduced."
+                    }
+                existingURL:
+                  value: |-
+                    {
+                        "status": 400,
+                        "error": "Bad Request",
+                        "message": "The introduced url already exists in other submission."
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "This apiKey doesn't exist."
+                    }
+      security:
+      - ApiKeyAuth: []
+
+  /submissions/{id}:
     get:
       tags:
       - Submissions
@@ -92,8 +181,7 @@ paths:
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
-                  
-  /submission/{id}/edit:
+    
     put:
       tags:
         - Submissions
@@ -209,100 +297,9 @@ paths:
                         "message": "Comment with id: 123 doesn't exist in our database"
                     }
       security:
-      - ApiKeyAuth: []
-    
-  
-  /submissions/create:
-    post:
-      tags:
-      - Submissions
-      summary: Crea una submission
-      description: Crea una nova publicació de l'usuari que l'esta creant. 
-      requestBody:
-        description: Es requereix el titol, el text o la url
-        content: 
-          application/json:
-            schema:
-              required:
-              - title
-              - text
-              - url
-              type: object
-              properties:
-                title: 
-                  type: string
-                  minLength: 4
-                  example: Hello world!
-                text: 
-                  type: string
-                  minLength: 4
-                  example: Today is the second delivery
-                url:
-                  type: string
-                  example: https://www.eunoia.es/
-      responses:
-        '200':
-          description: Created submission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Submission'
-              examples:
-                URLcreated:
-                  value: |-
-                    {
-                        "status": 200,
-                        "message": "A new URL submission has been created"
-                    }
-        '400':
-          description: 'Error: Bad Request'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                MissingContent:
-                  value: |-
-                    {
-                        "status": 400,
-                        "error": "Bad Request",
-                        "message": "Not text or url has been introduced."
-                    }
-                existingURL:
-                  value: |-
-                    {
-                        "status": 400,
-                        "error": "Bad Request",
-                        "message": "The introduced url already exists in other submission."
-                    }
-        '401':
-          description: 'Error: Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  $ref: '#/components/examples/error401'
-        '404':
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  value: |-
-                    {
-                        "status": 404,
-                        "error": "Not Found",
-                        "message": "This apiKey doesn't exist."
-                    }
-      security:
-      - ApiKeyAuth: []
-          
-          
-  /submission/{id}/upvote:
+      - ApiKeyAuth: [] 
+
+  /submissions/{id}/upvote:
     put:
       tags:
       - Submissions
@@ -356,9 +353,8 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
-              
-              
-  /submission/{id}/unvote:
+
+  /submissions/{id}/unvote:
     put:
       tags:
       - Submissions
@@ -448,11 +444,18 @@ paths:
       security:
         - ApiKeyAuth: []
   
-  /comments:
+  /submissions/{id_submission}/comments:
     post:
       tags:
-        - comments
+        - Submissions
       summary: Afegeix un nou Comentari a una Submission de Hacker News
+      parameters:
+      - name: id_submission
+        in: path
+        description: ID de la submission a desvotar. 
+        required: true
+        schema:
+          type: integer
       requestBody:
         description: Proporcioneu el contingut del nou Comentari
         content:
@@ -460,12 +463,8 @@ paths:
             schema:
               required:
                 - comment
-                - id_submission
               type: object
               properties:
-                id_submission:
-                  type: string
-                  example: "1"
                 comment:
                   type: string
                   minLength: 4
@@ -520,13 +519,21 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
-  /comment/{id}:
+
+  /submissions/{id_submission}/comments/{id}:
     get:
       tags:
-        - comments
+        - Submissions
       summary: Troba un Comentari pel seu identificador
       description: Retorna un únic Comentari i tots els seus fills
       parameters:
+        - name: id_submission
+          in: path
+          description: ID del submission
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: id
           in: path
           description: ID del Comentari a retornar
@@ -563,9 +570,16 @@ paths:
                   $ref: '#/components/examples/error404'
     delete:
       tags:
-        - comments
+        - Submissions
       summary: Esborra un Comentari i tots els seus fills
       parameters:
+        - name: id_submission
+          in: path
+          description: ID del Submission
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: id
           in: path
           description: ID del commentari a esborrar
@@ -623,12 +637,18 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
-  /comment/{id}/edit:
     put:
       tags:
-        - comments
+        - Submissions
       summary: Editeu un comentari donat el seu identificador
       parameters:
+        - name: id_submission
+          in: path
+          description: ID del submission
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: id
           in: path
           description: ID del commentari a editar
@@ -711,12 +731,20 @@ paths:
                     }
       security:
         - ApiKeyAuth: []
-  /comment/{id}/upvote:
+
+  /submissions/{id_submission}/comments/{id}/upvote:
     put:
       tags:
-        - comments
+        - Submissions
       summary: Upvote a Comment
       parameters:
+        - name: id_submission
+          in: path
+          description: Submission id
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: id
           in: path
           description: Comment id to upvote
@@ -799,12 +827,20 @@ paths:
                     }
       security:
         - ApiKeyAuth: []
-  /comment/{id}/unvote:
+
+  /submissions/{id_submission}/comments/{id}/unvote:
     put:
       tags:
-        - comments
+        - Submissions
       summary: Unvote a Comment
       parameters:
+        - name: id_submission
+          in: path
+          description: Submission id
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: id
           in: path
           description: Comment id to unvote
@@ -887,62 +923,8 @@ paths:
                     }
       security:
         - ApiKeyAuth: []
-  /user/{name}:
-    get:
-      tags:
-        - user
-      summary: Recupera el perfil de l'usuari
-      description: Retorna les dades del perfil d'un usuari
-      parameters:
-        - name: name
-          in: path
-          description: ID of Comment to return
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-              examples:
-                SuccessInfoProfile:
-                  value: |-
-                    {
-                        "status": 200,
-                        "user": {
-                            "id": 1,
-                            "created_at": "2022-05-09T18:01:27.196Z",
-                            "email": "electrike.official@gmail.com",
-                            "name": "ElectrikeOfficial",
-                            "about": null,
-                            "karma": 0,
-                            "LikedSubmissions": [
-                                "{-1}"
-                            ],
-                            "LikedComments": [
-                                "{-1}",
-                                "2"
-                            ]
-                        }
-                    }
-        '404':
-          description: 'Error: Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                NotFound:
-                  value: |-
-                    {
-                        "status": 404,
-                        "error": "Not Found",
-                        "message": "User with name: Testing doesn't exist in our database"
-                    }
-  /users/edit:
+
+  /users:
     put:
       tags:
         - user
@@ -1036,12 +1018,20 @@ paths:
                     }
       security:
         - ApiKeyAuth: []
-  /users/upvotedComments:
+
+  /users/{name}:
     get:
       tags:
         - user
-      summary: Recupera tots els comentaris votats per un usuari
-      description: Retorna tots els comentaris votats per un usuari
+      summary: Recupera el perfil de l'usuari
+      description: Retorna les dades del perfil d'un usuari
+      parameters:
+        - name: name
+          in: path
+          description: ID of Comment to return
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: successful operation
@@ -1050,29 +1040,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
               examples:
-                VotedComments:
+                SuccessInfoProfile:
                   value: |-
                     {
                         "status": 200,
-                        "comments": [
-                            {
-                                "id": 2,
-                                "author": "Alexandru-D6",
-                                "comment": "dfgsdgfsdfgdsfdfd",
-                                "UpVotes": 1,
-                                "created_at": "2022-05-09T21:31:04.594Z",
-                                "id_submission": 2,
-                                "id_comment_father": 0,
-                                "comments": []
-                            }
-                        ]
+                        "user": {
+                            "id": 1,
+                            "created_at": "2022-05-09T18:01:27.196Z",
+                            "email": "electrike.official@gmail.com",
+                            "name": "ElectrikeOfficial",
+                            "about": null,
+                            "karma": 0,
+                            "LikedSubmissions": [
+                                "{-1}"
+                            ],
+                            "LikedComments": [
+                                "{-1}",
+                                "2"
+                            ]
+                        }
                     }
-        '401':
-          description: 'Error: Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
         '404':
           description: 'Error: Not Found'
           content:
@@ -1085,18 +1072,10 @@ paths:
                     {
                         "status": 404,
                         "error": "Not Found",
-                        "message": "User with apiKey: Re659ZU5FV4Yv5qJxH9CbPc doesn't exist in our database"
+                        "message": "User with name: Testing doesn't exist in our database"
                     }
-                Unauthorized:
-                  value: |-
-                    {
-                        "status": 401,
-                        "error": "Unauthorized",
-                        "message": "API key not found"
-                    }
-      security:
-        - ApiKeyAuth: []
-  /user/{name}/comments:
+
+  /users/{name}/comments:
     get:
       tags:
         - user
@@ -1154,7 +1133,8 @@ paths:
                         "error": "Not Found",
                         "message": "User not found"
                     }
-  /user/{name}/submissions:
+
+  /users/{name}/submissions:
     get:
       tags:
         - user
@@ -1196,11 +1176,18 @@ paths:
                 errorExample:
                   $ref: '#/components/examples/error404'
   
-  /users/upvotedSubmissions:
+  /users/{name}/upvotedSubmissions:
     get:
       tags:
         - user
       summary: Obté el llistat de submissions que ha votat l'usuari amb userID.
+      parameters:
+        - name: name
+          in: path
+          description: ID de l'usuari del que volem el llistat de submissions.
+          required: true
+          schema:
+            type: string
       operationId: getUserVotedSubmissions
       responses:
         '200':
@@ -1233,6 +1220,75 @@ paths:
                   $ref: '#/components/examples/error404'
       security:
         - ApiKeyAuth: []
+
+  /users/{name}/upvotedComments:
+    get:
+      tags:
+        - user
+      summary: Recupera tots els comentaris votats per un usuari
+      description: Retorna tots els comentaris votats per un usuari
+      parameters:
+        - name: name
+          in: path
+          description: ID de l'usuari del que volem el llistat de submissions.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                VotedComments:
+                  value: |-
+                    {
+                        "status": 200,
+                        "comments": [
+                            {
+                                "id": 2,
+                                "author": "Alexandru-D6",
+                                "comment": "dfgsdgfsdfgdsfdfd",
+                                "UpVotes": 1,
+                                "created_at": "2022-05-09T21:31:04.594Z",
+                                "id_submission": 2,
+                                "id_comment_father": 0,
+                                "comments": []
+                            }
+                        ]
+                    }
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                NotFound:
+                  value: |-
+                    {
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "User with apiKey: Re659ZU5FV4Yv5qJxH9CbPc doesn't exist in our database"
+                    }
+                Unauthorized:
+                  value: |-
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "API key not found"
+                    }
+      security:
+        - ApiKeyAuth: []
+
 components:
   schemas:
     Comment:
