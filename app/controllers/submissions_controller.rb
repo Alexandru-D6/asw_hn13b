@@ -458,19 +458,19 @@ class SubmissionsController < ApplicationController
       render json: {status: 400, error: "Bad Request", message: "Field url and text not found"}, status: 400
       return
     end
-    if params[:url].present? params[:url] == "" && params[:text].present? && params[:text] == ""
+    if !params[:url].nil? && params[:url] == "" && !params[:text].nil? && params[:text] == ""
       render json: {status: 400, error: "Bad Request", message: "You need to fill some field"}, status: 400
       return
     end
-    if params[:url].present? &&  params[:url] == "" && params[:text].nil? 
+    if !params[:url].nil? &&  params[:url] == "" && params[:text].nil? 
       render json: {status: 400, error: "Bad Request", message: "You need to introduce the url"}, status: 400
       return
     end
-    if params[:text].present? && params[:text] == "" && params[:url].nil? 
+    if !params[:text].nil? && params[:text] == "" && params[:url].nil? 
       render json: {status: 400, error: "Bad Request", message: "You need to introduce the text"}, status: 400
       return
     end
-    if Submission.find_by(url: params[:url]).present? && params[:url] != ""
+    if !Submission.find_by(url: params[:url]).nil? && params[:url] != ""
       render json: {status: 400, error: "Bad Request", message: "There is a submission with the entered url"}, status: 400
       return
     end
@@ -486,7 +486,7 @@ class SubmissionsController < ApplicationController
       @submission = Submission.new(title: params["title"], url: params["url"], text: "", author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
     end
     if @submission.save
-      if comment.author.present? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
+      if !comment.author.nil? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
         comment.id_submission = @submission.id
         comment.save
         
