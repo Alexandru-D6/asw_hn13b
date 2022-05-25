@@ -454,8 +454,20 @@ class SubmissionsController < ApplicationController
       render json: {status: 403, error: "Forbidden", message: "User not found"}, status: 403
       return
     end
-    if params[:url].nil? and params[:text].nil?
+    if params[:url].nil? && params[:text].nil?
       render json: {status: 400, error: "Bad Request", message: "Field url and text not found"}, status: 400
+      return
+    end
+    if params[:url].present? params[:url] == "" && params[:text].present? && params[:text] == ""
+      render json: {status: 400, error: "Bad Request", message: "You need to fill some field"}, status: 400
+      return
+    end
+    if params[:url].present? &&  params[:url] == "" && params[:text].nil? 
+      render json: {status: 400, error: "Bad Request", message: "You need to introduce the url"}, status: 400
+      return
+    end
+    if params[:text].present? && params[:text] == "" && params[:url].nil? 
+      render json: {status: 400, error: "Bad Request", message: "You need to introduce the text"}, status: 400
       return
     end
     if Submission.find_by(url: params[:url]).present? && params[:url] != ""
