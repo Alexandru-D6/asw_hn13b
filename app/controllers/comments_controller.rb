@@ -317,7 +317,7 @@ class CommentsController < ApplicationController
         comment = Comment.find(params[:id])
         
         if params[:id_submission].to_s != comment.id_submission.to_s
-          render json: {status: 400, error: "Bad Request", message: "ID submissions: " + params[:id_submission].to_s + "does not match with: " + comment.id_submission.to_s}, status: 400
+          render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
           return
         end
       
@@ -358,7 +358,7 @@ class CommentsController < ApplicationController
         return
       end
       
-      if params[:id_submission] != comment.id_submission
+      if params[:id_submission].to_s != comment.id_submission.to_s
         render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
@@ -498,7 +498,7 @@ class CommentsController < ApplicationController
         return
       end
       
-      if params[:id_submission] != comment.id_submission
+      if params[:id_submission].to_s != comment.id_submission.to_s
         render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
@@ -563,7 +563,7 @@ class CommentsController < ApplicationController
         return
       end
       
-      if params[:id_submission] != comment.id_submission
+      if params[:id_submission].to_s != comment.id_submission.to_s
         render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
@@ -628,7 +628,7 @@ class CommentsController < ApplicationController
         return
       end
       
-      if params[:id_submission] != comment.id_submission
+      if params[:id_submission].to_s != comment.id_submission.to_s
         render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
         return
       end
