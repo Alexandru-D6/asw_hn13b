@@ -86,9 +86,9 @@ Rails.application.routes.draw do
   post '/API/v1.0/submissions/:id_submission/comments', to: 'comments#create_api'
   get '/API/v1.0/submissions/:id_submission/comments/:id', to: 'comments#show_api'
   delete '/API/v1.0/submissions/:id_submission/comments/:id', to: 'comments#soft_delete_api'
+  put '/API/v1.0/submissions/:id_submission/comments/:id', to: 'comments#edit_api'
   put '/API/v1.0/submissions/:id_submission/comments/:id/upvote', to: 'comments#upvote_api'
   put '/API/v1.0/submissions/:id_submission/comments/:id/unvote', to: 'comments#unvote_api'
-  put '/API/v1.0/submissions/:id_submission/comments/:id/edit', to: 'comments#edit_api'
   
   root to: 'submissions#index'
   
