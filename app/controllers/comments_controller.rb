@@ -317,7 +317,7 @@ class CommentsController < ApplicationController
         comment = Comment.find(params[:id])
         
         if params[:id_submission] != comment.id_submission
-          render json: {status: 400, error: "Bad Request", message: "ID submissions does not match"}, status: 400
+          render json: {status: 400, error: "Bad Request", message: "ID submissions: " + params[:id_submission] + "does not match with: " + comment.id_submission}, status: 400
           return
         end
       
