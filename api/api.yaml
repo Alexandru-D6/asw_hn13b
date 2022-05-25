@@ -1176,18 +1176,11 @@ paths:
                 errorExample:
                   $ref: '#/components/examples/error404'
   
-  /users/{name}/upvotedSubmissions:
+  /users/upvotedSubmissions:
     get:
       tags:
         - user
       summary: Obté el llistat de submissions que ha votat l'usuari amb userID.
-      parameters:
-        - name: name
-          in: path
-          description: ID de l'usuari del que volem el llistat de submissions.
-          required: true
-          schema:
-            type: string
       operationId: getUserVotedSubmissions
       responses:
         '200':
@@ -1221,19 +1214,12 @@ paths:
       security:
         - ApiKeyAuth: []
 
-  /users/{name}/upvotedComments:
+  /users/upvotedComments:
     get:
       tags:
         - user
       summary: Recupera tots els comentaris votats per un usuari
       description: Retorna tots els comentaris votats per un usuari
-      parameters:
-        - name: name
-          in: path
-          description: ID de l'usuari del que volem el llistat de submissions.
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: successful operation
