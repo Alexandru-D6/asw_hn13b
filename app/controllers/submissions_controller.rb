@@ -433,15 +433,15 @@ class SubmissionsController < ApplicationController
       return
     end
     comment = Comment.new()
-    if params[:url] != "" && params[:text] != ""
+    if !params[:url].nil? && params[:url] != "" && params[:text] != ""
       comment.comment = params[:text]
       comment.author = User.find_by(auth_token: request.headers["x-api-key"]).name
       params[:text] = nil
     end
-    if (params[:url].nil?)
+    if !params[:text].nil? && params[:url].nil?
       @submission = Submission.new(title: params["title"], url: "", text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
     else
-      @submission = Submission.new(title: params["title"], url: params["url"], text: params["text"], author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
+      @submission = Submission.new(title: params["title"], url: params["url"], text: "", author_username: User.find_by(auth_token: request.headers["x-api-key"]).name)
     end
     if @submission.save
       if comment.author.present? && comment.author == User.find_by(auth_token: request.headers["x-api-key"]).name
